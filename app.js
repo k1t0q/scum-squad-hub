@@ -34,29 +34,7 @@ async function saveOp(e,id){e.preventDefault();let f=new FormData(e.target);let 
 async function deleteOp(id){if(!confirm('Удалить этот рейд?'))return;let {error}=await sb.from('raids').delete().eq('id',id);if(error){toast('Удалить может создатель или админ');return}await syncOnline();toast('Рейд удалён')}
 async function toggleRaid(id){let o=db.ops.find(x=>x.id===id),joined=(o.participants||[]).includes(db.profile.nick);let q=joined?sb.from('raid_participants').delete().eq('raid_id',id).eq('member_id',onlineMember.id):sb.from('raid_participants').insert({raid_id:id,member_id:onlineMember.id});let {error}=await q;if(error){toast('Не удалось изменить участие');return}await syncOnline();toast(joined?'Ты вышел из рейда':'Ты записался на рейд')}
 function raidPeople(o){let p=Array.isArray(o.participants)?o.participants:[];return p.length?p.map(n=>'<span class="badge work">'+esc(n)+'</span>').join(' '):'<span class="muted">Пока никто не записался</span>'}
-async async function setPresence(s){
-  if(s==='Без меня')s='Не буду';
-  if(s==='Буду'){setTime(true);return}
-  let old={...db.presence};
-  db.presence.status=s;db.presence.time='';save();render();
-  let row={squad_id:onlineMember.squad_id,member_id:onlineMember.id,day:moscowPresenceDay(),status:s,join_time:null,updated_at:new Date().toISOString()};
-  let {error}=await sb.from('presence_history').upsert(row,{onConflict:'member_id,day'});
-  if(error){db.presence=old;save();render();toast('Ошибка синхронизации');return}
-  await syncOnline()
-}
-function setTime(fromGoing=false){
-  modal('<h2>'+(fromGoing?'Во сколько будешь?':'Время захода')+'</h2><form class="form" onsubmit="saveTime(event)"><input type="hidden" name="fromGoing" value="'+(fromGoing?'1':'0')+'"><label class="muted">Выбери время</label>'+timePicker('time',db.presence.time||'20:00')+'<div class="dialogfoot"><button type="button" class="ghost" onclick="closeModal()">Отмена</button><button class="primary">'+(fromGoing?'БУДУ В ЭТО ВРЕМЯ':'Сохранить')+'</button></div></form>')
-}
-async function saveTime(e){
-  e.preventDefault();
-  let f=new FormData(e.target),t=getPickedTime(f,'time');
-  let old={...db.presence};
-  db.presence.status='Буду';db.presence.time=t;save();render();
-  let row={squad_id:onlineMember.squad_id,member_id:onlineMember.id,day:moscowPresenceDay(),status:'Буду',join_time:t,updated_at:new Date().toISOString()};
-  let {error}=await sb.from('presence_history').upsert(row,{onConflict:'member_id,day'});
-  if(error){db.presence=old;save();render();toast('Ошибка синхронизации');return}
-  closeModal();await syncOnline();toast('Буду · '+t)
-}
+async async function setPresence(s){if(s==='Без меня')s='Не буду';let old={...db.presence};db.presence.status=s;if(s!=='Буду')db.presence.time='';save();render();let row={squad_id:onlineMember.squad_id,member_id:onlineMember.id,day:moscowPresenceDay(),status:s,join_time:s==='Буду'?(db.presence.time||null):null,updated_at:new Date().toISOString()};let {error}=await sb.from('presence_history').upsert(row,{onConflict:'member_id,day'});if(error){db.presence=old;save();render();toast('Ошибка синхронизации');return}await syncOnline()}function setTime(){modal('<h2>Время захода</h2><form class="form" onsubmit="saveTime(event)"><label class="muted">Выбери время</label>'+timePicker('time',db.presence.time||'20:00')+'<div class="dialogfoot"><button type="button" class="ghost" onclick="closeModal()">Отмена</button><button class="primary">Сохранить</button></div></form>')}async function saveTime(e){e.preventDefault();let f=new FormData(e.target),t=getPickedTime(f,'time');db.presence.time=t;let status=db.presence.status==='Не буду'?'Буду':db.presence.status;let row={squad_id:onlineMember.squad_id,member_id:onlineMember.id,day:moscowPresenceDay(),status,join_time:t,updated_at:new Date().toISOString()};let {error}=await sb.from('presence_history').upsert(row,{onConflict:'member_id,day'});if(error){toast('Ошибка синхронизации');return}closeModal();await syncOnline();toast('Время обновлено')}
 function editProfile(){let admin=db.profile.access==='admin';modal('<h2>Профиль бойца</h2>'+(admin?'<div style="margin-bottom:12px"><span class="badge work">АДМИНИСТРАТОР 4.0.4</span></div>':'')+'<form class="form" onsubmit="saveProfile(event)"><input name="nick" required value="'+esc(db.profile.nick)+'" placeholder="Ник"><select name="role">'+['Rifler','Bomber','Locker','Builder','Helper','Sniper'].map(r=>'<option '+(r===db.profile.role?'selected':'')+'>'+r+'</option>').join('')+'</select><div class="dialogfoot"><button type="button" class="logoutbtn" onclick="logoutSquad()">ВЫЙТИ</button><span style="flex:1"></span><button type="button" class="ghost" onclick="closeModal()">Отмена</button><button class="primary">Сохранить</button></div></form>')}
 async function saveProfile(e){e.preventDefault();let f=new FormData(e.target);let {error}=await sb.from('members').update({nick:f.get('nick'),game_role:f.get('role')}).eq('id',onlineMember.id);if(error){toast('Не удалось сохранить профиль');return}onlineMember.nick=f.get('nick');onlineMember.game_role=f.get('role');db.profile={nick:onlineMember.nick,role:onlineMember.game_role,access:onlineMember.access_role};save();closeModal();await syncOnline();toast('Профиль сохранён')}
 async function logoutSquad(){if(!confirm('Выйти из профиля на этом устройстве?'))return;if(sb)await sb.auth.signOut();onlineMember=null;localStorage.removeItem(K);db=JSON.parse(JSON.stringify(base));closeModal();render();document.documentElement.classList.add('auth-lock');toast('Вы вышли');setTimeout(()=>joinOnline(),300)}
