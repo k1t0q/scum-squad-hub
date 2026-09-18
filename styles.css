@@ -27,3 +27,17 @@
   nav{margin-bottom:0!important}
   main header{margin-top:0!important}
 }
+
+/* v66 mobile layout: sidebar must not keep desktop viewport height */
+@media(max-width:900px){
+  .app{display:block!important;min-height:100dvh!important}
+  aside{position:relative!important;top:auto!important;height:auto!important;min-height:0!important;padding:14px!important}
+  .logo{padding-bottom:10px!important}
+  nav{margin:0!important;padding:0!important}
+  main{padding:18px 14px!important}
+  main header{margin-top:0!important;margin-bottom:22px!important}
+}
+@media(max-width:520px){
+  aside{height:auto!important;min-height:0!important}
+  main{padding-top:16px!important}
+}
