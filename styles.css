@@ -263,3 +263,13 @@
     margin-bottom:8px!important;
   }
 }
+
+/* v81 mobile: larger participation status controls */
+@media(max-width:520px){
+  #view .presencechoice{
+    min-height:52px!important;
+    padding:0 18px!important;
+    font-size:17px!important;
+    font-weight:700!important;
+  }
+}
