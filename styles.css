@@ -199,3 +199,24 @@
     line-height:1!important;
   }
 }
+
+/* v79 mobile Home: tighten spacing inside the four main sections */
+@media(max-width:520px){
+  #view>.grid>.card:not(.span3){
+    padding:18px!important;
+  }
+  #view>.grid>.card:not(.span3) h2{
+    margin:0 0 14px!important;
+  }
+  #view>.grid>.card:not(.span3) .head{
+    margin-bottom:14px!important;
+  }
+  #view>.grid>.card:not(.span3) .empty{
+    min-height:72px!important;
+    padding:14px!important;
+    margin-top:12px!important;
+  }
+  #view>.grid>.card:not(.span3) .btn.acid{
+    min-height:46px!important;
+  }
+}
