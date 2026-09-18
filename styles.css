@@ -143,3 +143,32 @@
   width:28px!important;
   min-width:28px!important;
 }
+
+/* v76 compact Home metrics on phones */
+@media(max-width:520px){
+  #view>.grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  #view>.grid>.card.span3{
+    grid-column:span 1!important;
+    min-height:104px!important;
+    padding:16px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:space-between!important;
+  }
+  #view>.grid>.card.span3 .muted{
+    font-size:11px!important;
+    line-height:1.2!important;
+  }
+  #view>.grid>.card.span3 .metric{
+    font-size:24px!important;
+    line-height:1.08!important;
+    margin-top:8px!important;
+    overflow-wrap:anywhere!important;
+  }
+  #view>.grid>.card:not(.span3){
+    grid-column:1/-1!important;
+  }
+}
