@@ -273,3 +273,12 @@
     font-weight:700!important;
   }
 }
+
+@media (max-width:700px){
+  .presence-buttons button,
+  .my-presence button{
+    min-height:0!important;
+    padding:10px 14px!important;
+    font-size:16px!important;
+  }
+}
