@@ -41,3 +41,23 @@
   aside{height:auto!important;min-height:0!important}
   main{padding-top:16px!important}
 }
+
+/* v70 mobile forms: uniform fields and date/time rows */
+@media(max-width:520px){
+  .dialog{width:calc(100vw - 28px)!important;padding:22px!important}
+  .form{gap:12px!important}
+  .formrow{grid-template-columns:1fr!important;gap:12px!important}
+  .form input,.form select,.form textarea,.datepick{
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    height:48px!important;padding:0 14px!important;border-radius:7px!important;
+    box-sizing:border-box!important;font-size:14px!important;
+  }
+  .form textarea{height:96px!important;padding:14px!important}
+  .form small.muted{display:block;margin:0 0 5px!important}
+  .timepicker{width:100%!important;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr)!important;gap:8px!important}
+  .timepicker select{min-width:0!important;width:100%!important;height:48px!important;padding:0 32px 0 12px!important;font-size:20px!important}
+  .timepicker span{width:18px!important;min-width:18px!important;text-align:center!important}
+  input[type="date"].datepick{-webkit-appearance:none;appearance:none;display:block!important;line-height:48px!important}
+  .dialogfoot{display:grid!important;grid-template-columns:130px 1fr!important;gap:10px!important}
+  .dialogfoot button{height:48px!important}
+}
