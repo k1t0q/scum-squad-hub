@@ -220,3 +220,46 @@
     min-height:46px!important;
   }
 }
+
+/* v80 mobile Home: compact section rhythm + centered empty states */
+@media(max-width:520px){
+  #view>.grid>.card:not(.span3){
+    padding:16px!important;
+  }
+
+  /* headings closer to their content */
+  #view>.grid>.card:not(.span3) h2,
+  #view>.grid>.card:not(.span3) .head{
+    margin-top:0!important;
+    margin-bottom:10px!important;
+  }
+
+  /* Plan / Tasks buttons sit directly under heading */
+  #view>.grid>.card:not(.span3) .head + .btn,
+  #view>.grid>.card:not(.span3) h2 + .btn{
+    margin-top:0!important;
+  }
+
+  /* compact empty state and perfectly center its text */
+  #view>.grid>.card:not(.span3) .empty{
+    min-height:64px!important;
+    height:64px!important;
+    margin-top:10px!important;
+    padding:10px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+    box-sizing:border-box!important;
+  }
+
+  /* My participation: remove oversized vertical gaps */
+  #view>.grid>.card:not(.span3) p{
+    margin-top:8px!important;
+    margin-bottom:8px!important;
+  }
+  #view>.grid>.card:not(.span3) .actions{
+    margin-top:8px!important;
+    margin-bottom:8px!important;
+  }
+}
