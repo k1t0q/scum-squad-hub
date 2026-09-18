@@ -61,3 +61,18 @@
   .dialogfoot{display:grid!important;grid-template-columns:130px 1fr!important;gap:10px!important}
   .dialogfoot button{height:48px!important}
 }
+
+/* v71 mobile: keep time picker aligned with the rest of the form */
+@media(max-width:520px){
+  .formrow>div{width:100%!important;min-width:0!important}
+  .timepicker{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    align-items:center!important;
+  }
+  .timepicker select{margin:0!important;width:100%!important}
+  .timepicker span{width:30px!important;min-width:30px!important;margin:0!important;text-align:center!important;justify-self:center!important}
+}
