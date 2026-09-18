@@ -76,3 +76,22 @@
   .timepicker select{margin:0!important;width:100%!important}
   .timepicker span{width:30px!important;min-width:30px!important;margin:0!important;text-align:center!important;justify-self:center!important}
 }
+
+/* v72 desktop + mobile: time picker fills its form column */
+.formrow>div{min-width:0}
+.formrow .timepicker{
+  width:100%!important;
+  grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)!important;
+  margin:0!important;
+}
+.formrow .timepicker select{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+}
+.formrow .timepicker span{
+  width:30px!important;
+  min-width:30px!important;
+  justify-self:center!important;
+  text-align:center!important;
+}
