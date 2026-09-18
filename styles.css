@@ -95,3 +95,31 @@
   justify-self:center!important;
   text-align:center!important;
 }
+
+/* v73: prevent desktop time values from being clipped */
+.formrow .timepicker{
+  display:grid!important;
+  grid-template-columns:minmax(92px,1fr) 30px minmax(92px,1fr)!important;
+  gap:10px!important;
+  overflow:visible!important;
+}
+.formrow .timepicker select{
+  box-sizing:border-box!important;
+  min-width:92px!important;
+  width:100%!important;
+  padding-left:16px!important;
+  padding-right:36px!important;
+  text-align:left!important;
+  text-align-last:left!important;
+  overflow:visible!important;
+}
+@media(max-width:520px){
+  .formrow .timepicker{
+    grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)!important;
+  }
+  .formrow .timepicker select{
+    min-width:0!important;
+    text-align:center!important;
+    text-align-last:center!important;
+  }
+}
