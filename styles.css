@@ -299,3 +299,14 @@
     line-height:1.15!important;
   }
 }
+
+/* v87: same Create Plan/Create Task button sizing */
+.toolbar .primary{
+  min-width:170px!important;
+  min-height:42px!important;
+  padding:11px 14px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+}
