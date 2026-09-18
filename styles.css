@@ -16,3 +16,14 @@
 .presencechoice.active.yes{background:#233a18!important;border-color:#b8ff38!important}
 .presencechoice.active.maybe{background:#443719!important;border-color:#ffd166!important}
 .presencechoice.active.no{background:#43201f!important;border-color:#ff5d55!important}
+
+/* v64 mobile: remove the oversized gap under the top navigation */
+@media(max-width:900px){
+  aside{position:relative!important}
+  main{padding-top:14px!important}
+}
+@media(max-width:520px){
+  .logo{margin-bottom:0!important}
+  nav{margin-bottom:0!important}
+  main header{margin-top:0!important}
+}
