@@ -4,3 +4,8 @@
 
 .datepick,.timepicker select{height:44px;box-sizing:border-box}
 .datepick{cursor:pointer}
+
+/* v58: keep time values fully visible in every custom time picker */
+.timepicker{grid-template-columns:minmax(88px,1fr) auto minmax(88px,1fr)!important}
+.timepicker select{min-width:88px!important;width:100%!important;padding:0 34px 0 14px!important;line-height:44px!important;font-size:20px!important;font-weight:900!important;color:var(--text)!important;overflow:visible!important}
+.timepicker span{min-width:12px;text-align:center}
