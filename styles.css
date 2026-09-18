@@ -421,17 +421,3 @@
   white-space:nowrap!important;
 }
 
-
-/* v103: vertically center attendance badge in each home roster row */
-#view>.grid>.card.span4 .list>.item>.itemtop{
-  position:relative!important;
-  min-height:58px!important;
-  align-items:flex-start!important;
-}
-#view>.grid>.card.span4 .list>.item>.itemtop>.badge.status{
-  position:absolute!important;
-  right:0!important;
-  top:50%!important;
-  transform:translateY(-50%)!important;
-  margin:0!important;
-}
