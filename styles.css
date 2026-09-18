@@ -344,3 +344,62 @@
     font-weight:700!important;
   }
 }
+
+
+/* v99: roster status/action sizing and spacing */
+#view .list .item .itemtop{
+  align-items:flex-start!important;
+  gap:24px!important;
+}
+#view .list .item .itemtop>div:last-child{
+  min-width:220px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-end!important;
+  gap:8px!important;
+}
+#view .list .item .itemtop>div:last-child>br{
+  display:none!important;
+}
+#view .list .item .itemtop>div:last-child>b{
+  display:block!important;
+  min-height:18px!important;
+  line-height:18px!important;
+  margin:0!important;
+}
+#view .list .item .badge.status{
+  min-width:82px!important;
+  height:32px!important;
+  padding:0 12px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  white-space:nowrap!important;
+  line-height:1!important;
+}
+#view .list .item .actions{
+  margin-top:4px!important;
+  gap:10px!important;
+}
+#view .list .item .actions button{
+  min-height:32px!important;
+  height:32px!important;
+  padding:0 12px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+  white-space:nowrap!important;
+}
+@media(max-width:700px){
+  #view .list .item .itemtop{gap:14px!important}
+  #view .list .item .itemtop>div:last-child{min-width:0!important}
+  #view .list .item .badge.status,
+  #view .list .item .actions button{
+    height:32px!important;
+    min-height:32px!important;
+    font-size:12px!important;
+    padding:0 9px!important;
+  }
+}
