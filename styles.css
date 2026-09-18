@@ -181,3 +181,21 @@
   #view>.grid>.card.span8{order:6!important}
   #view>.grid>.card.span4{order:8!important}
 }
+
+/* v78 mobile metric cards: reduce label-to-value dead space */
+@media(max-width:520px){
+  #view>.grid>.card.span3{
+    min-height:0!important;
+    height:auto!important;
+    padding:14px 16px!important;
+    justify-content:flex-start!important;
+    gap:8px!important;
+  }
+  #view>.grid>.card.span3 .muted{
+    margin:0!important;
+  }
+  #view>.grid>.card.span3 .metric{
+    margin:0!important;
+    line-height:1!important;
+  }
+}
