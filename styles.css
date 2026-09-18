@@ -310,3 +310,11 @@
   justify-content:center!important;
   box-sizing:border-box!important;
 }
+
+/* v90: balanced desktop home layout after section reorder */
+@media (min-width:901px){
+  #view>.grid>.card.span6:nth-of-type(5){grid-column:span 6!important}
+  #view>.grid>.card.span8{grid-column:span 6!important}
+  #view>.grid>.card.span6:nth-of-type(7){grid-column:span 6!important}
+  #view>.grid>.card.span4{grid-column:span 6!important}
+}
