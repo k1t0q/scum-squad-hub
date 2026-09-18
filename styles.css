@@ -403,3 +403,20 @@
     padding:0 9px!important;
   }
 }
+
+
+/* v102: center and enlarge status labels in "Who is here today?" */
+#view>.grid>.card.span4 .itemtop>.badge.status{
+  min-width:92px!important;
+  height:36px!important;
+  padding:0 14px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  font-size:14px!important;
+  font-weight:800!important;
+  line-height:1!important;
+  box-sizing:border-box!important;
+  white-space:nowrap!important;
+}
