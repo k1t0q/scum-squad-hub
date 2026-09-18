@@ -328,3 +328,19 @@
     grid-column:1/-1!important;
   }
 }
+
+/* v92: mobile home order + smaller participation buttons */
+@media (max-width:520px){
+  #view>.grid>.card.span6:nth-of-type(5){order:5!important;} /* plan */
+  #view>.grid>.card.span8{order:6!important;}               /* tasks */
+  #view>.grid>.card.span6:nth-of-type(7){order:7!important;} /* my participation */
+  #view>.grid>.card.span4{order:8!important;}               /* who today */
+
+  #view .presencechoice{
+    min-height:40px!important;
+    height:40px!important;
+    padding:0 12px!important;
+    font-size:14px!important;
+    font-weight:700!important;
+  }
+}
