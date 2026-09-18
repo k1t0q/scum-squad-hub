@@ -421,3 +421,28 @@
   white-space:nowrap!important;
 }
 
+
+
+/* v105: desktop-only larger "My participation" identity and controls */
+@media (min-width:901px){
+  #view>.grid>.card.span6:nth-of-type(7)>b{
+    font-size:18px!important;
+    line-height:1.35!important;
+  }
+  #view>.grid>.card.span6:nth-of-type(7) .presencechoice{
+    min-height:38px!important;
+    height:38px!important;
+    padding:0 14px!important;
+    font-size:15px!important;
+    font-weight:700!important;
+  }
+  #view>.grid>.card.span6:nth-of-type(7) .time-row{
+    font-size:16px!important;
+  }
+  #view>.grid>.card.span6:nth-of-type(7) .time-row button{
+    min-height:38px!important;
+    height:38px!important;
+    padding:0 14px!important;
+    font-size:14px!important;
+  }
+}
