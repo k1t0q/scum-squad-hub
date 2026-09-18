@@ -172,3 +172,12 @@
     grid-column:1/-1!important;
   }
 }
+
+/* v77 mobile Home content order:
+   metrics -> plan -> tasks -> my participation -> who will be here */
+@media(max-width:520px){
+  #view>.grid>.card.span6:nth-of-type(5){order:7!important}
+  #view>.grid>.card.span6:nth-of-type(6){order:5!important}
+  #view>.grid>.card.span8{order:6!important}
+  #view>.grid>.card.span4{order:8!important}
+}
