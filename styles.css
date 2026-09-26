@@ -798,3 +798,7 @@
 /* v175 larger participant nicknames across raid/tasks */
 .item .presence .badge.work{font-size:14px!important;padding:6px 10px!important;font-weight:800!important;line-height:1.15!important}
 @media(max-width:520px){.item .presence .badge.work{font-size:13px!important;padding:6px 9px!important}}
+
+/* v177 larger task status badges */
+.taskstatus{font-size:14px!important;padding:6px 10px!important;font-weight:800!important;line-height:1.15!important}
+@media(max-width:520px){.taskstatus{font-size:13px!important;padding:6px 9px!important}}
