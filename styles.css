@@ -765,3 +765,9 @@
     margin-top:6px!important;
   }
 }
+
+/* v159 desktop: center action only when protect is empty */
+@media(min-width:521px){
+ .protect-home-card.protect-empty .protect-home-btn{top:50%!important;transform:translateY(-50%)!important}
+ .protect-home-card.has-protect .protect-home-btn{top:16px!important;transform:none!important}
+}
