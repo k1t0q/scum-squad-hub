@@ -469,3 +469,7 @@
 
 /* Hide native number steppers: inventory uses +/- controls */
 .explosiveqty input[type=number]::-webkit-inner-spin-button,.explosiveqty input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.explosiveqty input[type=number]{-moz-appearance:textfield;appearance:textfield}
+
+/* Explosive inventory number fields */
+.explosiveedit input[type="number"]{-webkit-appearance:none!important;-moz-appearance:textfield!important;appearance:textfield!important}
+.explosiveedit input[type="number"]::-webkit-inner-spin-button,.explosiveedit input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none!important;appearance:none!important;margin:0!important;display:none!important}
