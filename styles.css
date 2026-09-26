@@ -905,3 +905,7 @@ font-family:inherit!important;font-size:15px!important;line-height:1.5!important
  #dialog .placephotos:not(:empty){margin-bottom:14px!important}
  #dialog #placeEditComment.place-comment{height:110px!important;min-height:110px!important;font-size:16px!important}
 }
+
+/* v193 clickable FURY home logo */
+.logo-home{cursor:pointer!important;user-select:none!important}
+.logo-home:focus-visible{outline:2px solid #ff3035!important;outline-offset:5px!important;border-radius:4px!important}
