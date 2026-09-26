@@ -620,3 +620,5 @@
  color:#e8ece9!important;
 }
 .protect-close-btn:hover{background:#202822!important}
+
+.protect-history-list + .modalactions{margin-top:18px!important}
