@@ -479,3 +479,5 @@
 /* Time selectors: hide native dropdown arrows everywhere */
 .timepicker select{-webkit-appearance:none!important;-moz-appearance:none!important;appearance:none!important;background-image:none!important;padding-right:12px!important}
 .timepicker select::-ms-expand{display:none!important}
+
+.wallpicker{display:grid;grid-template-columns:52px 1fr 52px;gap:8px;align-items:center}.wallpicker button{height:48px;font-size:22px;font-weight:800}.wallpicker input{text-align:center}.wallpicker input[type=number]::-webkit-inner-spin-button,.wallpicker input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none!important;display:none!important}.wallpicker input[type=number]{-moz-appearance:textfield!important;appearance:textfield!important}
