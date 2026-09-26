@@ -551,3 +551,12 @@
 .card .attendance-list>.attendance-item small{
   margin-top:1px!important;line-height:16px!important;
 }
+
+/* v150: raid tab participant spacing exactly like task cards */
+#view .raiditem.raidclick .presence{
+  margin-top:6px!important;
+  margin-bottom:10px!important;
+}
+#view .raiditem.raidclick .presence + .actions{
+  margin-top:0!important;
+}
