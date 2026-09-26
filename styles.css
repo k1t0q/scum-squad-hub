@@ -512,3 +512,6 @@
 
 /* Clickable task cards */
 .taskclick{cursor:pointer!important;-webkit-user-select:none;user-select:none}.taskclick input,.taskclick textarea{cursor:text}.taskclick button,.taskclick select{cursor:pointer}
+
+/* Task participant spacing: match raid card */
+.taskclick .presence{margin-top:6px!important;margin-bottom:10px!important}.taskclick .presence+.actions{margin-top:0!important}
