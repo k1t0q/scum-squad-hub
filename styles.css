@@ -771,3 +771,21 @@
  .protect-home-card.protect-empty .protect-home-btn{top:50%!important;transform:translateY(-50%)!important}
  .protect-home-card.has-protect .protect-home-btn{top:16px!important;transform:none!important}
 }
+
+/* v160 mobile: once protect is updated, hide action and give details full card width */
+@media(max-width:520px){
+  .protect-home-card.has-protect .protect-home-btn{display:none!important}
+  .protect-home-card.has-protect .protect-home-row{display:block!important}
+  .protect-home-card.has-protect .protectmetric{width:100%!important;overflow:visible!important}
+  .protect-home-card.has-protect .protect-who{
+    font-size:17px!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+  }
+  .protect-home-card.has-protect .protect-times,
+  .protect-home-card.has-protect .protect-countdown{
+    font-size:12px!important;
+    white-space:normal!important;
+  }
+  .protect-home-card.protect-empty .protect-home-btn{display:block!important}
+}
