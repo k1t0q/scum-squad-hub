@@ -111,7 +111,7 @@ function moscowPresenceDay(){let parts=new Intl.DateTimeFormat('en-CA',{timeZone
 let protectCountdownTimer=null;
 function protectClock(d){return d.toLocaleTimeString('ru-RU',{timeZone:'Europe/Moscow',hour:'2-digit',minute:'2-digit'})}
 function protectHomeHtml(p){
- let updated=new Date(p.time),starts=new Date(updated.getTime()+20*1000),ends=new Date(starts.getTime()+30*1000),now=new Date(),status='';
+ let updated=new Date(p.time),starts=new Date(updated.getTime()+60*60*1000),ends=new Date(starts.getTime()+8*60*60*1000),now=new Date(),status='';
  if(now<starts){let ms=starts-now,h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000);status='<div class="protect-countdown" data-start="'+starts.toISOString()+'">До начала: <b>'+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'</b></div>'}
  else if(now<ends){status='<div class="protect-active">ПРОТЕКТ АКТИВЕН</div>'}
  else{status='<div class="protect-ended">ПРОТЕКТ СПАЛ</div>'}
