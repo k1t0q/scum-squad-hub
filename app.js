@@ -42,18 +42,31 @@ function openRaidPhoto(url){
 
  const d=document.createElement('div');
  d.id='photoViewer';
- d.setAttribute('style','position:fixed!important;inset:0!important;z-index:2147483647!important;background:#000!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;touch-action:pan-x pan-y pinch-zoom!important;margin:0!important;padding:0!important;box-sizing:border-box!important;');
-
- const stage=document.createElement('div');
- stage.setAttribute('style','min-width:100%!important;min-height:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:16px!important;box-sizing:border-box!important;');
+ d.setAttribute('style','position:fixed!important;inset:0!important;z-index:2147483647!important;background:#000!important;overflow:hidden!important;overscroll-behavior:none!important;margin:0!important;padding:0!important;box-sizing:border-box!important;');
 
  const img=document.createElement('img');
- img.src=url;img.alt='Фото';
- img.setAttribute('style','display:block!important;width:auto!important;height:auto!important;max-width:calc(100vw - 32px)!important;max-height:calc(100dvh - 32px)!important;object-fit:contain!important;object-position:center!important;margin:auto!important;border:0!important;border-radius:0!important;transform:none!important;touch-action:pinch-zoom!important;-webkit-user-select:none!important;user-select:none!important;');
- img.onclick=closeRaidPhoto;
- stage.appendChild(img);d.appendChild(stage);document.body.appendChild(d);
+ img.src=url;img.alt='Фото';img.onclick=closeRaidPhoto;
+ img.setAttribute('style','position:absolute!important;display:block!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;max-width:none!important;max-height:none!important;min-width:0!important;min-height:0!important;object-fit:fill!important;object-position:center!important;transform:none!important;');
+ d.appendChild(img);document.body.appendChild(d);
 
- d.addEventListener('click',e=>{if(e.target===d||e.target===stage)closeRaidPhoto()});
+ const fit=()=>{
+   if(!img.naturalWidth||!img.naturalHeight)return;
+   const vv=window.visualViewport;
+   const vw=Math.max(1,Math.floor(vv?.width||window.innerWidth));
+   const vh=Math.max(1,Math.floor(vv?.height||window.innerHeight));
+   const pad=16,aw=Math.max(1,vw-pad*2),ah=Math.max(1,vh-pad*2);
+   const scale=Math.min(aw/img.naturalWidth,ah/img.naturalHeight);
+   const w=Math.floor(img.naturalWidth*scale),hh=Math.floor(img.naturalHeight*scale);
+   d.style.width=vw+'px';d.style.height=vh+'px';
+   img.style.setProperty('width',w+'px','important');
+   img.style.setProperty('height',hh+'px','important');
+   img.style.setProperty('left',Math.floor((vw-w)/2)+'px','important');
+   img.style.setProperty('top',Math.floor((vh-hh)/2)+'px','important');
+ };
+ img.onload=()=>requestAnimationFrame(fit);
+ fit();
+ if(window.visualViewport)window.visualViewport.addEventListener('resize',fit,{once:true});
+ d.addEventListener('click',e=>{if(e.target===d)closeRaidPhoto()});
 }
 function viewOp(id){let o=db.ops.find(x=>x.id===id);if(!o)return;modal('<h2>'+esc(o.title)+'</h2><p>'+(o.date?formatPlanDate(o.date)+' · ':'')+esc(o.time)+'</p>'+(o.sector?'<p>Сектор: '+esc(o.sector)+'</p>':'')+(o.walls?'<p>Стены: '+o.walls+'</p>':'')+(o.transport?'<p>Транспорт: '+esc(o.transport)+'</p>':'')+(o.loadout?'<p>Что взять: '+esc(o.loadout)+'</p>':'')+(o.rally_point?'<p>Точка сбора: '+esc(o.rally_point)+'</p>':'')+(o.note?'<p>Комментарий: '+esc(o.note)+'</p>':'')+(o.images&&o.images.length?'<div class="raidphotos">'+o.images.map(u=>'<img src="'+esc(u)+'" alt="Фото для рейда" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in">').join('')+'</div>':'')+'<div class="dialogfoot"><button class="ghost" onclick="closeModal()">Закрыть</button></div>')}
 function members(){let admin=db.profile.access==='admin'||db.profile.nick==='k1t0';$('#view').innerHTML='<div class="card"><div class="toolbar"><div><h2>Состав FURY</h2><span class="muted">Ник, роль, время захода и статус на сегодня.</span></div>'+(admin?'<button class="ghost" onclick="changeInviteCode()">СМЕНИТЬ КОД ВСТУПЛЕНИЯ</button>':'')+'</div><div class="list">'+db.members.map(m=>'<div class="item"><div class="itemtop"><div><h3>'+esc(m[0])+(m[0]===db.profile.nick&&admin?' <span class="badge work">АДМИН</span>':'')+'</h3><span class="muted">'+esc(m[1])+'</span></div><div style="text-align:right"><b>'+(m[3]==='Буду'?esc(m[2]):'')+'</b><br><span class="badge status '+(m[3]==='Буду'?'yes':m[3]==='Под вопросом'?'maybe':'no')+'">'+esc(m[3])+'</span>'+(admin&&m[0]!==db.profile.nick?'<div class="actions" style="justify-content:flex-end;margin-top:8px"><button onclick="editMemberNick(\''+esc(m[0]).replace(/'/g,"\\'")+'\')">Изменить ник</button><button class="danger" onclick="kickMemberByNick(\''+esc(m[0]).replace(/'/g,"\\'")+'\')">Выгнать</button></div>':'')+'</div></div></div>').join('')+'</div></div>'}
