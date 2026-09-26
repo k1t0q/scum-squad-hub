@@ -877,3 +877,12 @@ line-height:1.5!important;box-shadow:none!important;-webkit-text-fill-color:#f0f
 /* v186 spacing between draft screenshots and file picker */
 .place-compose .placephotos:not(:empty){margin-bottom:12px!important}
 @media(max-width:700px){.place-compose .placephotos:not(:empty){margin-bottom:14px!important}}
+
+/* v187 exact mobile header vertical alignment */
+@media(max-width:700px){
+ .app>aside{padding-top:16px!important;padding-bottom:16px!important}
+ .app>aside>.logo{padding-top:0!important;padding-bottom:0!important;margin-top:0!important;margin-bottom:0!important;height:64px!important;align-items:center!important}
+ .app>aside>.logo i{margin:0!important}
+ .app>aside>.logo>div{align-self:center!important}
+ .app>aside>.mobile-menu-btn{margin-top:0!important;margin-bottom:0!important}
+}
