@@ -446,3 +446,17 @@
     font-size:14px!important;
   }
 }
+
+
+/* FURY v108: participation colors + shared explosives inventory */
+.presencechoice.yes{background:#17351d!important;border-color:#35c759!important;color:#72ff8e!important}
+.presencechoice.yes.active{background:#246b32!important;border-color:#72ff8e!important;color:#fff!important}
+.presencechoice.no{background:#3a1515!important;border-color:#ff3b30!important;color:#ff817a!important}
+.presencechoice.no.active{background:#7a201d!important;border-color:#ff817a!important;color:#fff!important}
+.explosivegrid{display:grid;gap:10px}
+.explosiveitem{display:flex;align-items:center;justify-content:space-between;gap:18px;background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:16px}
+.explosiveitem h3{margin:0 0 4px;font-size:17px}
+.explosiveedit{display:grid;grid-template-columns:42px 90px 42px;gap:7px;align-items:center}
+.explosiveedit button{height:42px;border:1px solid #713030;background:#281313;color:#ff6b65;border-radius:7px;font-size:22px;font-weight:900;cursor:pointer}
+.explosiveedit input{height:42px;width:90px;box-sizing:border-box;text-align:center;background:#090c0a;border:1px solid #713030;color:#fff;border-radius:7px;font-size:18px;font-weight:900}
+@media(max-width:520px){.explosiveitem{padding:13px}.explosiveedit{grid-template-columns:38px 68px 38px}.explosiveedit button{height:40px}.explosiveedit input{height:40px;width:68px}}
