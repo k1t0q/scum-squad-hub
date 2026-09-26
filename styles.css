@@ -806,3 +806,8 @@
 /* v178 raid participant count badge matches task status size */
 .raiditem .itemtop>.badge{font-size:14px!important;padding:6px 10px!important;font-weight:800!important;line-height:1.15!important}
 @media(max-width:520px){.raiditem .itemtop>.badge{font-size:13px!important;padding:6px 9px!important}}
+
+/* v179 stash/base composer */
+.place-compose .place-comment{width:100%!important;min-height:110px!important;box-sizing:border-box!important;background:#0d1210!important;border:1px solid #303a34!important;border-radius:10px!important;color:#eef2ef!important;padding:14px 16px!important;font:inherit!important;font-size:15px!important;line-height:1.45!important;resize:vertical!important;outline:none!important;transition:border-color .18s ease,box-shadow .18s ease!important}
+.place-compose .place-comment::placeholder{color:#707a74!important}
+.place-compose .place-comment:focus{border-color:#ff3035!important;box-shadow:0 0 0 2px rgba(255,48,53,.10)!important}
