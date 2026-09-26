@@ -509,3 +509,6 @@
 
 /* Protect member selector: restore full styled field */
 .protectquick{grid-template-columns:minmax(0,1fr) auto!important;gap:14px!important}.protectquick select{width:100%!important;height:52px!important;min-height:52px!important;padding:0 16px!important;border:1px solid var(--line)!important;border-radius:9px!important;background:#080c0a!important;color:#f2f4f2!important;font:inherit!important;font-weight:700!important;box-sizing:border-box!important}.protectquick .protectbtn{height:52px!important;min-height:52px!important}@media(max-width:640px){.protectquick{grid-template-columns:minmax(0,1fr) auto!important}.protectquick select{min-width:0!important}}
+
+/* Clickable task cards */
+.taskclick{cursor:pointer!important;-webkit-user-select:none;user-select:none}.taskclick input,.taskclick textarea{cursor:text}.taskclick button,.taskclick select{cursor:pointer}
