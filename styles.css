@@ -789,3 +789,8 @@
   }
   .protect-home-card.protect-empty .protect-home-btn{display:block!important}
 }
+
+/* v165 task completion */
+.taskstatus.done{background:rgba(45,190,95,.16)!important;border-color:rgba(45,190,95,.55)!important;color:#55df84!important}
+.task-complete-flash{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(0,0,0,.34);font-size:clamp(46px,8vw,110px);font-weight:1000;letter-spacing:.06em;color:#58e388;opacity:0;transform:scale(.9);transition:.22s ease;text-shadow:0 4px 35px rgba(0,0,0,.8)}
+.task-complete-flash.show{opacity:1;transform:scale(1)}
