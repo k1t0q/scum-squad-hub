@@ -873,3 +873,7 @@ line-height:1.5!important;box-shadow:none!important;-webkit-text-fill-color:#f0f
  .app>aside>.logo{align-self:center!important;align-items:center!important;top:0!important;bottom:auto!important}
  .app>aside>.mobile-menu-btn{align-self:center!important}
 }
+
+/* v186 spacing between draft screenshots and file picker */
+.place-compose .placephotos:not(:empty){margin-bottom:12px!important}
+@media(max-width:700px){.place-compose .placephotos:not(:empty){margin-bottom:14px!important}}
