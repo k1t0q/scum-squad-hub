@@ -503,3 +503,6 @@
 
 /* All time values are white */
 .timepicker .timefield span,.timepicker>b{color:#f2f4f2!important}
+
+/* Protect quick update: member left, action right */
+.protectquick{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:stretch}.protectquick select,.protectquick .protectbtn{height:52px!important;min-height:52px!important}.protectquick .protectbtn{white-space:nowrap}@media(max-width:640px){.protectquick{grid-template-columns:minmax(0,1fr) auto;gap:8px}.protectquick .protectbtn{padding-left:10px!important;padding-right:10px!important;font-size:11px!important}}
