@@ -518,3 +518,6 @@
 
 /* Raid tab participant spacing: same as home raid/task cards */
 #operations .presence{margin-top:6px!important;margin-bottom:10px!important}#operations .presence+.actions{margin-top:0!important}
+
+/* Compact attendance rows */
+.attendance-list .item{padding:14px 18px!important;min-height:0!important}.attendance-list .itemtop{min-height:0!important}.attendance-list .itemtop b{line-height:1.15}.attendance-list .item>small{display:block;margin-top:5px!important;line-height:1.2}
