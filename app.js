@@ -46,26 +46,22 @@ function openRaidPhoto(url){
 
  const img=document.createElement('img');
  img.src=url;img.alt='Фото';img.onclick=closeRaidPhoto;
- img.setAttribute('style','display:block!important;position:static!important;width:auto!important;height:auto!important;max-width:calc(100vw - 24px)!important;max-height:calc(100vh - 24px)!important;object-fit:contain!important;object-position:center!important;margin:auto!important;padding:0!important;border:0!important;border-radius:0!important;transform:none!important;');
+ img.setAttribute('style','display:block!important;position:static!important;width:calc(100vw - 24px)!important;height:auto!important;max-width:calc(100vw - 24px)!important;max-height:none!important;object-fit:contain!important;object-position:center!important;margin:auto!important;padding:0!important;border:0!important;border-radius:0!important;transform:none!important;');
  d.appendChild(img);
+ document.body.appendChild(d);
 
  const fit=()=>{
    if(!img.naturalWidth||!img.naturalHeight)return;
    const vv=window.visualViewport;
    const vw=Math.max(1,Math.floor(vv?.width||window.innerWidth));
    const vh=Math.max(1,Math.floor(vv?.height||window.innerHeight));
-   const availW=Math.max(1,vw-24),availH=Math.max(1,vh-24);
-   const ratio=img.naturalWidth/img.naturalHeight;
-   let w=availW,hh=w/ratio;
-   if(hh>availH){hh=availH;w=hh*ratio}
+   const maxW=Math.max(1,vw-24),maxH=Math.max(1,vh-24);
+   let w=maxW,hh=w*(img.naturalHeight/img.naturalWidth);
+   if(hh>maxH){hh=maxH;w=hh*(img.naturalWidth/img.naturalHeight)}
    img.style.setProperty('width',Math.floor(w)+'px','important');
    img.style.setProperty('height',Math.floor(hh)+'px','important');
-   img.style.setProperty('max-width','none','important');
-   img.style.setProperty('max-height','none','important');
  };
- img.onload=fit;
- document.body.appendChild(d);
- fit();
+ img.onload=fit;fit();
  d.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
  d.addEventListener('wheel',e=>e.preventDefault(),{passive:false});
  d.addEventListener('click',e=>{if(e.target===d)closeRaidPhoto()});
