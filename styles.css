@@ -488,3 +488,7 @@
 /* Center time values inside all time boxes */
 .timepicker select{text-align:center!important;text-align-last:center!important;padding-left:0!important;padding-right:0!important}
 .timepicker select option{text-align:center}
+
+/* Time picker: compensate native select checkmark/gutter and visually center values */
+.timepicker select{box-sizing:border-box!important;text-align:center!important;text-align-last:center!important;text-indent:0!important;padding:0!important;background:none!important;background-image:none!important}
+@supports (-webkit-appearance:none){.timepicker select{-webkit-appearance:none!important;appearance:none!important}}
