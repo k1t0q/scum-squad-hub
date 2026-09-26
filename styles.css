@@ -926,3 +926,11 @@ font-family:inherit!important;font-size:15px!important;line-height:1.5!important
  #modal.open{display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;padding:14px!important;overscroll-behavior:contain!important}
  #modal.open .dialog{width:100%!important;max-height:calc(100dvh - 28px)!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;touch-action:pan-y!important}
 }
+
+/* v196 full raid photo must always fit inside the viewport */
+.photooverlay{padding:18px!important;box-sizing:border-box!important;overflow:hidden!important}
+.photooverlay img{display:block!important;width:auto!important;height:auto!important;max-width:calc(100vw - 36px)!important;max-height:calc(100dvh - 36px)!important;object-fit:contain!important}
+@media(max-width:700px){
+ .photooverlay{padding:12px!important}
+ .photooverlay img{max-width:calc(100vw - 24px)!important;max-height:calc(100dvh - 24px)!important;object-fit:contain!important}
+}
