@@ -727,3 +727,41 @@
   .protect-times{font-size:12px!important;line-height:1.35!important;margin-top:4px!important}
   .protect-countdown,.protect-active,.protect-ended{font-size:12px!important;line-height:1.35!important;margin-top:5px!important}
 }
+
+/* v158 desktop protect: top-right action + fuller readable typography */
+@media(min-width:521px){
+  .protect-home-card{position:relative!important}
+  .protect-home-row{
+    display:block!important;
+    margin-top:10px!important;
+    padding-right:0!important;
+  }
+  .protect-home-btn{
+    position:absolute!important;
+    top:16px!important;
+    right:16px!important;
+    margin:0!important;
+    width:auto!important;
+    max-width:none!important;
+    padding:11px 16px!important;
+    font-size:12px!important;
+  }
+  .protect-home-row .protectmetric{
+    width:100%!important;
+    padding-right:0!important;
+  }
+  .protect-who{
+    font-size:19px!important;
+    line-height:1.25!important;
+  }
+  .protect-times{
+    font-size:13px!important;
+    line-height:1.4!important;
+    margin-top:5px!important;
+  }
+  .protect-countdown,.protect-active,.protect-ended{
+    font-size:14px!important;
+    line-height:1.4!important;
+    margin-top:6px!important;
+  }
+}
