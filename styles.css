@@ -712,3 +712,18 @@
   .protect-who{font-size:15px!important}
   .protect-times,.protect-countdown{font-size:10px!important}
 }
+
+/* v157 desktop protect: restore readable text, button aligned to top */
+@media(min-width:521px){
+  .protect-home-row{align-items:start!important}
+  .protect-home-btn{
+    align-self:start!important;
+    margin-top:0!important;
+    max-width:112px!important;
+    padding:10px 12px!important;
+    font-size:12px!important;
+  }
+  .protect-who{font-size:17px!important;line-height:1.2!important}
+  .protect-times{font-size:12px!important;line-height:1.35!important;margin-top:4px!important}
+  .protect-countdown,.protect-active,.protect-ended{font-size:12px!important;line-height:1.35!important;margin-top:5px!important}
+}
