@@ -811,3 +811,16 @@
 .place-compose .place-comment{width:100%!important;min-height:110px!important;box-sizing:border-box!important;background:#0d1210!important;border:1px solid #303a34!important;border-radius:10px!important;color:#eef2ef!important;padding:14px 16px!important;font:inherit!important;font-size:15px!important;line-height:1.45!important;resize:vertical!important;outline:none!important;transition:border-color .18s ease,box-shadow .18s ease!important}
 .place-compose .place-comment::placeholder{color:#707a74!important}
 .place-compose .place-comment:focus{border-color:#ff3035!important;box-shadow:0 0 0 2px rgba(255,48,53,.10)!important}
+
+/* v180 compact mobile dropdown navigation */
+.mobile-menu-btn{display:none}
+@media(max-width:700px){
+ aside{position:relative!important;display:flex!important;align-items:center!important;justify-content:space-between!important;padding:18px 26px!important;min-height:88px!important}
+ aside .logo{order:2!important;margin:0!important}
+ .mobile-menu-btn{order:1;display:flex!important;width:50px;height:50px;border:1px solid #303a34;border-radius:10px;background:#121714;align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0!important}
+ .mobile-menu-btn span{display:block;width:22px;height:2px;background:#eef2ef;border-radius:2px}
+ aside nav{display:none!important;position:absolute!important;top:78px!important;left:26px!important;z-index:5000!important;width:min(280px,calc(100vw - 52px))!important;padding:8px!important;background:#101512!important;border:1px solid #303a34!important;border-radius:12px!important;box-shadow:0 18px 45px rgba(0,0,0,.55)!important;overflow:visible!important;white-space:normal!important}
+ aside.mobile-nav-open nav{display:flex!important;flex-direction:column!important;gap:4px!important}
+ aside nav button{width:100%!important;text-align:left!important;padding:13px 14px!important;border-radius:8px!important;flex:none!important}
+ aside .server{display:none!important}
+}
