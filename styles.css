@@ -524,3 +524,11 @@
 
 /* Full raid card is clickable like task card */
 .raidclick{cursor:pointer!important;-webkit-user-select:none;user-select:none}.raidclick button,.raidclick select{cursor:pointer}
+
+/* v148 hard fixes */
+.attendance-list .attendance-item{padding:10px 16px!important;min-height:74px!important;height:auto!important;display:block!important}
+.attendance-list .attendance-item .itemtop{min-height:34px!important;margin:0!important;align-items:center!important}
+.attendance-list .attendance-item small{display:block!important;margin-top:2px!important;line-height:18px!important}
+.raiditem.raidclick{cursor:pointer!important}
+.raiditem.raidclick *:not(button):not(input):not(select):not(textarea){cursor:pointer!important}
+.raiditem.raidclick button{cursor:pointer!important}
