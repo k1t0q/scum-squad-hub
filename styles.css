@@ -969,3 +969,13 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
  .placephotos img,.raidphotos img,.place-photo-grid img,.photo-grid img{flex:0 0 auto!important;max-width:calc(100vw - 72px)!important}
  input,textarea,select,button{max-width:100%!important;box-sizing:border-box!important}
 }
+
+
+/* v195 — place publications stay inside mobile card */
+@media(max-width:700px){
+ #placeBody,.place-compose,#placeBody>.list,#placeBody>.list>.item{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+ #placeBody>.list>.item{overflow:hidden!important}
+ #placeBody .placephotos{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;width:100%!important;max-width:100%!important;overflow:hidden!important}
+ #placeBody .placephotos .placephoto{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important}
+ #placeBody .placephotos .placephoto img{display:block!important;width:100%!important;height:auto!important;aspect-ratio:110/72!important;object-fit:cover!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+}
