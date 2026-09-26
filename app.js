@@ -39,28 +39,35 @@ function openRaidPhoto(url){
  document.body.style.position='fixed';
  document.body.style.top='-'+photoScrollY+'px';
  document.body.style.width='100%';
+
  const d=document.createElement('div');
  d.id='photoViewer';
- d.setAttribute('style','position:fixed!important;inset:0!important;z-index:2147483647!important;background:#000!important;overflow:hidden!important;touch-action:none!important;overscroll-behavior:none!important;margin:0!important;padding:0!important;');
+ d.setAttribute('style','position:fixed!important;inset:0!important;z-index:2147483647!important;background:#000!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;touch-action:none!important;overscroll-behavior:none!important;padding:12px!important;box-sizing:border-box!important;');
+
  const img=document.createElement('img');
  img.src=url;img.alt='Фото';img.onclick=closeRaidPhoto;
- img.setAttribute('style','position:absolute!important;display:block!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;max-width:none!important;max-height:none!important;min-width:0!important;min-height:0!important;object-fit:fill!important;transform:none!important;');
+ img.setAttribute('style','display:block!important;position:static!important;width:auto!important;height:auto!important;max-width:calc(100vw - 24px)!important;max-height:calc(100vh - 24px)!important;object-fit:contain!important;object-position:center!important;margin:auto!important;padding:0!important;border:0!important;border-radius:0!important;transform:none!important;');
  d.appendChild(img);
+
  const fit=()=>{
    if(!img.naturalWidth||!img.naturalHeight)return;
    const vv=window.visualViewport;
    const vw=Math.max(1,Math.floor(vv?.width||window.innerWidth));
    const vh=Math.max(1,Math.floor(vv?.height||window.innerHeight));
-   const safeW=Math.max(1,vw-24),safeH=Math.max(1,vh-24);
-   const scale=Math.min(safeW/img.naturalWidth,safeH/img.naturalHeight);
-   const w=Math.floor(img.naturalWidth*scale),hh=Math.floor(img.naturalHeight*scale);
-   d.style.setProperty('width',vw+'px','important');d.style.setProperty('height',vh+'px','important');
-   d.style.setProperty('left',(vv?.offsetLeft||0)+'px','important');d.style.setProperty('top',(vv?.offsetTop||0)+'px','important');
-   img.style.setProperty('width',w+'px','important');img.style.setProperty('height',hh+'px','important');
-   img.style.setProperty('left',Math.floor((vw-w)/2)+'px','important');img.style.setProperty('top',Math.floor((vh-hh)/2)+'px','important');
+   const availW=Math.max(1,vw-24),availH=Math.max(1,vh-24);
+   const ratio=img.naturalWidth/img.naturalHeight;
+   let w=availW,hh=w/ratio;
+   if(hh>availH){hh=availH;w=hh*ratio}
+   img.style.setProperty('width',Math.floor(w)+'px','important');
+   img.style.setProperty('height',Math.floor(hh)+'px','important');
+   img.style.setProperty('max-width','none','important');
+   img.style.setProperty('max-height','none','important');
  };
- img.onload=fit;document.body.appendChild(d);fit();
+ img.onload=fit;
+ document.body.appendChild(d);
+ fit();
  d.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
+ d.addEventListener('wheel',e=>e.preventDefault(),{passive:false});
  d.addEventListener('click',e=>{if(e.target===d)closeRaidPhoto()});
 }
 function viewOp(id){let o=db.ops.find(x=>x.id===id);if(!o)return;modal('<h2>'+esc(o.title)+'</h2><p>'+(o.date?formatPlanDate(o.date)+' · ':'')+esc(o.time)+'</p>'+(o.sector?'<p>Сектор: '+esc(o.sector)+'</p>':'')+(o.walls?'<p>Стены: '+o.walls+'</p>':'')+(o.transport?'<p>Транспорт: '+esc(o.transport)+'</p>':'')+(o.loadout?'<p>Что взять: '+esc(o.loadout)+'</p>':'')+(o.rally_point?'<p>Точка сбора: '+esc(o.rally_point)+'</p>':'')+(o.note?'<p>Комментарий: '+esc(o.note)+'</p>':'')+(o.images&&o.images.length?'<div class="raidphotos">'+o.images.map(u=>'<img src="'+esc(u)+'" alt="Фото для рейда" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in">').join('')+'</div>':'')+'<div class="dialogfoot"><button class="ghost" onclick="closeModal()">Закрыть</button></div>')}
