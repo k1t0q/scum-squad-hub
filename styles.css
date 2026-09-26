@@ -573,3 +573,25 @@
   margin-top:0!important;
   margin-bottom:0!important;
 }
+
+/* v152: status button centered against the entire attendance card */
+.card .attendance-list>.attendance-item{
+  position:relative!important;
+  padding-right:210px!important;
+}
+.card .attendance-list>.attendance-item .itemtop{
+  display:block!important;
+  flex:none!important;
+  height:auto!important;
+}
+.card .attendance-list>.attendance-item .itemtop>.badge.status{
+  position:absolute!important;
+  right:16px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  margin:0!important;
+}
+@media(max-width:520px){
+  .card .attendance-list>.attendance-item{padding-right:130px!important}
+  .card .attendance-list>.attendance-item .itemtop>.badge.status{right:12px!important}
+}
