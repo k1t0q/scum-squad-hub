@@ -532,3 +532,22 @@
 .raiditem.raidclick{cursor:pointer!important}
 .raiditem.raidclick *:not(button):not(input):not(select):not(textarea){cursor:pointer!important}
 .raiditem.raidclick button{cursor:pointer!important}
+
+/* v149: compact home attendance cards */
+.card .attendance-list{gap:8px!important}
+.card .attendance-list>.attendance-item{
+  padding:8px 14px!important;
+  min-height:58px!important;
+  height:58px!important;
+  max-height:58px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+}
+.card .attendance-list>.attendance-item .itemtop{
+  min-height:0!important;height:24px!important;line-height:24px!important;
+}
+.card .attendance-list>.attendance-item small{
+  margin-top:1px!important;line-height:16px!important;
+}
