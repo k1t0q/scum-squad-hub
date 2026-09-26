@@ -560,3 +560,16 @@
 #view .raiditem.raidclick .presence + .actions{
   margin-top:0!important;
 }
+
+/* v151: vertically center attendance status button inside compact row */
+.card .attendance-list>.attendance-item .itemtop{
+  height:auto!important;
+  min-height:0!important;
+  flex:1!important;
+  align-items:center!important;
+}
+.card .attendance-list>.attendance-item .itemtop>.badge.status{
+  align-self:center!important;
+  margin-top:0!important;
+  margin-bottom:0!important;
+}
