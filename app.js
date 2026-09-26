@@ -83,7 +83,7 @@ let placeDraft={stash:{images:[],comment:''},base:{images:[],comment:''}},placeE
 async function placePage(kind){
  let title=placeTitle(kind);
  $('#view').innerHTML='<div class="card"><div class="toolbar"><div><h2>'+title+'</h2><span class="muted">Фото и комментарии сохраняются отдельными публикациями.</span></div></div><div id="placeBody"><div class="empty">Загрузка…</div></div></div>';
- if(!sb||!onlineMember)return;
+ if(!sb||!onlineMember){let body=$('#placeBody');if(body)body.innerHTML='<div class="empty">Подключение…</div>';return}
  let {data,error}=await sb.rpc('get_squad_place_posts',{p_kind:kind});
  if(error){$('#placeBody').innerHTML='<div class="empty">Не удалось загрузить</div>';return}
  let d=placeDraft[kind]||{images:[],comment:''};
