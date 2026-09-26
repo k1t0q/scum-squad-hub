@@ -824,3 +824,15 @@
  aside nav button{width:100%!important;text-align:left!important;padding:13px 14px!important;border-radius:8px!important;flex:none!important}
  aside .server{display:none!important}
 }
+
+/* v181 force styled place comment field */
+#placeBody .place-compose textarea#placeComment.place-comment{
+display:block!important;width:100%!important;min-height:120px!important;margin:0!important;
+box-sizing:border-box!important;background:#0d1210!important;border:1px solid #354039!important;
+border-radius:10px!important;color:#eef2ef!important;padding:14px 16px!important;
+font-family:inherit!important;font-size:15px!important;line-height:1.5!important;
+-webkit-appearance:none!important;appearance:none!important;resize:vertical!important;outline:none!important
+}
+#placeBody .place-compose textarea#placeComment.place-comment::placeholder{color:#727c76!important;opacity:1!important}
+#placeBody .place-compose textarea#placeComment.place-comment:focus{border-color:#ff3035!important;box-shadow:0 0 0 2px rgba(255,48,53,.12)!important}
+@media(max-width:700px){#placeBody .place-compose textarea#placeComment.place-comment{min-height:105px!important;font-size:16px!important;border-radius:10px!important}}
