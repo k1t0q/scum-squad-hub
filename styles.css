@@ -836,3 +836,21 @@ font-family:inherit!important;font-size:15px!important;line-height:1.5!important
 #placeBody .place-compose textarea#placeComment.place-comment::placeholder{color:#727c76!important;opacity:1!important}
 #placeBody .place-compose textarea#placeComment.place-comment:focus{border-color:#ff3035!important;box-shadow:0 0 0 2px rgba(255,48,53,.12)!important}
 @media(max-width:700px){#placeBody .place-compose textarea#placeComment.place-comment{min-height:105px!important;font-size:16px!important;border-radius:10px!important}}
+
+/* v182 mobile header + place composer definitive overrides */
+#placeBody .place-compose{display:block!important}
+#placeBody .place-compose #placeComment{
+display:block!important;width:100%!important;height:118px!important;min-height:118px!important;
+background:#111714!important;color:#f0f3f1!important;border:1px solid #344039!important;border-radius:12px!important;
+padding:15px 16px!important;box-sizing:border-box!important;font-family:inherit!important;font-size:15px!important;
+line-height:1.5!important;box-shadow:none!important;-webkit-text-fill-color:#f0f3f1!important
+}
+#placeBody .place-compose #placeComment::placeholder{color:#747e78!important;-webkit-text-fill-color:#747e78!important}
+@media(max-width:700px){
+ .app>aside{height:auto!important;min-height:96px!important;overflow:visible!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;padding:16px 22px!important}
+ .app>aside>.mobile-menu-btn{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;left:auto!important;top:auto!important;flex:0 0 50px!important;z-index:6001!important}
+ .app>aside>.logo{display:flex!important;position:relative!important;margin-left:auto!important;transform:none!important}
+ .app>aside>nav{position:absolute!important;top:78px!important;left:22px!important;right:auto!important}
+ .app>aside.mobile-nav-open>nav{display:flex!important}
+ #placeBody .place-compose #placeComment{height:110px!important;min-height:110px!important;font-size:16px!important}
+}
