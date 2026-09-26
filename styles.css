@@ -689,3 +689,26 @@
     white-space:nowrap!important;
   }
 }
+
+/* v156 desktop protect card: prevent action button overflow */
+@media(min-width:521px){
+  .protect-home-card{min-width:0!important;overflow:hidden!important}
+  .protect-home-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+    gap:8px!important;
+    min-width:0!important;
+  }
+  .protect-home-row .protectmetric{min-width:0!important}
+  .protect-home-btn{
+    width:auto!important;
+    min-width:0!important;
+    max-width:108px!important;
+    padding:10px 12px!important;
+    font-size:11px!important;
+    white-space:nowrap!important;
+  }
+  .protect-who{font-size:15px!important}
+  .protect-times,.protect-countdown{font-size:10px!important}
+}
