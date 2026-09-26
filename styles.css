@@ -886,3 +886,22 @@ line-height:1.5!important;box-shadow:none!important;-webkit-text-fill-color:#f0f
  .app>aside>.logo>div{align-self:center!important}
  .app>aside>.mobile-menu-btn{margin-top:0!important;margin-bottom:0!important}
 }
+
+/* v188 place post edit modal: match create composer */
+#dialog .placephotos:not(:empty){margin-bottom:14px!important}
+#dialog #placeEditFiles{display:block!important;margin:0 0 8px!important}
+#dialog #placeEditComment.place-comment{
+display:block!important;width:100%!important;height:118px!important;min-height:118px!important;margin:0!important;
+box-sizing:border-box!important;background:#111714!important;color:#f0f3f1!important;
+border:1px solid #344039!important;border-radius:12px!important;padding:15px 16px!important;
+font-family:inherit!important;font-size:15px!important;line-height:1.5!important;outline:none!important;
+-webkit-appearance:none!important;appearance:none!important;resize:vertical!important;
+-webkit-text-fill-color:#f0f3f1!important;transition:border-color .18s ease,box-shadow .18s ease!important
+}
+#dialog #placeEditComment.place-comment::placeholder{color:#747e78!important;-webkit-text-fill-color:#747e78!important;opacity:1!important}
+#dialog #placeEditComment.place-comment:focus{border-color:#ff3035!important;box-shadow:0 0 0 2px rgba(255,48,53,.12)!important}
+#dialog #placeEditComment+.dialogfoot{margin-top:14px!important}
+@media(max-width:700px){
+ #dialog .placephotos:not(:empty){margin-bottom:14px!important}
+ #dialog #placeEditComment.place-comment{height:110px!important;min-height:110px!important;font-size:16px!important}
+}
