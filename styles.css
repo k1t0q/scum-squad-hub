@@ -919,3 +919,10 @@ font-family:inherit!important;font-size:15px!important;line-height:1.5!important
  #dialog .profile-actions .ghost{grid-column:2!important;width:100%!important}
  #dialog .profile-actions .primary{grid-column:3!important;width:100%!important}
 }
+
+/* v195 mobile modal owns the scroll, not the page */
+@media(max-width:700px){
+ body:has(#modal.open){overflow:hidden!important;position:fixed!important;width:100%!important}
+ #modal.open{display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;padding:14px!important;overscroll-behavior:contain!important}
+ #modal.open .dialog{width:100%!important;max-height:calc(100dvh - 28px)!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;touch-action:pan-y!important}
+}
