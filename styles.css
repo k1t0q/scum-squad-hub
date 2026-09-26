@@ -484,3 +484,7 @@
 
 /* Raid wall count: manual input without native steppers */
 .form input[name="walls"]{-moz-appearance:textfield!important;appearance:textfield!important}.form input[name="walls"]::-webkit-inner-spin-button,.form input[name="walls"]::-webkit-outer-spin-button{-webkit-appearance:none!important;appearance:none!important;display:none!important;margin:0!important}
+
+/* Center time values inside all time boxes */
+.timepicker select{text-align:center!important;text-align-last:center!important;padding-left:0!important;padding-right:0!important}
+.timepicker select option{text-align:center}
