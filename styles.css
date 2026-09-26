@@ -664,3 +664,28 @@
  .protect-who,.protect-times,.protect-countdown{white-space:normal!important}
  .protectmetric{font-size:15px!important}
 }
+
+/* v155 mobile protect identity: compact one-line updater/time */
+@media(max-width:520px){
+  .protect-home-row{grid-template-columns:minmax(0,1fr) auto!important}
+  .protect-home-btn{width:auto!important;min-width:118px!important}
+  .protectmetric{min-width:0!important;overflow:hidden!important}
+  .protect-who{
+    display:flex!important;
+    align-items:center!important;
+    gap:6px!important;
+    font-size:15px!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+  }
+  .protect-who b{
+    flex:0 0 auto!important;
+    color:var(--text)!important;
+  }
+  .protect-times,.protect-countdown{
+    font-size:10px!important;
+    line-height:1.35!important;
+    white-space:nowrap!important;
+  }
+}
