@@ -492,3 +492,6 @@
 /* Time picker: compensate native select checkmark/gutter and visually center values */
 .timepicker select{box-sizing:border-box!important;text-align:center!important;text-align-last:center!important;text-indent:0!important;padding:0!important;background:none!important;background-image:none!important}
 @supports (-webkit-appearance:none){.timepicker select{-webkit-appearance:none!important;appearance:none!important}}
+
+/* True centered time display; native select stays transparent for interaction */
+.timepicker{align-items:center}.timepicker .timefield{position:relative;min-width:0}.timepicker .timefield>span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:inherit;font-weight:800;pointer-events:none;z-index:1}.timepicker .timefield>select{width:100%;color:transparent!important;caret-color:transparent!important;position:relative;z-index:2}.timepicker .timefield>select option{color:#fff!important}.timepicker>b{display:flex;align-items:center;justify-content:center}
