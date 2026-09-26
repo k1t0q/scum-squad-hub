@@ -39,40 +39,29 @@ function openRaidPhoto(url){
  document.body.style.position='fixed';
  document.body.style.top='-'+photoScrollY+'px';
  document.body.style.width='100%';
-
  const d=document.createElement('div');
  d.id='photoViewer';
- Object.assign(d.style,{position:'fixed',left:'0',top:'0',zIndex:'2147483647',background:'#000',overflow:'hidden',touchAction:'none',overscrollBehavior:'none',display:'block',margin:'0',padding:'0'});
-
+ d.setAttribute('style','position:fixed!important;inset:0!important;z-index:2147483647!important;background:#000!important;overflow:hidden!important;touch-action:none!important;overscroll-behavior:none!important;margin:0!important;padding:0!important;');
  const img=document.createElement('img');
- img.src=url; img.alt='Фото';
- img.onclick=closeRaidPhoto;
- Object.assign(img.style,{position:'absolute',display:'block',margin:'0',padding:'0',border:'0',borderRadius:'0',maxWidth:'none',maxHeight:'none',minWidth:'0',minHeight:'0',objectFit:'fill',transform:'none',transformOrigin:'center center',cursor:'zoom-out'});
+ img.src=url;img.alt='Фото';img.onclick=closeRaidPhoto;
+ img.setAttribute('style','position:absolute!important;display:block!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;max-width:none!important;max-height:none!important;min-width:0!important;min-height:0!important;object-fit:fill!important;transform:none!important;');
  d.appendChild(img);
-
  const fit=()=>{
-   const vv=window.visualViewport;
-   const vw=Math.max(1,Math.floor(vv?.width||document.documentElement.clientWidth||window.innerWidth));
-   const vh=Math.max(1,Math.floor(vv?.height||document.documentElement.clientHeight||window.innerHeight));
-   const ox=Math.floor(vv?.offsetLeft||0), oy=Math.floor(vv?.offsetTop||0);
-   d.style.left=ox+'px'; d.style.top=oy+'px'; d.style.width=vw+'px'; d.style.height=vh+'px';
    if(!img.naturalWidth||!img.naturalHeight)return;
-   const s=Math.min(vw/img.naturalWidth,vh/img.naturalHeight);
-   const w=Math.max(1,Math.floor(img.naturalWidth*s));
-   const h=Math.max(1,Math.floor(img.naturalHeight*s));
-   img.style.setProperty('width',w+'px','important');
-   img.style.setProperty('height',h+'px','important');
-   img.style.setProperty('left',Math.floor((vw-w)/2)+'px','important');
-   img.style.setProperty('top',Math.floor((vh-h)/2)+'px','important');
+   const vv=window.visualViewport;
+   const vw=Math.max(1,Math.floor(vv?.width||window.innerWidth));
+   const vh=Math.max(1,Math.floor(vv?.height||window.innerHeight));
+   const safeW=Math.max(1,vw-24),safeH=Math.max(1,vh-24);
+   const scale=Math.min(safeW/img.naturalWidth,safeH/img.naturalHeight);
+   const w=Math.floor(img.naturalWidth*scale),hh=Math.floor(img.naturalHeight*scale);
+   d.style.setProperty('width',vw+'px','important');d.style.setProperty('height',vh+'px','important');
+   d.style.setProperty('left',(vv?.offsetLeft||0)+'px','important');d.style.setProperty('top',(vv?.offsetTop||0)+'px','important');
+   img.style.setProperty('width',w+'px','important');img.style.setProperty('height',hh+'px','important');
+   img.style.setProperty('left',Math.floor((vw-w)/2)+'px','important');img.style.setProperty('top',Math.floor((vh-hh)/2)+'px','important');
  };
- img.addEventListener('load',fit);
+ img.onload=fit;document.body.appendChild(d);fit();
  d.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
- d.addEventListener('wheel',e=>e.preventDefault(),{passive:false});
  d.addEventListener('click',e=>{if(e.target===d)closeRaidPhoto()});
- document.body.appendChild(d);
- fit();
- window.visualViewport?.addEventListener('resize',fit,{once:true});
- window.visualViewport?.addEventListener('scroll',fit,{once:true});
 }
 function viewOp(id){let o=db.ops.find(x=>x.id===id);if(!o)return;modal('<h2>'+esc(o.title)+'</h2><p>'+(o.date?formatPlanDate(o.date)+' · ':'')+esc(o.time)+'</p>'+(o.sector?'<p>Сектор: '+esc(o.sector)+'</p>':'')+(o.walls?'<p>Стены: '+o.walls+'</p>':'')+(o.transport?'<p>Транспорт: '+esc(o.transport)+'</p>':'')+(o.loadout?'<p>Что взять: '+esc(o.loadout)+'</p>':'')+(o.rally_point?'<p>Точка сбора: '+esc(o.rally_point)+'</p>':'')+(o.note?'<p>Комментарий: '+esc(o.note)+'</p>':'')+(o.images&&o.images.length?'<div class="raidphotos">'+o.images.map(u=>'<img src="'+esc(u)+'" alt="Фото для рейда" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in">').join('')+'</div>':'')+'<div class="dialogfoot"><button class="ghost" onclick="closeModal()">Закрыть</button></div>')}
 function members(){let admin=db.profile.access==='admin'||db.profile.nick==='k1t0';$('#view').innerHTML='<div class="card"><div class="toolbar"><div><h2>Состав FURY</h2><span class="muted">Ник, роль, время захода и статус на сегодня.</span></div>'+(admin?'<button class="ghost" onclick="changeInviteCode()">СМЕНИТЬ КОД ВСТУПЛЕНИЯ</button>':'')+'</div><div class="list">'+db.members.map(m=>'<div class="item"><div class="itemtop"><div><h3>'+esc(m[0])+(m[0]===db.profile.nick&&admin?' <span class="badge work">АДМИН</span>':'')+'</h3><span class="muted">'+esc(m[1])+'</span></div><div style="text-align:right"><b>'+(m[3]==='Буду'?esc(m[2]):'')+'</b><br><span class="badge status '+(m[3]==='Буду'?'yes':m[3]==='Под вопросом'?'maybe':'no')+'">'+esc(m[3])+'</span>'+(admin&&m[0]!==db.profile.nick?'<div class="actions" style="justify-content:flex-end;margin-top:8px"><button onclick="editMemberNick(\''+esc(m[0]).replace(/'/g,"\\'")+'\')">Изменить ник</button><button class="danger" onclick="kickMemberByNick(\''+esc(m[0]).replace(/'/g,"\\'")+'\')">Выгнать</button></div>':'')+'</div></div></div>').join('')+'</div></div>'}
