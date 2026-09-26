@@ -934,3 +934,27 @@ font-family:inherit!important;font-size:15px!important;line-height:1.5!important
  .photooverlay{padding:12px!important}
  .photooverlay img{max-width:calc(100vw - 24px)!important;max-height:calc(100dvh - 24px)!important;object-fit:contain!important}
 }
+
+/* v197 universal full-screen photo viewer */
+html.photo-open,body.photo-open{overflow:hidden!important;overscroll-behavior:none!important;height:100%!important}
+body.photo-open{position:fixed!important;left:0!important;right:0!important;width:100%!important}
+.photooverlay{
+ position:fixed!important;inset:0!important;z-index:99999!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:100vw!important;height:100dvh!important;box-sizing:border-box!important;
+ padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))!important;
+ background:rgba(0,0,0,.94)!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important
+}
+.photooverlay img{
+ display:block!important;position:static!important;
+ width:auto!important;height:auto!important;
+ max-width:100%!important;max-height:100%!important;
+ object-fit:contain!important;object-position:center!important;
+ margin:auto!important;border-radius:10px!important
+}
+.photooverlay-close{
+ position:absolute!important;top:max(14px,env(safe-area-inset-top))!important;right:max(14px,env(safe-area-inset-right))!important;
+ z-index:2!important;width:42px!important;height:42px!important;min-width:42px!important;padding:0!important;
+ border:1px solid rgba(255,255,255,.2)!important;border-radius:50%!important;
+ background:rgba(15,18,16,.82)!important;color:#fff!important;font-size:30px!important;line-height:38px!important
+}
