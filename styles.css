@@ -497,3 +497,6 @@
 .timepicker{align-items:center}.timepicker .timefield{position:relative;min-width:0}.timepicker .timefield>span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:inherit;font-weight:800;pointer-events:none;z-index:1}.timepicker .timefield>select{width:100%;color:transparent!important;caret-color:transparent!important;position:relative;z-index:2}.timepicker .timefield>select option{color:#fff!important}.timepicker>b{display:flex;align-items:center;justify-content:center}
 
 .protectrow{display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:12px;align-items:end}.protecttime{min-width:0}.protectbtn{height:48px;white-space:nowrap}@media(max-width:640px){.protectrow{grid-template-columns:1fr auto}.protectbtn{padding-left:12px!important;padding-right:12px!important;font-size:12px!important}}
+
+/* Protect time controls */
+.protectrow .timepicker,.protectrow .timefield,.protectrow .timefield select,.protectrow .timefield span,.protectbtn{height:48px!important;min-height:48px!important}.protectrow .timefield span{display:flex!important;align-items:center!important;justify-content:center!important;color:#f2f4f2!important}.protectrow .timepicker>b{color:#f2f4f2!important;align-self:center!important}
