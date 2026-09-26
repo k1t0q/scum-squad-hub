@@ -595,3 +595,10 @@
   .card .attendance-list>.attendance-item{padding-right:130px!important}
   .card .attendance-list>.attendance-item .itemtop>.badge.status{right:12px!important}
 }
+
+.protect-home-card{cursor:pointer}
+.protect-home-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
+.protect-home-btn{flex:0 0 auto;padding:10px 14px}
+.protect-history-item{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.protect-history-list{margin-top:16px}
+@media(max-width:700px){.protect-home-row{align-items:center}.protect-home-btn{padding:9px 11px;font-size:12px}}
