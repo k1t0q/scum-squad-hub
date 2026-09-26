@@ -622,3 +622,31 @@
 .protect-close-btn:hover{background:#202822!important}
 
 .protect-history-list + .modalactions{margin-top:18px!important}
+
+
+/* v153: mobile protect card — keep updater/date readable and button compact */
+@media(max-width:520px){
+  .protect-home-card{padding:16px!important}
+  .protect-home-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+    gap:10px!important;
+  }
+  .protect-home-row .protectmetric{
+    min-width:0!important;
+    margin-top:0!important;
+    font-size:20px!important;
+    line-height:1.2!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+    white-space:normal!important;
+  }
+  .protect-home-btn{
+    width:auto!important;
+    min-width:96px!important;
+    padding:10px 12px!important;
+    font-size:11px!important;
+    white-space:nowrap!important;
+  }
+}
