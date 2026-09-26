@@ -515,3 +515,6 @@
 
 /* Task participant spacing: match raid card */
 .taskclick .presence{margin-top:6px!important;margin-bottom:10px!important}.taskclick .presence+.actions{margin-top:0!important}
+
+/* Raid tab participant spacing: same as home raid/task cards */
+#operations .presence{margin-top:6px!important;margin-bottom:10px!important}#operations .presence+.actions{margin-top:0!important}
