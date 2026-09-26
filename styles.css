@@ -500,3 +500,6 @@
 
 /* Protect time controls */
 .protectrow .timepicker,.protectrow .timefield,.protectrow .timefield select,.protectrow .timefield span,.protectbtn{height:48px!important;min-height:48px!important}.protectrow .timefield span{display:flex!important;align-items:center!important;justify-content:center!important;color:#f2f4f2!important}.protectrow .timepicker>b{color:#f2f4f2!important;align-self:center!important}
+
+/* All time values are white */
+.timepicker .timefield span,.timepicker>b{color:#f2f4f2!important}
