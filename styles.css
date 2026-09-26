@@ -802,3 +802,7 @@
 /* v177 larger task status badges */
 .taskstatus{font-size:14px!important;padding:6px 10px!important;font-weight:800!important;line-height:1.15!important}
 @media(max-width:520px){.taskstatus{font-size:13px!important;padding:6px 9px!important}}
+
+/* v178 raid participant count badge matches task status size */
+.raiditem .itemtop>.badge{font-size:14px!important;padding:6px 10px!important;font-weight:800!important;line-height:1.15!important}
+@media(max-width:520px){.raiditem .itemtop>.badge{font-size:13px!important;padding:6px 9px!important}}
