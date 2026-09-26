@@ -506,3 +506,6 @@
 
 /* Protect quick update: member left, action right */
 .protectquick{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:stretch}.protectquick select,.protectquick .protectbtn{height:52px!important;min-height:52px!important}.protectquick .protectbtn{white-space:nowrap}@media(max-width:640px){.protectquick{grid-template-columns:minmax(0,1fr) auto;gap:8px}.protectquick .protectbtn{padding-left:10px!important;padding-right:10px!important;font-size:11px!important}}
+
+/* Protect member selector: restore full styled field */
+.protectquick{grid-template-columns:minmax(0,1fr) auto!important;gap:14px!important}.protectquick select{width:100%!important;height:52px!important;min-height:52px!important;padding:0 16px!important;border:1px solid var(--line)!important;border-radius:9px!important;background:#080c0a!important;color:#f2f4f2!important;font:inherit!important;font-weight:700!important;box-sizing:border-box!important}.protectquick .protectbtn{height:52px!important;min-height:52px!important}@media(max-width:640px){.protectquick{grid-template-columns:minmax(0,1fr) auto!important}.protectquick select{min-width:0!important}}
