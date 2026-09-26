@@ -909,3 +909,13 @@ font-family:inherit!important;font-size:15px!important;line-height:1.5!important
 /* v193 clickable FURY home logo */
 .logo-home{cursor:pointer!important;user-select:none!important}
 .logo-home:focus-visible{outline:2px solid #ff3035!important;outline-offset:5px!important;border-radius:4px!important}
+
+/* v194 compact mobile profile actions */
+@media(max-width:700px){
+ #dialog .profile-actions{display:grid!important;grid-template-columns:auto 1fr 1fr!important;gap:8px!important;align-items:center!important;margin-top:14px!important}
+ #dialog .profile-actions-spacer{display:none!important}
+ #dialog .profile-actions button{width:auto!important;min-width:0!important;height:48px!important;margin:0!important;padding:0 14px!important;font-size:14px!important;white-space:nowrap!important}
+ #dialog .profile-actions .logoutbtn{grid-column:1!important;padding:0 12px!important}
+ #dialog .profile-actions .ghost{grid-column:2!important;width:100%!important}
+ #dialog .profile-actions .primary{grid-column:3!important;width:100%!important}
+}
