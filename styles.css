@@ -1114,3 +1114,21 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
    margin-bottom:14px!important;
  }
 }
+
+
+/* v204 — home publish button aligns exactly with the form */
+@media(max-width:700px){
+ .home-feed-card #homePlaceBody .place-compose>.primary{
+   width:100%!important;
+   max-width:100%!important;
+   margin-left:0!important;
+   margin-right:0!important;
+   box-sizing:border-box!important;
+   align-self:stretch!important;
+ }
+ .home-feed-card #homePlaceBody .place-compose{
+   width:100%!important;
+   max-width:100%!important;
+   box-sizing:border-box!important;
+ }
+}
