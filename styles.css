@@ -1034,3 +1034,42 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
    margin-top:18px!important;
  }
 }
+
+
+/* v200 — task card geometry exactly matches raid-plan card on mobile */
+@media(max-width:700px){
+ #view>.grid>.card.span6:has(.toolbar h2),
+ #view>.grid>.card.span8:has(.toolbar h2){
+   padding:24px!important;
+ }
+ #view>.grid>.card.span6 .toolbar,
+ #view>.grid>.card.span8 .toolbar{
+   display:flex!important;
+   flex-direction:column!important;
+   align-items:stretch!important;
+   gap:22px!important;
+   margin:0 0 22px!important;
+ }
+ #view>.grid>.card.span6 .toolbar h2,
+ #view>.grid>.card.span8 .toolbar h2{
+   margin:0!important;
+   line-height:1.2!important;
+ }
+ #view>.grid>.card.span6 .toolbar .primary,
+ #view>.grid>.card.span8 .toolbar .primary{
+   width:100%!important;
+   height:64px!important;
+   min-height:64px!important;
+   margin:0!important;
+   padding:0 18px!important;
+ }
+ #view>.grid>.card.span6>.empty,
+ #view>.grid>.card.span8>.list,
+ #view>.grid>.card.span8>.list>.empty{
+   margin:0!important;
+ }
+ #view>.grid>.card.span8>.list>.empty{
+   width:100%!important;
+   box-sizing:border-box!important;
+ }
+}
