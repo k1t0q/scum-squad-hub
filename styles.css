@@ -1073,3 +1073,14 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
    box-sizing:border-box!important;
  }
 }
+
+
+/* v201 — restore previous mobile create-button size */
+@media(max-width:700px){
+ #view>.grid>.card.span6 .toolbar .primary,
+ #view>.grid>.card.span8 .toolbar .primary{
+   height:auto!important;
+   min-height:0!important;
+   padding:14px 18px!important;
+ }
+}
