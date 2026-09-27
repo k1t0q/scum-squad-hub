@@ -1021,3 +1021,16 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
    font-weight:900!important;
  }
 }
+
+
+/* v199 — mobile publish size + equal empty-state spacing */
+@media(max-width:700px){
+ .place-compose>.primary{
+   min-height:48px!important;
+   height:48px!important;
+   padding:0 16px!important;
+ }
+ #view>.grid>.card.span8 .list>.empty{
+   margin-top:18px!important;
+ }
+}
