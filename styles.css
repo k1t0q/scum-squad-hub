@@ -986,3 +986,23 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
  #view>.grid{display:flex!important;flex-direction:column!important}
  #view>.grid>.home-feed-card{order:9999!important;width:100%!important;max-width:100%!important}
 }
+
+
+/* v197 — equal mobile spacing in home raid/tasks cards */
+@media(max-width:700px){
+ #view>.grid>.card.span6 .toolbar,
+ #view>.grid>.card.span8 .toolbar{
+   display:flex!important;
+   flex-direction:column!important;
+   align-items:stretch!important;
+   gap:18px!important;
+   margin-bottom:18px!important;
+ }
+ #view>.grid>.card.span6 .toolbar h2,
+ #view>.grid>.card.span8 .toolbar h2{margin:0!important}
+ #view>.grid>.card.span6 .toolbar .primary,
+ #view>.grid>.card.span8 .toolbar .primary{
+   width:100%!important;
+   margin:0!important;
+ }
+}
