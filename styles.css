@@ -1101,3 +1101,16 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
    line-height:1.2!important;
  }
 }
+
+
+/* v203 — tighter mobile vertical rhythm */
+@media(max-width:700px){
+ .place-compose>.primary{margin-top:14px!important}
+ #homePlaceBody>.list,
+ #placeBody>.list{margin-top:12px!important}
+ #view>.grid>.card.span6 .toolbar,
+ #view>.grid>.card.span8 .toolbar{
+   gap:14px!important;
+   margin-bottom:14px!important;
+ }
+}
