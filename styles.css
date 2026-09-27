@@ -1084,3 +1084,20 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
    padding:14px 18px!important;
  }
 }
+
+
+/* v202 — publish buttons match create buttons on mobile */
+@media(max-width:700px){
+ .place-compose>.primary{
+   width:100%!important;
+   height:auto!important;
+   min-height:0!important;
+   margin:22px 0 0!important;
+   padding:14px 18px!important;
+   display:flex!important;
+   align-items:center!important;
+   justify-content:center!important;
+   box-sizing:border-box!important;
+   line-height:1.2!important;
+ }
+}
