@@ -1006,3 +1006,18 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
    margin:0!important;
  }
 }
+
+
+/* v198 — publish buttons match create-task button height on mobile */
+@media(max-width:700px){
+ .place-compose>.primary{
+   width:100%!important;
+   min-height:64px!important;
+   height:64px!important;
+   padding:0 18px!important;
+   display:flex!important;
+   align-items:center!important;
+   justify-content:center!important;
+   font-weight:900!important;
+ }
+}
