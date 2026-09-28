@@ -1182,3 +1182,14 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
  .attendance-divider{margin:20px 0!important}
  .my-attendance-block .toolbar{margin-bottom:14px!important}
 }
+
+
+/* v207 — desktop: attendance left, publications right */
+@media(min-width:701px){
+ .attendance-combined{grid-column:span 6!important}
+ .home-feed-card{grid-column:span 6!important}
+ .attendance-combined,.home-feed-card{min-width:0!important;align-self:start!important}
+}
+@media(max-width:700px){
+ .attendance-combined,.home-feed-card{grid-column:1/-1!important;width:100%!important}
+}
