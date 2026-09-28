@@ -1219,3 +1219,6 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
    font-size:14px!important;
  }
 }
+
+/* per explosive wall count */
+.itemwalls{color:#ff5b5f;font-weight:800}
