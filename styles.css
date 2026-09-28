@@ -1171,3 +1171,14 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
    box-sizing:border-box!important;
  }
 }
+
+
+/* v206 — combine participation and today's attendance */
+.attendance-combined{width:100%!important}
+.attendance-divider{height:1px;background:var(--line,#26322d);margin:22px 0}
+.squad-attendance-block>h2{margin-top:0}
+@media(max-width:700px){
+ .attendance-combined{padding:24px!important}
+ .attendance-divider{margin:20px 0!important}
+ .my-attendance-block .toolbar{margin-bottom:14px!important}
+}
