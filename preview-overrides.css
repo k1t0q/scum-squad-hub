@@ -528,3 +528,29 @@
   .ref-feed .ref-feed-list::-webkit-scrollbar-track{background:transparent!important}
   .ref-feed .ref-feed-list::-webkit-scrollbar-thumb{background:#5b2428!important;border-radius:8px!important}
 }
+
+/* Feed post auto-height + keep three-dot menu above neighboring posts */
+.ref-feed .ref-feed-list{
+  overflow-y:auto!important;
+  overflow-x:visible!important;
+}
+.ref-feed-post{
+  min-height:0!important;
+  height:auto!important;
+  padding:8px 10px!important;
+  margin-bottom:7px!important;
+  overflow:visible!important;
+}
+.ref-feed-post .itemtop{min-height:18px!important}
+.ref-feed-comment{
+  margin-top:5px!important;
+  line-height:1.25!important;
+}
+.ref-feed-post .placephotos:empty{display:none!important}
+.ref-post-menu{z-index:50!important}
+.ref-post-menu-pop{
+  z-index:1000!important;
+  top:22px!important;
+  right:0!important;
+}
+.ref-feed-post:has(.ref-post-menu-pop.open){z-index:100!important}
