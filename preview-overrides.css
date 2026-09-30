@@ -898,3 +898,28 @@ textarea::-webkit-scrollbar{
   min-height:42px!important;
   line-height:40px!important;
 }
+
+/* Sidebar protect duplicate for layout comparison */
+@media (min-width:901px){
+  .sidebar-protect{
+    margin-top:auto!important;
+    margin-bottom:8px!important;
+    padding:10px 12px!important;
+    border:1px solid #253a36!important;
+    border-radius:7px!important;
+    background:#091312!important;
+    cursor:pointer!important;
+    display:grid!important;
+    gap:3px!important;
+    transition:.15s ease!important;
+  }
+  .sidebar-protect small{font-size:9px!important;color:#81918d!important}
+  .sidebar-protect b{font-size:12px!important;line-height:1.2!important}
+  .sidebar-protect span{font-size:9px!important;color:#91a09c!important}
+  .sidebar-protect em{font-size:10px!important;font-style:normal!important;font-weight:800!important;color:#e8b84f!important;margin-top:2px!important}
+  .sidebar-protect.protect-green b{color:#51e5b0!important}
+  .sidebar-protect.protect-orange b{color:#e8b84f!important}
+  .sidebar-protect.protect-red b{color:#ff5962!important}
+  .sidebar-protect:hover{background:#0d1a18!important;border-color:#38504b!important}
+  .server.server-link{margin-top:0!important}
+}
