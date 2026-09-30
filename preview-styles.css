@@ -1493,3 +1493,6 @@ header h1{color:#647872!important;font-size:10px!important}
  .ref-profile b{height:46px!important;padding:0 18px!important;font-size:11px!important;cursor:pointer!important}
  .ref-profile:hover b{border-color:#45585d!important;background:#101d20!important}
 }
+
+/* FURY PREVIEW v7.4 — real uploaded protect icon asset */
+.ref-shield{width:31px!important;height:36px!important;background-color:currentColor!important;background-image:none!important;-webkit-mask-image:url("./preview/protect-icon.png")!important;mask-image:url("./preview/protect-icon.png")!important;-webkit-mask-size:contain!important;mask-size:contain!important;-webkit-mask-position:center!important;mask-position:center!important;-webkit-mask-repeat:no-repeat!important;mask-repeat:no-repeat!important}
