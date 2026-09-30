@@ -1233,3 +1233,107 @@ textarea::-webkit-scrollbar{
     margin-bottom:8px!important;
   }
 }
+
+/* Mobile attendance polish */
+@media (max-width:900px){
+  .ref-att-base{
+    padding:18px 20px!important;
+  }
+  .ref-att-base>.ref-title{
+    padding-bottom:10px!important;
+    margin-bottom:14px!important;
+  }
+  .ref-att-base>.ref-title h2{
+    font-size:24px!important;
+    line-height:1!important;
+    font-weight:900!important;
+    letter-spacing:-.35px!important;
+  }
+  .ref-att-base .ref-me-line{
+    display:flex!important;
+    align-items:baseline!important;
+    gap:12px!important;
+    margin-bottom:12px!important;
+  }
+  .ref-att-base .ref-me-line b{
+    font-size:20px!important;
+    line-height:24px!important;
+  }
+  .ref-att-base .ref-me-line span{
+    font-size:14px!important;
+    line-height:20px!important;
+  }
+  .ref-att-base .ref-presence-buttons{
+    display:flex!important;
+    gap:10px!important;
+    flex-wrap:nowrap!important;
+  }
+  .ref-att-base .ref-presence-buttons button{
+    min-height:50px!important;
+    padding:0 14px!important;
+    font-size:17px!important;
+    white-space:nowrap!important;
+  }
+  .ref-att-base .ref-join-time{
+    margin-top:12px!important;
+    font-size:14px!important;
+  }
+  .ref-att-base .ref-time-change{
+    height:36px!important;
+    margin-left:8px!important;
+  }
+  .ref-att-base .ref-att-divider{
+    margin:18px 0 14px!important;
+  }
+  .ref-att-base .ref-att-head{
+    min-height:38px!important;
+    padding-bottom:9px!important;
+  }
+  .ref-att-base .ref-att-head h3{
+    font-size:18px!important;
+    line-height:22px!important;
+  }
+  .ref-att-base .ref-att-head>b{
+    font-size:16px!important;
+  }
+  .ref-att-base .ref-members{
+    overflow:visible!important;
+  }
+  .ref-att-base .ref-member{
+    min-height:62px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 122px 54px!important;
+    align-items:center!important;
+    gap:10px!important;
+    padding:8px 0!important;
+  }
+  .ref-att-base .ref-member-info b{
+    font-size:16px!important;
+    line-height:20px!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+  }
+  .ref-att-base .ref-member-info small{
+    margin-top:2px!important;
+    font-size:13px!important;
+    line-height:17px!important;
+  }
+  .ref-att-base .ref-status{
+    width:122px!important;
+    min-width:122px!important;
+    height:38px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    font-size:13px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+  .ref-att-base .ref-member-time{
+    width:54px!important;
+    text-align:right!important;
+    font-size:13px!important;
+    line-height:18px!important;
+  }
+}
