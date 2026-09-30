@@ -52,3 +52,13 @@
 .raid-detail-actions .raid-participation.leave{
   background:#2a1215!important;border-color:#743036!important;color:#ff686e!important
 }
+
+/* Raid participant count on Home */
+.ref-plan-row .ref-people-count{
+  justify-self:end!important;
+  color:#9aa8aa!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  letter-spacing:.1px!important
+}
