@@ -1834,3 +1834,39 @@ textarea::-webkit-scrollbar{
     gap:4px!important;
   }
 }
+
+/* Desktop roster: compact rows and align status/edit/kick controls */
+@media (min-width:901px){
+  #view>.card>.list>.item{
+    min-height:58px!important;
+    padding:10px 12px!important;
+    box-sizing:border-box!important;
+  }
+  #view>.card>.list>.item .itemtop{
+    min-height:36px!important;
+    align-items:center!important;
+  }
+  #view>.card>.list>.item h3{margin:0 0 2px!important}
+  .member-actions-row{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:8px!important;
+    white-space:nowrap!important;
+  }
+  .member-actions-row .member-join-time{
+    min-width:42px!important;
+    text-align:right!important;
+  }
+  .member-actions-row .status,
+  .member-actions-row button{
+    height:32px!important;
+    min-height:32px!important;
+    margin:0!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+  }
+  .member-actions-row .status{min-width:82px!important}
+}
