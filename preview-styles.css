@@ -1420,3 +1420,14 @@ header h1{color:#647872!important;font-size:10px!important}
  .server-online-row .online-dot{margin:0!important;flex:0 0 auto!important}
  .server-online-row .server-online{display:inline!important;margin:0 0 0 auto!important;font-size:16px!important;line-height:1!important;color:#50e2aa!important}
 }
+
+
+/* FURY PREVIEW v6.3 — restore original sidebar logo/nav behavior */
+@media(min-width:901px){
+ .logo i{display:block!important;width:auto!important;height:auto!important;font-family:inherit!important;font-size:30px!important;line-height:normal!important;letter-spacing:-2px!important;transform:none!important;text-shadow:0 0 22px #fff2!important}
+ .logo>div{margin-top:4px!important}.logo b{display:block!important}.logo small{font-size:8px!important;letter-spacing:normal!important}
+ nav button{padding:12px 13px!important;height:auto!important;text-align:left!important;background:transparent!important;border:1px solid transparent!important}
+ nav button:before{display:none!important;content:none!important}
+ nav button:hover,nav button.active{background:linear-gradient(90deg,#311718,#171313)!important;border-color:#5d2427!important;color:#fff!important;box-shadow:inset 3px 0 #ef3941!important;transform:none!important}
+ nav button.active:after{display:block!important;content:"";position:absolute;right:10px;top:50%;width:5px;height:5px;border-radius:50%;background:#ef4148;transform:translateY(-50%);box-shadow:0 0 10px #ef4148}
+}
