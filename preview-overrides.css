@@ -445,3 +445,21 @@
     white-space:nowrap!important;
   }
 }
+
+/* Attendance: exact six-member viewport */
+@media (min-width:901px){
+  .ref-att-base,.ref-feed{
+    height:430px!important;
+    min-height:430px!important;
+    max-height:430px!important;
+  }
+  .ref-att-base .ref-members{
+    flex:0 0 210px!important;
+    height:210px!important;
+    max-height:210px!important;
+  }
+  .ref-att-base .ref-member{
+    height:35px!important;
+    min-height:35px!important;
+  }
+}
