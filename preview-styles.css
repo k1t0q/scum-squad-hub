@@ -1571,3 +1571,8 @@ header .ref-brand h1,#pageTitle{font-size:13px!important;font-weight:800!importa
 .raid-roster-name.is-out{color:#ff6268!important}
 .raid-roster-name.is-in{color:#55e6aa!important;text-shadow:0 0 9px rgba(85,230,170,.18)!important}
 .raid-comma{color:#758581!important;font-size:12px!important}
+
+/* FURY PREVIEW v8.8 — nested raid modal flow + background scroll lock */
+html.modal-lock,body.modal-lock{overflow:hidden!important;height:100%!important}
+.modal.open{overflow-y:auto!important;overscroll-behavior:contain!important}
+.modal.open .dialog{max-height:calc(100vh - 28px)!important;overflow-y:auto!important;overscroll-behavior:contain!important}
