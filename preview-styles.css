@@ -1529,3 +1529,12 @@ header .ref-brand h1,#pageTitle{font-size:13px!important;font-weight:800!importa
 .ref-create:hover{background:#15302b!important;border-color:#3d7567!important;color:#fff!important}
 .ref-plan .ref-icon,.ref-tasks .ref-icon{display:none!important}
 .ref-section-link{cursor:pointer!important;transition:.15s!important}.ref-section-link:hover{color:#fff!important}
+/* FURY PREVIEW v8.3 — task details action styling */
+.task-detail-actions{display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:wrap!important;margin-top:14px!important}
+.task-detail-actions button{height:38px!important;padding:0 14px!important;border-radius:6px!important;border:1px solid #30433f!important;background:#0c1715!important;color:#dfe8e5!important;font-size:12px!important;font-weight:700!important;cursor:pointer!important;transition:.15s!important}
+.task-detail-actions button:hover{background:#142521!important;border-color:#49645e!important;color:#fff!important}
+.task-detail-actions button:first-child{border-color:#257558!important;background:#0c241d!important;color:#62e5b0!important}
+.task-detail-actions button:first-child:hover{background:#12382c!important;border-color:#39a87d!important}
+.task-detail-actions .danger{border-color:#743036!important;background:#2a1215!important;color:#ff686e!important}
+.task-detail-actions .danger:hover{background:#3b181c!important;border-color:#a33d45!important}
+.task-detail-actions .ghost{margin-left:auto!important;background:#0b1413!important;color:#aebbb8!important}
