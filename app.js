@@ -209,7 +209,7 @@ function sidebarProtectHtml(){
  if(!p){el.className='sidebar-protect protect-red';el.innerHTML='<small>ПРОТЕКТ</small><b>ПРОТЕКТ СПАЛ</b><span>Нет активного протекта</span>';return}
  let u=new Date(p.time),st=new Date(u.getTime()+3600000),en=new Date(st.getTime()+8*3600000),n=new Date(),cls=n<st?'protect-orange':n<en?'protect-green':'protect-red',label=n<st?'ЗАПУСКАЕТСЯ':n<en?'АКТИВЕН':'СПАЛ';
  let extra=n<st?'<em>До начала: '+String(Math.floor((st-n)/3600000)).padStart(2,'0')+':'+String(Math.floor((st-n)%3600000/60000)).padStart(2,'0')+'</em>':'';
- el.className='sidebar-protect '+cls;el.innerHTML='<small>ПРОТЕКТ</small><b>'+label+'</b><span>'+esc(p.nick)+' · '+protectClock(u)+'</span><span>'+protectClock(st)+' — '+protectClock(en)+'</span>'+extra;
+ el.className='sidebar-protect '+cls;el.innerHTML='<small>ПРОТЕКТ</small><b>'+label+'</b><span class="sidebar-protect-who">'+esc(p.nick)+' · '+protectClock(u)+'</span><div class="sidebar-protect-times"><span>Начало: <strong>'+protectClock(st)+'</strong></span><span>Спадёт: <strong>'+protectClock(en)+'</strong></span><span>Активен: <strong>8 ч</strong></span></div>'+extra;
 }
 function startHeaderProtectCountdown(){
  let x=document.querySelector('.ref-protect-countdown[data-start]');if(!x)return;
