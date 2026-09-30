@@ -132,7 +132,8 @@ async function loadExplosives(){
  refreshWallMetric();
 }
 function explosiveInputs(item){return [...document.querySelectorAll('.explosiveedit input[data-item="'+CSS.escape(item)+'"], .ref-expl-edit input[data-item="'+CSS.escape(item)+'"]')]}function explosiveInput(item){return explosiveInputs(item).find(el=>document.activeElement===el)||explosiveInputs(item)[0]||null}
-function updateExplosiveInput(item,q){explosiveInputs(item).forEach(el=>{if(document.activeElement!==el)el.value=Number(q||0)})}
+function explosiveItemLabel(item,q){let key=item==='Граната'?'ГРАНАТА':item,per={'С4':3,'РПГ':6,'ГРАНАТА':12,'ДИНАМИТ':6}[key];if(!per)return'';let w=Math.floor(q/per),r=q%per,extra=r?' + '+r+' '+(key==='С4'?'C4':key==='РПГ'?'РПГ':key==='ГРАНАТА'?(r===1?'граната':r>=2&&r<=4?'гранаты':'гранат'):'динамит'):'';return w+' '+wallWord(w).toLowerCase()+extra}
+function updateExplosiveInput(item,q){explosiveInputs(item).forEach(el=>{if(document.activeElement!==el)el.value=Number(q||0);let card=el.closest('.explosiveitem,.ref-expl-item');let label=card?.querySelector('.itemwalls,.ref-expl-bottom>small>b');if(label)label.textContent=explosiveItemLabel(item,Number(q||0))})}
 async function setExplosive(item,value){
  let q=Math.max(0,parseInt(value,10)||0),el=explosiveInput(item);if(el)el.value=q;
  let {error}=await sb.from('explosives_inventory').update({quantity:q,updated_at:new Date().toISOString(),updated_by:onlineMember.id}).eq('squad_id',onlineMember.squad_id).eq('item',item);
