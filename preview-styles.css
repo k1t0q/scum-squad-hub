@@ -1496,3 +1496,9 @@ header h1{color:#647872!important;font-size:10px!important}
 
 /* FURY PREVIEW v7.4 — real uploaded protect icon asset */
 .ref-shield{width:31px!important;height:36px!important;background-color:currentColor!important;background-image:none!important;-webkit-mask-image:url("./preview/protect-icon.png")!important;mask-image:url("./preview/protect-icon.png")!important;-webkit-mask-size:contain!important;mask-size:contain!important;-webkit-mask-position:center!important;mask-position:center!important;-webkit-mask-repeat:no-repeat!important;mask-repeat:no-repeat!important}
+
+/* FURY PREVIEW v7.5 — simplify protect banner */
+.ref-protect-head{grid-template-columns:1fr 9px!important;padding-left:14px!important;column-gap:7px!important}
+.ref-protect-head .ref-shield{display:none!important}
+.ref-protect-head small{color:#f2f5f3!important}
+.ref-protect-head i{justify-self:end!important;margin-left:0!important}
