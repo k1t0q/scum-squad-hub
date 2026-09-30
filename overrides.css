@@ -2083,3 +2083,32 @@ textarea::-webkit-scrollbar{
     white-space:nowrap!important;
   }
 }
+
+/* Mobile header final ordering: logo | profile | menu */
+@media(max-width:900px){
+  .app>aside>.logo{order:1!important}
+  .app>aside>.mobile-profile-btn{
+    order:2!important;
+    display:flex!important;
+    flex:0 0 auto!important;
+    margin:0 10px 0 0!important;
+    visibility:visible!important;
+    opacity:1!important;
+  }
+  .app>aside>.mobile-menu-btn{
+    order:3!important;
+    flex:0 0 auto!important;
+    margin:0!important;
+  }
+  .app>aside>nav{order:4!important}
+}
+@media(max-width:430px){
+  .app>aside>.mobile-profile-btn{
+    width:48px!important;
+    min-width:48px!important;
+    max-width:48px!important;
+    padding:0!important;
+    justify-content:center!important;
+  }
+  .app>aside>.mobile-profile-btn #mobileProfileNick{display:none!important}
+}
