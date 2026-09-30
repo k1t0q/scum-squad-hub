@@ -890,3 +890,11 @@ textarea::-webkit-scrollbar{
   background:#421b1f!important;
   transform:none!important;
 }
+
+/* Unified action height — match Stash/Base send button */
+.ref-feed-send,
+.card>.toolbar>.primary{
+  height:42px!important;
+  min-height:42px!important;
+  line-height:40px!important;
+}
