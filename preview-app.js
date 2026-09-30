@@ -207,7 +207,14 @@ function headerProtectHtml(){
  if(!p){el.className='ref-protect-head protect-red';el.innerHTML='<span class="ref-shield"></span><div><b>ПРОТЕКТ СПАЛ</b><small>Нет активного протекта</small></div><i></i>';return}
  let u=new Date(p.time),st=new Date(u.getTime()+3600000),en=new Date(st.getTime()+8*3600000),n=new Date(),cls=n<st?'protect-orange':n<en?'protect-green':'protect-red',label=n<st?'ПРОТЕКТ ЗАПУСКАЕТСЯ':n<en?'ПРОТЕКТ АКТИВЕН':'ПРОТЕКТ СПАЛ';
  el.className='ref-protect-head '+cls;
- el.innerHTML='<span class="ref-shield"></span><div><b>'+label+'</b><small>'+esc(p.nick)+' · '+protectClock(u)+' &nbsp; Начало: '+protectClock(st)+' · Спадёт: '+protectClock(en)+'</small></div><i></i>';
+ let timer='';if(n<st){let ms=st-n,h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000);timer='<em class="ref-protect-countdown" data-start="'+st.toISOString()+'">До начала: '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'</em>'}
+ el.innerHTML='<span class="ref-shield"></span><div><b>'+label+'</b><small>'+esc(p.nick)+' · '+protectClock(u)+' &nbsp; Начало: '+protectClock(st)+' · Спадёт: '+protectClock(en)+'</small>'+timer+'</div><i></i>';
+ if(n<st)setTimeout(startHeaderProtectCountdown,0);
+}
+function startHeaderProtectCountdown(){
+ let x=document.querySelector('.ref-protect-countdown[data-start]');if(!x)return;
+ if(window.headerProtectCountdownTimer)clearInterval(window.headerProtectCountdownTimer);
+ window.headerProtectCountdownTimer=setInterval(()=>{let el=document.querySelector('.ref-protect-countdown[data-start]');if(!el){clearInterval(window.headerProtectCountdownTimer);return}let ms=new Date(el.dataset.start)-new Date();if(ms<=0){clearInterval(window.headerProtectCountdownTimer);headerProtectHtml();return}let h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000);el.textContent='До начала: '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')},1000)
 }
 function protectHomeHtml(p){
  let updated=new Date(p.time),starts=new Date(updated.getTime()+60*60*1000),ends=new Date(starts.getTime()+8*60*60*1000),now=new Date(),status='';
