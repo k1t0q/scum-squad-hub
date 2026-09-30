@@ -68,3 +68,10 @@
   .app{grid-template-columns:220px minmax(0,1fr)!important}
   .app>aside{width:auto!important;padding-left:14px!important;padding-right:14px!important}
 }
+
+/* Live protect countdown in header */
+.ref-protect-countdown{
+ display:block!important;margin-top:3px!important;color:#ffb13b!important;
+ font-size:10px!important;font-weight:900!important;font-style:normal!important;
+ line-height:1.2!important;white-space:nowrap!important
+}
