@@ -100,3 +100,31 @@
     margin:0!important;align-self:auto!important
   }
 }
+
+/* Fixed-height Home plan/tasks cards with internal mouse-wheel scroll */
+@media (min-width:901px){
+  .ref-plan,.ref-tasks{
+    height:220px!important;
+    min-height:220px!important;
+    max-height:220px!important;
+    overflow:hidden!important;
+  }
+  .ref-plan .ref-title,.ref-tasks .ref-title{
+    height:56px!important;
+    min-height:56px!important;
+    flex:0 0 56px!important;
+  }
+  .ref-plan .ref-list,.ref-tasks .ref-list{
+    display:block!important;
+    height:calc(220px - 56px)!important;
+    max-height:calc(220px - 56px)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    scrollbar-width:thin!important;
+    scrollbar-color:#5b2428 transparent!important;
+    padding-right:4px!important;
+  }
+  .ref-plan .ref-list::-webkit-scrollbar,.ref-tasks .ref-list::-webkit-scrollbar{width:5px!important}
+  .ref-plan .ref-list::-webkit-scrollbar-track,.ref-tasks .ref-list::-webkit-scrollbar-track{background:transparent!important}
+  .ref-plan .ref-list::-webkit-scrollbar-thumb,.ref-tasks .ref-list::-webkit-scrollbar-thumb{background:#5b2428!important;border-radius:10px!important}
+}
