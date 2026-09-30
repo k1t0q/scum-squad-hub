@@ -249,3 +249,44 @@
 .ref-att-base .ref-member:last-child{
   border-bottom:0!important;
 }
+
+/* My attendance: larger controls + cleaner black/red styling */
+@media (min-width:901px){
+  .ref-my-presence{padding:9px 0 18px!important}
+  .ref-me-line{gap:9px!important;margin-bottom:13px!important}
+  .ref-me-line>b{font-size:16px!important;line-height:1!important}
+  .ref-me-line>span{font-size:11px!important}
+  .ref-presence-buttons{gap:9px!important}
+  .ref-presence-buttons .presencechoice{
+    min-width:112px!important;
+    height:36px!important;
+    padding:0 16px!important;
+    border-radius:6px!important;
+    font-size:11px!important;
+    font-weight:900!important;
+    background:#151718!important;
+    box-shadow:none!important;
+    transition:.15s ease!important;
+  }
+  .ref-presence-buttons .presencechoice.yes{
+    color:#66e7b0!important;border:1px solid #26785a!important;background:#10201b!important;
+  }
+  .ref-presence-buttons .presencechoice.maybe{
+    color:#f2c25f!important;border:1px solid #76551d!important;background:#221b10!important;
+  }
+  .ref-presence-buttons .presencechoice.no{
+    color:#ff6c72!important;border:1px solid #783137!important;background:#251315!important;
+  }
+  .ref-presence-buttons .presencechoice.active{
+    border-width:2px!important;
+    box-shadow:0 0 0 1px rgba(255,255,255,.03) inset!important;
+  }
+  .ref-presence-buttons .presencechoice:hover{filter:brightness(1.12)!important}
+  .ref-join-time{margin-top:14px!important;font-size:11px!important}
+  .ref-join-time b{font-size:13px!important;margin-left:3px!important}
+  .ref-time-change{
+    height:30px!important;margin-left:10px!important;padding:0 12px!important;
+    border-radius:5px!important;font-size:10px!important;font-weight:800!important;
+    background:#201719!important;border:1px solid #573034!important;color:#d9cacc!important;
+  }
+}
