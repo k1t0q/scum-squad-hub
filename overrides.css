@@ -1551,3 +1551,34 @@ textarea::-webkit-scrollbar{
     gap:14px!important;
   }
 }
+
+/* Mobile home: exact protect spacing + full expired red state */
+@media (max-width:900px){
+  .ref-home{
+    display:block!important;
+  }
+  .ref-home>.mobile-home-protect{
+    margin-top:14px!important;
+    margin-bottom:14px!important;
+  }
+  .ref-home>.ref-top{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:14px!important;
+  }
+  .ref-home>.ref-top>.ref-plan,
+  .ref-home>.ref-top>.ref-tasks{
+    margin:0!important;
+  }
+  .mobile-home-protect:has(.protect-ended){
+    border-color:#7a2c33!important;
+    background:linear-gradient(90deg,#281013,#1c0c0e)!important;
+  }
+  .mobile-home-protect:has(.protect-ended) .protect-who,
+  .mobile-home-protect:has(.protect-ended) .protect-times{
+    color:#c99a9e!important;
+  }
+  .mobile-home-protect .protect-ended{
+    color:#ff6269!important;
+  }
+}
