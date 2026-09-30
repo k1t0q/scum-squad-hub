@@ -1458,3 +1458,12 @@ textarea::-webkit-scrollbar{
     margin-bottom:10px!important;
   }
 }
+
+/* Mobile: attendance heading exactly matches plan heading */
+@media (max-width:900px){
+  .ref-att-base>.ref-title h2{
+    font-size:22px!important;
+    line-height:1!important;
+    letter-spacing:0!important;
+  }
+}
