@@ -1158,3 +1158,41 @@ textarea::-webkit-scrollbar{
   }
   main,#view{background:#050b0a!important}
 }
+
+/* Mobile home protect — original wide card above raid plan */
+.mobile-home-protect{display:none}
+@media (max-width:900px){
+  .ref-header .ref-protect-head{display:none!important}
+  .mobile-home-protect{
+    display:block!important;
+    margin:0 0 14px!important;
+    padding:10px 14px!important;
+    min-height:66px!important;
+    box-sizing:border-box!important;
+    border:1px solid #805a17!important;
+    border-radius:8px!important;
+    background:linear-gradient(90deg,#211708,#181308)!important;
+    color:#dfe5e2!important;
+    cursor:pointer!important;
+  }
+  .mobile-home-protect .protect-who{
+    font-size:11px!important;
+    line-height:15px!important;
+    color:#b7c0bd!important;
+  }
+  .mobile-home-protect .protect-times{
+    margin-top:2px!important;
+    font-size:11px!important;
+    line-height:15px!important;
+    color:#b7c0bd!important;
+  }
+  .mobile-home-protect .protect-countdown,
+  .mobile-home-protect .protect-active,
+  .mobile-home-protect .protect-ended{
+    margin-top:5px!important;
+    font-size:13px!important;
+    line-height:17px!important;
+    font-weight:900!important;
+    color:#e6a62b!important;
+  }
+}
