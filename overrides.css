@@ -1496,3 +1496,26 @@ textarea::-webkit-scrollbar{
     letter-spacing:0!important;
   }
 }
+
+/* Mobile Stash/Base: comment field exactly matches Send button height */
+@media (max-width:900px){
+  .place-page-card #placeBody .ref-feed-compose-row{
+    align-items:stretch!important;
+  }
+  .place-page-card #placeBody .place-compose textarea#placeComment.place-comment,
+  .place-page-card #placeBody .ref-feed-compose-row .place-comment{
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    box-sizing:border-box!important;
+    padding:10px 12px!important;
+    line-height:20px!important;
+    resize:none!important;
+  }
+  .place-page-card #placeBody .ref-feed-send{
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    box-sizing:border-box!important;
+  }
+}
