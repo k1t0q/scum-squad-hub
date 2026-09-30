@@ -1558,3 +1558,9 @@ header .ref-brand h1,#pageTitle{font-size:13px!important;font-weight:800!importa
 .raid-detail-actions .danger{border-color:#743036!important;background:#2a1215!important;color:#ff686e!important}
 .raid-detail-actions .danger:hover{background:#3b181c!important;border-color:#a33d45!important}
 .raid-detail-actions .ghost{margin-left:auto!important;color:#aebbb8!important}
+
+/* FURY PREVIEW v8.6 — raid participants inside detail modal */
+.raid-detail-people{margin-top:14px!important;padding-top:12px!important;border-top:1px solid #21302d!important}
+.raid-detail-people>span{display:block!important;margin-bottom:8px!important;color:#82928e!important;font-size:10px!important;font-weight:800!important;letter-spacing:.7px!important}
+.raid-detail-people>div{display:flex!important;gap:6px!important;flex-wrap:wrap!important}
+.raid-detail-people .badge.work{padding:5px 9px!important;border-radius:5px!important;background:#0c241d!important;border:1px solid #255a48!important;color:#65ddb0!important;font-size:11px!important}
