@@ -755,3 +755,9 @@ textarea::-webkit-scrollbar{
   width:0!important;
   height:0!important;
 }
+
+/* Stash/Base publication text slightly larger */
+.place-page-card #placeBody .ref-feed-post .ref-feed-comment{
+  font-size:12px!important;
+  line-height:1.4!important;
+}
