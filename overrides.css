@@ -1530,3 +1530,10 @@ textarea::-webkit-scrollbar{
   .mobile-home-protect .protect-countdown{color:#e6a62b!important}
   .mobile-home-protect .protect-ended{color:#e75a62!important}
 }
+
+/* Short attachment label on mobile only */
+.attach-mobile{display:none}
+@media (max-width:900px){
+  .ref-feed-attach .attach-full{display:none!important}
+  .ref-feed-attach .attach-mobile{display:inline!important}
+}
