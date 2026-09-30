@@ -208,8 +208,12 @@ function sidebarProtectHtml(){
  let p=db.protect,el=document.getElementById('sidebarProtect');if(!el)return;
  if(!p){el.className='sidebar-protect protect-red';el.innerHTML='<small>ПРОТЕКТ</small><b>ПРОТЕКТ СПАЛ</b><span>Нет активного протекта</span>';return}
  let u=new Date(p.time),st=new Date(u.getTime()+3600000),en=new Date(st.getTime()+8*3600000),n=new Date(),cls=n<st?'protect-orange':n<en?'protect-green':'protect-red',label=n<st?'ЗАПУСКАЕТСЯ':n<en?'АКТИВЕН':'СПАЛ';
- let extra=n<st?'<em>До начала: '+String(Math.floor((st-n)/3600000)).padStart(2,'0')+':'+String(Math.floor((st-n)%3600000/60000)).padStart(2,'0')+'</em>':'';
- el.className='sidebar-protect '+cls;el.innerHTML='<small>ПРОТЕКТ</small><b>'+label+'</b><span class="sidebar-protect-who">'+esc(p.nick)+' · '+protectClock(u)+'</span><div class="sidebar-protect-times"><span>Начало: <strong>'+protectClock(st)+'</strong></span><span>Спадёт: <strong>'+protectClock(en)+'</strong></span><span>Активен: <strong>8 ч</strong></span></div>'+extra;
+ let extra=n<st?'<em class="sidebar-protect-countdown" data-start="'+st.toISOString()+'">До начала: '+String(Math.floor((st-n)/3600000)).padStart(2,'0')+':'+String(Math.floor((st-n)%3600000/60000)).padStart(2,'0')+':'+String(Math.floor((st-n)%60000/1000)).padStart(2,'0')+'</em>':'';
+ el.className='sidebar-protect '+cls;el.innerHTML='<small>ПРОТЕКТ</small><b>'+label+'</b><span class="sidebar-protect-who">'+esc(p.nick)+' · '+protectClock(u)+'</span><div class="sidebar-protect-times"><span>Начало: <strong>'+protectClock(st)+'</strong></span><span>Спадёт: <strong>'+protectClock(en)+'</strong></span></div>'+extra;if(n<st)setTimeout(startSidebarProtectCountdown,0);
+}
+function startSidebarProtectCountdown(){
+ if(window.sidebarProtectCountdownTimer)clearInterval(window.sidebarProtectCountdownTimer);
+ window.sidebarProtectCountdownTimer=setInterval(()=>{let el=document.querySelector('.sidebar-protect-countdown[data-start]');if(!el){clearInterval(window.sidebarProtectCountdownTimer);return}let ms=new Date(el.dataset.start)-new Date();if(ms<=0){clearInterval(window.sidebarProtectCountdownTimer);sidebarProtectHtml();return}let h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000);el.textContent='До начала: '+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')},1000)
 }
 function startHeaderProtectCountdown(){
  let x=document.querySelector('.ref-protect-countdown[data-start]');if(!x)return;
