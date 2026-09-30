@@ -290,3 +290,10 @@
     background:#201719!important;border:1px solid #573034!important;color:#d9cacc!important;
   }
 }
+
+/* Align attendance card directly under raid-plan card */
+@media (min-width:901px){
+  .ref-middle{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  }
+}
