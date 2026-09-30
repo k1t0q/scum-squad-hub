@@ -627,3 +627,38 @@
     max-height:410px!important;
   }
 }
+
+/* Home feed photos: use the same natural thumbnail behavior as Stash/Base */
+.ref-feed-post{
+  overflow:visible!important;
+}
+.ref-feed-post .placephotos:not(:empty){
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:flex-start!important;
+  gap:8px!important;
+  width:100%!important;
+  height:auto!important;
+  max-height:none!important;
+  margin:8px 0 0!important;
+  overflow:visible!important;
+}
+.ref-feed-post .placephotos .placephoto{
+  position:relative!important;
+  display:block!important;
+  flex:0 0 110px!important;
+  width:110px!important;
+  height:72px!important;
+  min-width:110px!important;
+  min-height:72px!important;
+}
+.ref-feed-post .placephotos .placephoto img{
+  display:block!important;
+  width:110px!important;
+  height:72px!important;
+  min-width:110px!important;
+  min-height:72px!important;
+  max-width:110px!important;
+  object-fit:cover!important;
+  border-radius:7px!important;
+}
