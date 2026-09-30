@@ -1587,3 +1587,35 @@ html.modal-lock,body.modal-lock{overflow:hidden!important;height:100%!important}
 /* FURY PREVIEW v9 — restore readable raid roster */
 .raid-list-roster .raid-roster-name{font-size:13px!important;font-weight:800!important}
 .raid-list-roster .raid-comma{font-size:13px!important}
+
+/* FURY PREVIEW v9.3 — unified action buttons across raids/tasks */
+.card .actions,.item .actions,.raidactions,.taskactions,.dialogfoot,.profile-actions{gap:8px!important}
+.card .actions button,.item .actions button,.raidactions button,.taskactions button,
+.dialogfoot button,.profile-actions button{
+ min-height:36px!important;padding:0 14px!important;border-radius:6px!important;
+ border:1px solid #30433f!important;background:#0c1715!important;color:#dfe8e5!important;
+ font-size:12px!important;font-weight:700!important;box-shadow:none!important;
+ cursor:pointer!important;transition:background .15s,border-color .15s,color .15s!important
+}
+.card .actions button:hover,.item .actions button:hover,.raidactions button:hover,.taskactions button:hover,
+.dialogfoot button:hover,.profile-actions button:hover{
+ background:#142521!important;border-color:#49645e!important;color:#fff!important
+}
+/* positive actions */
+.card .actions button:first-child,.item .actions button:first-child,.raidactions button:first-child,
+.taskactions button:first-child,.dialogfoot .raid-join,.dialogfoot button[onclick*="addContribution"]{
+ background:#0c241d!important;border-color:#257558!important;color:#62e5b0!important
+}
+.card .actions button:first-child:hover,.item .actions button:first-child:hover,.raidactions button:first-child:hover,
+.taskactions button:first-child:hover,.dialogfoot .raid-join:hover,.dialogfoot button[onclick*="addContribution"]:hover{
+ background:#12382c!important;border-color:#39a87d!important;color:#8bf0c6!important
+}
+/* destructive actions */
+.card .actions .danger,.item .actions .danger,.raidactions .danger,.taskactions .danger,
+.dialogfoot .danger,.profile-actions .danger,button[onclick*="deleteOp"],button[onclick*="deleteTask"]{
+ background:#2a1215!important;border-color:#743036!important;color:#ff686e!important
+}
+.card .actions .danger:hover,.item .actions .danger:hover,.raidactions .danger:hover,.taskactions .danger:hover,
+.dialogfoot .danger:hover,.profile-actions .danger:hover,button[onclick*="deleteOp"]:hover,button[onclick*="deleteTask"]:hover{
+ background:#3b181c!important;border-color:#a33d45!important;color:#ff858a!important
+}
