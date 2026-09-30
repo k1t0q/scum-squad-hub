@@ -8,6 +8,7 @@ function showTaskComplete(){let d=document.createElement('div');d.className='tas
 function taskDetails(id,e){if(e&&e.target.closest('button'))return;let t=db.tasks.find(x=>x.id===id);if(!t)return;let hist=t.history||[];modal('<h2>'+esc(t.title)+'</h2><div class="muted">'+(t.need?('Нужно: '+t.need+' '+unitForm(t.need,t.unit)+' · Собрано: '+t.done+' '+unitForm(t.done,t.unit)):'Без количества')+'</div>'+(t.place?'<p>Место: '+esc(t.place)+'</p>':'')+(t.deadline?'<p>До: '+esc(t.deadline)+'</p>':'')+(t.comment?'<p>'+esc(t.comment)+'</p>':'')+'<h3 style="margin-top:20px">История</h3><div class="list">'+(hist.length?hist.map(h=>'<div class="item itemtop"><span>'+esc(h.nick)+' · +'+h.qty+' '+unitForm(h.qty,t.unit)+'</span><button class="ghost" onclick="undoContribution('+id+','+h.id+')">Отменить</button></div>').join(''):'<div class="empty">Вкладов пока нет</div>')+'</div><div class="dialogfoot"><button class="ghost" onclick="closeModal()">Закрыть</button></div>')}
 function render(){if(page==='Сегодня')page='Главная'; $('#myNick').textContent=db.profile.nick;let sc=$('#squadCount');if(sc){let n=db.members.length;sc.textContent=n+' '+(n%10===1&&n%100!==11?'УЧАСТНИК':(n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?'УЧАСТНИКА':'УЧАСТНИКОВ'));}if(page==='Главная'||page==='Сегодня')today();if(page==='Задачи')tasks();if(page==='План на рейд'||page==='Рейд')ops();if(page==='Состав')members();if(page==='Взрыв')stats();if(page==='Схрон')placePage('stash');if(page==='Базы')placePage('base')}
 function today(){
+ headerProtectHtml();
  let playing=db.members.filter(x=>x[3]==='Буду').length,walls=Number(window.furyWalls||0),activeTasks=db.tasks.filter(t=>t.status!=='Выполнено'&&t.status!=='Выполнена');
  let plan=db.ops.slice(0,3).map(o=>{let p=Array.isArray(o.participants)?o.participants:[];return '<div class="ref-plan-row raidclick" onclick="viewOp('+o.id+')"><span class="ref-dot"></span><b class="ref-time">'+esc(o.time)+'</b><div class="ref-plan-name"><b>'+esc(o.title)+'</b><small>'+esc(o.note||'')+'</small></div><div class="ref-people">'+(p.slice(0,3).map(n=>'<i>'+esc(n).slice(0,1).toUpperCase()+'</i>').join(''))+(p.length>3?'<em>+'+(p.length-3)+'</em>':'')+'</div></div>'}).join('');
  let taskRows=activeTasks.slice(0,5).map(t=>'<div class="ref-task-row" onclick="taskDetails('+t.id+',event)"><span class="ref-ring"></span><b>'+esc(t.title)+'</b><span>'+Number(t.done||0)+' / '+Number(t.need||0)+'</span></div>').join('');
@@ -200,6 +201,12 @@ function startSharedSync(){if(window.sharedSyncStarted)return;window.sharedSyncS
 function moscowPresenceDay(){let parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Moscow',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date());let v=Object.fromEntries(parts.map(x=>[x.type,x.value]));let d=new Date(Date.UTC(+v.year,+v.month-1,+v.day));if(+v.hour<5)d.setUTCDate(d.getUTCDate()-1);return d.toISOString().slice(0,10)}
 let protectCountdownTimer=null;
 function protectClock(d){return d.toLocaleTimeString('ru-RU',{timeZone:'Europe/Moscow',hour:'2-digit',minute:'2-digit'})}
+function headerProtectHtml(){
+ let p=db.protect,el=document.getElementById('headerProtect');if(!el)return;
+ if(!p){el.className='ref-protect-head protect-red';el.innerHTML='<span class="ref-shield">◇</span><div><b>ПРОТЕКТ СПАЛ</b><small>Нажмите, чтобы обновить</small></div><i></i>';return}
+ let u=new Date(p.time),s=new Date(u.getTime()+3600000),e=new Date(s.getTime()+8*3600000),n=new Date(),cls=n<s?'protect-orange':n<e?'protect-green':'protect-red',label=n<s?'ПРОТЕКТ ЗАПУСКАЕТСЯ':n<e?'ПРОТЕКТ АКТИВЕН':'ПРОТЕКТ СПАЛ';
+ el.className='ref-protect-head '+cls;el.innerHTML='<span class="ref-shield">◇</span><div><b>'+label+'</b><small>'+esc(p.nick)+' · '+protectClock(u)+'</small></div><i></i>';
+}
 function protectHomeHtml(p){
  let updated=new Date(p.time),starts=new Date(updated.getTime()+60*60*1000),ends=new Date(starts.getTime()+8*60*60*1000),now=new Date(),status='';
  if(now<starts){let ms=starts-now,h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000);status='<div class="protect-countdown" data-start="'+starts.toISOString()+'">До начала: <b>'+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'</b></div>'}
@@ -213,6 +220,7 @@ function startProtectCountdown(){
  let el=document.querySelector('.protect-countdown[data-start]');if(!el)return;
  protectCountdownTimer=setInterval(()=>{let x=document.querySelector('.protect-countdown[data-start]');if(!x){clearInterval(protectCountdownTimer);return}let end=new Date(x.dataset.start),ms=end-new Date();if(ms<=0){clearInterval(protectCountdownTimer);if(page==='Главная')render();return}let h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000);x.innerHTML='До начала: <b>'+String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'</b>'},1000);
 }
+function confirmQuickProtect(){if(!confirm('Обновить протект?'))return;quickProtect()}
 async function quickProtect(){
  if(!onlineMember){toast('Профиль не найден');return}
  let {error}=await sb.from('protect_updates').insert({squad_id:onlineMember.squad_id,member_id:onlineMember.id});
