@@ -1713,3 +1713,31 @@ textarea::-webkit-scrollbar{
     margin-bottom:0!important;
   }
 }
+
+/* Desktop: restore normal page scrolling */
+@media (min-width:901px){
+  html,body{
+    height:auto!important;
+    min-height:100%!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+  }
+  .app{
+    height:auto!important;
+    max-height:none!important;
+    min-height:100vh!important;
+    overflow:visible!important;
+  }
+  main{
+    height:auto!important;
+    max-height:none!important;
+    min-height:calc(100vh - 72px)!important;
+    overflow:visible!important;
+  }
+  #view{
+    height:auto!important;
+    max-height:none!important;
+    min-height:0!important;
+    overflow:visible!important;
+  }
+}
