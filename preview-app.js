@@ -9,23 +9,30 @@ function taskDetails(id,e){if(e&&e.target.closest('button'))return;let t=db.task
 function render(){if(page==='Сегодня')page='Главная'; $('#myNick').textContent=db.profile.nick;let sc=$('#squadCount');if(sc){let n=db.members.length;sc.textContent=n+' '+(n%10===1&&n%100!==11?'УЧАСТНИК':(n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?'УЧАСТНИКА':'УЧАСТНИКОВ'));}if(page==='Главная'||page==='Сегодня')today();if(page==='Задачи')tasks();if(page==='План на рейд'||page==='Рейд')ops();if(page==='Состав')members();if(page==='Взрыв')stats();if(page==='Схрон')placePage('stash');if(page==='Базы')placePage('base')}
 function today(){
  let playing=db.members.filter(x=>x[3]==='Буду').length,walls=Number(window.furyWalls||0),activeTasks=db.tasks.filter(t=>t.status!=='Выполнено'&&t.status!=='Выполнена');
- let plan=db.ops.slice(0,2).map(o=>{let p=Array.isArray(o.participants)?o.participants:[];return '<div class="item raiditem raidclick fury-raid-row" onclick="viewOp('+o.id+')"><div class="itemtop"><div><h3>'+esc(o.title)+'</h3><div class="muted">'+(o.date?formatPlanDate(o.date)+' · ':'')+'сбор '+esc(o.time)+'</div></div><span class="badge">'+p.length+' '+participantWord(p.length)+'</span></div><div class="muted fury-note">'+esc(o.note||'')+'</div><div class="presence fury-chips">'+(p.length?p.map(n=>'<span class="badge work">'+esc(n)+'</span>').join(' '):'<span class="muted">Пока никто не записался</span>')+'</div></div>'}).join('');
+ let plan=db.ops.slice(0,3).map(o=>{let p=Array.isArray(o.participants)?o.participants:[];return '<div class="ref-plan-row raidclick" onclick="viewOp('+o.id+')"><span class="ref-dot"></span><b class="ref-time">'+esc(o.time)+'</b><div class="ref-plan-name"><b>'+esc(o.title)+'</b><small>'+esc(o.note||'')+'</small></div><div class="ref-people">'+(p.slice(0,3).map(n=>'<i>'+esc(n).slice(0,1).toUpperCase()+'</i>').join(''))+(p.length>3?'<em>+'+(p.length-3)+'</em>':'')+'</div></div>'}).join('');
+ let taskRows=activeTasks.slice(0,5).map(t=>'<div class="ref-task-row" onclick="taskDetails('+t.id+',event)"><span class="ref-ring"></span><b>'+esc(t.title)+'</b><span>'+Number(t.done||0)+' / '+Number(t.need||0)+'</span></div>').join('');
  let choices=['Буду','Под вопросом','Не буду'].map(x=>'<button class="presencechoice '+(x==='Буду'?'yes':x==='Под вопросом'?'maybe':'no')+' '+(db.presence.status===x?'active':'')+'" onclick="setPresence(\''+x+'\')">'+x+'</button>').join('');
- let joinTime=db.presence.status==='Буду'?'<div class="fury-join-time">Время захода <b>'+esc(db.presence.time||'')+'</b><button class="ghost" onclick="setTime()">Изменить</button></div>':'';
- let protectText=db.protect?protectHomeHtml(db.protect):'—'; refreshWallMetric();
- $('#view').innerHTML='<div class="fury-home">'+
- '<section class="fury-hero"><div class="fury-hero-copy"><span class="fury-kicker">FURY / SCUM SQUAD HUB</span><h2>ШТАБ ОТРЯДА</h2><p>Планы, задачи, ресурсы и состав в одном месте.</p></div><div class="fury-hero-mark">FURY</div></section>'+
- '<div class="fury-metrics">'+
- '<div class="fury-metric"><span>СЕГОДНЯ ИГРАЮТ</span><b>'+playing+'</b></div>'+
- '<div class="fury-metric"><span>АКТИВНЫЕ ЗАДАЧИ</span><b>'+activeTasks.length+'</b></div>'+
- '<div class="fury-metric fury-click" onclick="go(\'Взрыв\')"><span>ВЗРЫВ</span><b id="wallMetric">'+walls+' '+wallWord(walls)+'</b></div>'+
- '<div class="fury-metric fury-protect '+(db.protect?'has-protect':'')+'" onclick="showProtectHistory()"><span>ПРОТЕКТ</span><div>'+protectText+'</div><button class="primary" onclick="event.stopPropagation();quickProtect()">ОБНОВИТЬ</button></div></div>'+
- '<div class="fury-dashboard">'+
- '<section class="fury-panel fury-plan"><div class="fury-panel-head"><div><span class="fury-section-no">01</span><h2>План на рейд</h2></div><button class="primary" onclick="newOp()">+ СОЗДАТЬ ПЛАН</button></div><div class="fury-panel-body">'+(plan||'<div class="empty">План пока не создан</div>')+'</div></section>'+
- '<section class="fury-panel fury-tasks"><div class="fury-panel-head"><div><span class="fury-section-no">02</span><h2>Активные задачи</h2></div><button class="primary" onclick="newTask()">+ СОЗДАТЬ ЗАДАЧУ</button></div><div class="list">'+(activeTasks.slice(0,4).map(taskCard).join('')||'<div class="empty">Задач пока нет</div>')+'</div></section>'+
- '<section class="fury-panel fury-attendance"><div class="fury-panel-head"><div><span class="fury-section-no">03</span><h2>Участие</h2></div></div><div class="fury-my"><b>'+esc(db.profile.nick)+'</b><span>'+esc(db.profile.role)+'</span><div class="presence">'+choices+'</div>'+joinTime+'</div><div class="fury-divider"></div><h3 class="fury-subhead">Кто сегодня будет?</h3><div class="attendance-list">'+db.members.map(m=>'<div class="fury-member"><div><b>'+esc(m[0])+'</b><small>'+esc(m[1])+(m[3]==='Буду'?' · '+esc(m[2]):'')+'</small></div><span class="badge status '+(m[3]==='Буду'?'yes':m[3]==='Под вопросом'?'maybe':'no')+'">'+esc(m[3])+'</span></div>').join('')+'</div></section>'+
- '<section class="fury-panel fury-feed"><div class="fury-panel-head"><div><span class="fury-section-no">04</span><h2>Фото и комментарии</h2></div></div><div id="homePlaceBody"><div class="empty">Загрузка…</div></div></section>'+
- '</div></div>'; renderHomePlace();
+ let protectText=db.protect?protectHomeHtml(db.protect):'—';
+ refreshWallMetric();
+ $('#view').innerHTML='<div class="ref-home">'+
+ '<div class="ref-top">'+
+  '<section class="ref-card ref-plan"><div class="ref-title"><span class="ref-icon green">▣</span><h2>ПЛАН НА ВЕЧЕР</h2><b>'+db.ops.length+'</b></div><div class="ref-list">'+(plan||'<div class="empty">План пока не создан</div>')+'</div></section>'+
+  '<section class="ref-card ref-tasks"><div class="ref-title"><span class="ref-icon red">◎</span><h2>АКТИВНЫЕ ЗАДАЧИ</h2><b>'+activeTasks.length+'</b></div><div class="ref-list">'+(taskRows||'<div class="empty">Задач пока нет</div>')+'</div></section>'+
+ '</div>'+
+ '<div class="ref-middle">'+
+  '<section class="ref-card ref-att"><div class="ref-title"><span class="ref-icon green">♙</span><h2>МОЁ УЧАСТИЕ</h2></div><div class="ref-mini-stats"><div><small>ЗАПЛАНИРОВАНО</small><b>'+db.tasks.length+' '+(db.tasks.length===1?'задача':'задачи')+'</b></div><div><small>УЧАСТВУЮ</small><b>'+db.ops.filter(o=>(o.participants||[]).includes(db.profile.nick)).length+' рейда</b></div><div><small>ВЫПОЛНЕНО</small><b>'+db.tasks.filter(t=>t.status==='Выполнено'||t.status==='Выполнена').length+' задача</b></div></div><div class="ref-att-head"><h3>КТО СЕГОДНЯ БУДЕТ?</h3><b>'+playing+' / '+db.members.length+'</b></div><div class="ref-members">'+db.members.map(m=>'<div class="ref-member"><div class="ref-avatar">'+esc(m[0]).slice(0,1).toUpperCase()+'</div><b>'+esc(m[0])+'</b><div class="ref-statuses">'+(m[0]===db.profile.nick?choices:'<span class="ref-status '+(m[3]==='Буду'?'yes':m[3]==='Под вопросом'?'maybe':'no')+'">'+esc(m[3])+'</span>')+'</div><span class="ref-member-time">'+(m[3]==='Буду'?esc(m[2]||'20:00–00:00'):'—')+'</span></div>').join('')+'</div></section>'+
+  '<section class="ref-card ref-feed"><div class="ref-title"><span class="ref-icon">▣</span><h2>ФОТО И КОММЕНТАРИИ</h2><button class="ghost" onclick="homeFeedAll=true;homeFeedShown=15;renderHomePlace()">Все записи</button></div><div id="homePlaceBody"><div class="empty">Загрузка…</div></div></section>'+
+ '</div>'+
+ '<section class="ref-card ref-expl"><div class="ref-title"><span class="ref-icon red">✣</span><h2>ВЗРЫВ</h2><small>Общий склад отряда. Любой участник может изменить количество.</small><button class="ghost" onclick="go(\'Взрыв\')">Открыть</button></div><div id="refExplosiveStrip"><div class="empty">Загрузка склада…</div></div></section>'+
+ '</div>'; renderHomePlace(); renderRefExplosives();
+}
+function renderRefExplosives(){
+ let host=document.getElementById('refExplosiveStrip');if(!host)return;
+ let inv=(db.explosives||window.explosives||[]),names=['С4','РПГ','ГРАНАТА','ДИНАМИТ','ПАЙПА','40'];
+ let getQ=n=>{let x=inv.find(v=>String(v.item||v.name||'').toUpperCase()===n);return Number(x?.qty??x?.quantity??0)};
+ let per={'С4':3,'РПГ':6,'ГРАНАТА':12,'ДИНАМИТ':6};
+ let cards=names.map(n=>{let q=getQ(n),pw=per[n],w=pw?Math.floor(q/pw):0,r=pw?q%pw:0;return '<div class="ref-expl-item"><div class="ref-expl-pic">'+(n==='С4'?'▰':n==='РПГ'?'╱':n==='ГРАНАТА'?'●':n==='ДИНАМИТ'?'▥':n==='ПАЙПА'?'╱':'◆')+'</div><div><b>'+n+'</b><strong>'+q+'</strong><small>В наличии · '+w+' стен'+(r?' + '+r+' '+n:'')+'</small></div></div>'}).join('');
+ host.innerHTML='<div class="ref-expl-items">'+cards+'</div><div class="ref-wall-total"><small>МОЖНО ВЗОРВАТЬ</small><b>'+Number(window.furyWalls||0)+' СТЕН</b></div>';
 }
 function tasks(){$('#view').innerHTML='<div class="card"><div class="toolbar"><div><h2>Задачи отряда</h2><span class="muted">Собрать, налутать, скрафтить или доставить на базу.</span></div><button class="primary" onclick="newTask()">+ СОЗДАТЬ ЗАДАЧУ</button></div><div class="list">'+(db.tasks.length?db.tasks.map(taskCard).join(''):'<div class="empty">Задач пока нет</div>')+'</div></div>'}
 function participantWord(n){n=Number(n)||0;let m=n%100,a=n%10;return (m>=11&&m<=14)?'участников':a===1?'участник':(a>=2&&a<=4)?'участника':'участников'}
