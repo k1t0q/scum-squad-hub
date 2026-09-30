@@ -1517,3 +1517,6 @@ header .ref-brand h1,#pageTitle{font-size:13px!important;font-weight:800!importa
  .ref-protect-head{width:max-content!important;min-width:0!important;max-width:none!important;padding:0 12px!important;grid-template-columns:max-content 9px!important;column-gap:9px!important}
  .ref-protect-head>div{width:max-content!important}
 }
+
+/* FURY PREVIEW v7.8 — pointer cursor for modal actions */
+.modal button,.modal .ghost,.modal .primary,.modal .danger{cursor:pointer!important}
