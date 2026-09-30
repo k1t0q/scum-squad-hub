@@ -618,3 +618,12 @@
   object-fit:cover!important;
   border-radius:5px!important;
 }
+
+/* Match middle home cards at 410px */
+@media (min-width:901px){
+  .ref-att-base,.ref-feed{
+    height:410px!important;
+    min-height:410px!important;
+    max-height:410px!important;
+  }
+}
