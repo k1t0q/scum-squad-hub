@@ -241,3 +241,11 @@
     letter-spacing:0!important;
   }
 }
+
+/* Attendance row separators like task rows */
+.ref-att-base .ref-member{
+  border-bottom:1px solid #1b292c!important;
+}
+.ref-att-base .ref-member:last-child{
+  border-bottom:0!important;
+}
