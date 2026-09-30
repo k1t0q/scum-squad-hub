@@ -1576,3 +1576,10 @@ header .ref-brand h1,#pageTitle{font-size:13px!important;font-weight:800!importa
 html.modal-lock,body.modal-lock{overflow:hidden!important;height:100%!important}
 .modal.open{overflow-y:auto!important;overscroll-behavior:contain!important}
 .modal.open .dialog{max-height:calc(100vh - 28px)!important;overflow-y:auto!important;overscroll-behavior:contain!important}
+
+/* FURY PREVIEW v8.9 — full roster on raid list cards */
+.raid-list-roster{margin-top:10px!important}
+.raid-list-roster .raid-roster{display:block!important;margin-top:6px!important;line-height:1.8!important}
+.raid-list-roster .raid-roster-name{font-size:11px!important;font-weight:800!important}
+.raid-list-roster .raid-roster-name.is-out{color:#ff6268!important}
+.raid-list-roster .raid-roster-name.is-in{color:#55e6aa!important;text-shadow:0 0 9px rgba(85,230,170,.18)!important}
