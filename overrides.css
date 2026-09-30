@@ -1621,3 +1621,16 @@ textarea::-webkit-scrollbar{
     margin-bottom:0!important;
   }
 }
+
+/* Desktop: remove protect from header and make header more compact */
+@media (min-width:901px){
+  .ref-header .ref-protect-head{
+    display:none!important;
+  }
+  .ref-header{
+    min-height:72px!important;
+    height:72px!important;
+    padding-top:0!important;
+    padding-bottom:0!important;
+  }
+}
