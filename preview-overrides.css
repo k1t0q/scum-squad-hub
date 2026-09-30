@@ -766,3 +766,11 @@ textarea::-webkit-scrollbar{
 .ref-expl .ref-expl-pic{
   display:none!important;
 }
+
+/* Home explosives quantity controls */
+.ref-expl-main{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
+.ref-expl-edit{display:flex!important;align-items:center!important;gap:5px!important}
+.ref-expl-edit button{width:25px!important;height:25px!important;min-width:25px!important;padding:0!important;border:1px solid #67252b!important;border-radius:5px!important;background:#261315!important;color:#ff5c64!important;font-size:17px!important;font-weight:900!important;cursor:pointer!important}
+.ref-expl-edit input{width:38px!important;height:25px!important;padding:0 3px!important;text-align:center!important;border:1px solid #263633!important;border-radius:4px!important;background:#09100f!important;color:#f2f5f3!important;font-size:15px!important;font-weight:900!important;-moz-appearance:textfield!important}
+.ref-expl-edit input::-webkit-inner-spin-button,.ref-expl-edit input::-webkit-outer-spin-button{-webkit-appearance:none!important;margin:0!important}
+.ref-expl-item>small{display:block!important;margin-top:7px!important}
