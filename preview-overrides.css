@@ -822,3 +822,18 @@ textarea::-webkit-scrollbar{
     box-sizing:border-box!important;
   }
 }
+
+/* Plan/tasks headings: same hover behavior as EXPLOSIVES */
+.ref-plan .ref-section-link,
+.ref-tasks .ref-section-link{
+  cursor:pointer!important;
+  transition:.15s ease!important;
+}
+.ref-plan .ref-section-link:hover,
+.ref-tasks .ref-section-link:hover{
+  color:#ff5b63!important;
+}
+.ref-plan .ref-section-link:hover .ref-count,
+.ref-tasks .ref-section-link:hover .ref-count{
+  color:#ff5b63!important;
+}
