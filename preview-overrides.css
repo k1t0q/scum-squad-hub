@@ -1,15 +1,29 @@
 /* Preview home readability overrides */
 @media (min-width:901px){
-  .ref-plan .ref-title,.ref-tasks .ref-title{height:46px!important}
-  .ref-plan .ref-title h2,.ref-tasks .ref-title h2{font-size:19px!important;gap:10px!important}
-  .ref-plan .ref-count,.ref-tasks .ref-count{min-width:28px!important;height:28px!important;font-size:14px!important}
+  .ref-plan .ref-title,.ref-tasks .ref-title{height:42px!important}
+  .ref-plan .ref-title h2,.ref-tasks .ref-title h2{font-size:17px!important;gap:8px!important}
+  .ref-plan .ref-count,.ref-tasks .ref-count{min-width:25px!important;height:25px!important;font-size:13px!important}
   .ref-plan .ref-create,.ref-tasks .ref-create{
-    height:40px!important;padding:0 18px!important;font-size:13px!important;
-    font-weight:900!important;border-radius:6px!important
+    height:32px!important;padding:0 12px!important;font-size:10px!important;
+    font-weight:900!important;border-radius:5px!important
   }
-  .ref-plan .ref-list,.ref-tasks .ref-list{font-size:15px!important}
-  .ref-plan .ref-row,.ref-tasks .ref-row{min-height:46px!important}
-  .ref-plan .ref-row strong,.ref-tasks .ref-row strong{font-size:15px!important;line-height:1.3!important}
-  .ref-plan .ref-row,.ref-plan .ref-row span,.ref-plan .ref-row b,
-  .ref-tasks .ref-row,.ref-tasks .ref-row span,.ref-tasks .ref-row b{font-size:15px!important}
+
+  /* Actual content rows */
+  .ref-plan-row{height:49px!important;grid-template-columns:16px 58px 1fr auto!important;gap:9px!important}
+  .ref-plan-row .ref-time{font-size:14px!important}
+  .ref-plan-row .ref-plan-name b{font-size:14px!important;line-height:1.25!important}
+  .ref-plan-row .ref-plan-name small{font-size:11px!important;line-height:1.25!important}
+  .ref-task-row{height:38px!important;grid-template-columns:18px 1fr auto!important;gap:7px!important}
+  .ref-task-row b{font-size:14px!important;line-height:1.25!important}
+  .ref-task-row>span:last-child{font-size:12px!important}
+
+  /* Same status circle style in Plan and Tasks */
+  .ref-plan-row .ref-dot,.ref-task-row .ref-ring{
+    width:13px!important;height:13px!important;
+    border:2px solid #3ad398!important;border-radius:50%!important;
+    box-sizing:border-box!important
+  }
+  .ref-plan-row:nth-child(2) .ref-dot,.ref-plan-row:nth-child(3) .ref-dot{
+    border-color:#3ad398!important
+  }
 }
