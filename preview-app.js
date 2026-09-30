@@ -203,10 +203,10 @@ let protectCountdownTimer=null;
 function protectClock(d){return d.toLocaleTimeString('ru-RU',{timeZone:'Europe/Moscow',hour:'2-digit',minute:'2-digit'})}
 function headerProtectHtml(){
  let p=db.protect,el=document.getElementById('headerProtect');if(!el)return;
- if(!p){el.className='ref-protect-head protect-red';el.innerHTML='<span class="ref-shield">♢</span><div><b>ПРОТЕКТ СПАЛ</b><small>Нет активного протекта</small></div><i></i>';return}
+ if(!p){el.className='ref-protect-head protect-red';el.innerHTML='<span class="ref-shield"></span><div><b>ПРОТЕКТ СПАЛ</b><small>Нет активного протекта</small></div><i></i>';return}
  let u=new Date(p.time),st=new Date(u.getTime()+3600000),en=new Date(st.getTime()+8*3600000),n=new Date(),cls=n<st?'protect-orange':n<en?'protect-green':'protect-red',label=n<st?'ПРОТЕКТ ЗАПУСКАЕТСЯ':n<en?'ПРОТЕКТ АКТИВЕН':'ПРОТЕКТ СПАЛ';
  el.className='ref-protect-head '+cls;
- el.innerHTML='<span class="ref-shield">♢</span><div><b>'+label+'</b><small>'+esc(p.nick)+' · '+protectClock(u)+' &nbsp; Начало: '+protectClock(st)+' · Спадёт: '+protectClock(en)+'</small></div><i></i>';
+ el.innerHTML='<span class="ref-shield"></span><div><b>'+label+'</b><small>'+esc(p.nick)+' · '+protectClock(u)+' &nbsp; Начало: '+protectClock(st)+' · Спадёт: '+protectClock(en)+'</small></div><i></i>';
 }
 function protectHomeHtml(p){
  let updated=new Date(p.time),starts=new Date(updated.getTime()+60*60*1000),ends=new Date(starts.getTime()+8*60*60*1000),now=new Date(),status='';
