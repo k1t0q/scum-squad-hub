@@ -1409,3 +1409,14 @@ header h1{color:#647872!important;font-size:10px!important}
  .ref-home{width:100%!important;max-width:none!important}
  .ref-top,.ref-middle{width:100%!important;min-width:0!important}
 }
+
+
+/* FURY PREVIEW v6.2 — restore logo proportions + online row */
+@media(min-width:901px){
+ .logo{height:82px!important;padding:5px 13px 14px!important}
+ .logo i{display:inline-block!important;width:auto!important;height:auto!important;font-family:Impact,"Arial Black",sans-serif!important;font-size:42px!important;line-height:.88!important;letter-spacing:-1.8px!important;transform:skew(-10deg) scaleX(1.28)!important;transform-origin:left center!important;white-space:nowrap!important}
+ .logo>div{margin-top:8px!important}.logo small{font-size:8px!important;letter-spacing:3.15px!important}
+ .server-online-row{display:flex!important;align-items:center!important;gap:5px!important;font-size:8px!important;color:#9cabad!important;white-space:nowrap!important}
+ .server-online-row .online-dot{margin:0!important;flex:0 0 auto!important}
+ .server-online-row .server-online{display:inline!important;margin:0 0 0 auto!important;font-size:16px!important;line-height:1!important;color:#50e2aa!important}
+}
