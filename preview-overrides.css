@@ -162,3 +162,24 @@
   .ref-plan-row .ref-plan-name small{font-size:10px!important;line-height:1.15!important;margin-top:1px!important}
   .ref-plan-row .ref-people-count{font-size:12px!important}
 }
+
+/* Base attendance structure restyled for black/red preview */
+.ref-att-base{height:505px!important;overflow:hidden!important}
+.ref-att-base .ref-title{border-bottom:1px solid #2d2022!important}
+.ref-my-presence{padding:5px 0 15px}
+.ref-me-line{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ref-me-line>b{font-size:14px}.ref-me-line>span{font-size:10px;color:#7f8b8d}
+.ref-presence-buttons{display:flex;gap:7px;flex-wrap:wrap}
+.ref-presence-buttons .presencechoice{height:31px!important;padding:0 12px!important;border-radius:5px!important;font-size:10px!important;font-weight:800!important}
+.ref-presence-buttons .presencechoice.yes{border-color:#286c55!important;color:#6ee4b1!important;background:#0d211c!important}
+.ref-presence-buttons .presencechoice.maybe{border-color:#725623!important;color:#f1bd5a!important;background:#261e10!important}
+.ref-presence-buttons .presencechoice.no{border-color:#713036!important;color:#ff6c72!important;background:#281315!important}
+.ref-presence-buttons .presencechoice.active{box-shadow:inset 0 0 0 1px currentColor!important}
+.ref-join-time{margin-top:10px;font-size:10px;color:#8d999b}
+.ref-join-time b{color:#ff555d;font-size:11px}
+.ref-time-change{margin-left:8px;background:#1b1516;border:1px solid #4c292c;color:#d7c9ca;border-radius:5px;padding:5px 8px;font-size:9px;cursor:pointer}
+.ref-att-divider{height:1px;background:#2d2022;margin:0 0 13px}
+.ref-att-base .ref-att-head{border-bottom:1px solid #2d2022!important}
+.ref-att-base .ref-member{grid-template-columns:28px 1fr 96px 62px!important}
+.ref-member-info{display:grid}.ref-member-info>b{font-size:10px}.ref-member-info>small{font-size:8px;color:#69787a;margin-top:2px}
+.ref-att-base .ref-avatar{background:#251719!important;border-color:#4d292d!important;color:#f0d9da!important}
