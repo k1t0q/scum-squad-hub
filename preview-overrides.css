@@ -27,3 +27,28 @@
     border-color:#3ad398!important
   }
 }
+
+/* Preview red accent pass */
+.ref-plan .ref-count,.ref-tasks .ref-count{
+  background:#351315!important;color:#ff666b!important
+}
+.ref-plan-row .ref-dot,.ref-task-row .ref-ring{
+  border-color:#ff3b43!important
+}
+.ref-plan-row:nth-child(2) .ref-dot,.ref-plan-row:nth-child(3) .ref-dot{
+  border-color:#ff3b43!important
+}
+.ref-create{border-color:#5f2b2f!important;background:#1b0e10!important}
+.ref-create:hover{background:#301316!important;border-color:#934047!important}
+
+/* Raid participation: join = green, leave = red */
+.raidactions .raid-participation.join,
+.actions .raid-participation.join,
+.raid-detail-actions .raid-participation.join{
+  background:#0c241d!important;border-color:#257558!important;color:#62e5b0!important
+}
+.raidactions .raid-participation.leave,
+.actions .raid-participation.leave,
+.raid-detail-actions .raid-participation.leave{
+  background:#2a1215!important;border-color:#743036!important;color:#ff686e!important
+}
