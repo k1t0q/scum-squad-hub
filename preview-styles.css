@@ -1583,3 +1583,7 @@ html.modal-lock,body.modal-lock{overflow:hidden!important;height:100%!important}
 .raid-list-roster .raid-roster-name{font-size:11px!important;font-weight:800!important}
 .raid-list-roster .raid-roster-name.is-out{color:#ff6268!important}
 .raid-list-roster .raid-roster-name.is-in{color:#55e6aa!important;text-shadow:0 0 9px rgba(85,230,170,.18)!important}
+
+/* FURY PREVIEW v9 — restore readable raid roster */
+.raid-list-roster .raid-roster-name{font-size:13px!important;font-weight:800!important}
+.raid-list-roster .raid-comma{font-size:13px!important}
