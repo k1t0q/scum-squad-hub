@@ -1687,3 +1687,29 @@ textarea::-webkit-scrollbar{
     box-sizing:border-box!important;
   }
 }
+
+/* Desktop compact header: vertically center both title block and account controls */
+@media (min-width:901px){
+  .ref-header{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+  }
+  .ref-header>div:first-child{
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    align-self:stretch!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  .ref-header>div:first-child>*{
+    margin-top:0!important;
+    margin-bottom:0!important;
+  }
+  .ref-header-actions{
+    align-self:center!important;
+    margin-top:0!important;
+    margin-bottom:0!important;
+  }
+}
