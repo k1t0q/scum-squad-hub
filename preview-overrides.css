@@ -800,3 +800,8 @@ textarea::-webkit-scrollbar{
  .ref-expl-item>small{height:14px!important;margin:0!important;display:flex!important;align-items:center!important;font-size:9px!important;line-height:14px!important}
  .ref-wall-total{height:78px!important;min-height:78px!important;box-sizing:border-box!important;align-self:stretch!important}
 }
+
+/* Explosives header interaction */
+.ref-expl .ref-title small{font-size:11px!important}
+.ref-expl-title-link{cursor:pointer!important;transition:.15s ease!important}
+.ref-expl-title-link:hover{color:#ff5b63!important}
