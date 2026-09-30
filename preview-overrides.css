@@ -858,3 +858,35 @@ textarea::-webkit-scrollbar{
     margin-left:0!important;
   }
 }
+
+/* Unified main action buttons: send / create plan / create task */
+.ref-feed-send,
+.card>.toolbar>.primary{
+  height:34px!important;
+  min-height:34px!important;
+  padding:0 14px!important;
+  border:1px solid #67252b!important;
+  border-radius:6px!important;
+  background:#261315!important;
+  color:#ff6269!important;
+  box-shadow:none!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  line-height:32px!important;
+  letter-spacing:.15px!important;
+  cursor:pointer!important;
+  transition:background .15s ease,border-color .15s ease,color .15s ease!important;
+}
+.ref-feed-send:hover,
+.card>.toolbar>.primary:hover{
+  background:#35181b!important;
+  border-color:#8a3037!important;
+  color:#ff777d!important;
+  transform:none!important;
+  box-shadow:none!important;
+}
+.ref-feed-send:active,
+.card>.toolbar>.primary:active{
+  background:#421b1f!important;
+  transform:none!important;
+}
