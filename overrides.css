@@ -1196,3 +1196,31 @@ textarea::-webkit-scrollbar{
     color:#e6a62b!important;
   }
 }
+
+/* Mobile protect: compact two-line layout */
+@media (max-width:900px){
+  .mobile-home-protect{
+    min-height:0!important;
+    padding:10px 14px!important;
+  }
+  .mobile-home-protect .protect-who{
+    display:inline!important;
+    font-size:11px!important;
+    line-height:16px!important;
+  }
+  .mobile-home-protect .protect-times{
+    display:inline!important;
+    margin:0 0 0 8px!important;
+    font-size:11px!important;
+    line-height:16px!important;
+  }
+  .mobile-home-protect .protect-times:before{content:""!important}
+  .mobile-home-protect .protect-countdown,
+  .mobile-home-protect .protect-active,
+  .mobile-home-protect .protect-ended{
+    display:block!important;
+    margin-top:4px!important;
+    font-size:13px!important;
+    line-height:17px!important;
+  }
+}
