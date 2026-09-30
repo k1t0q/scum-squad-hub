@@ -1428,3 +1428,33 @@ textarea::-webkit-scrollbar{
     max-height:396px!important;
   }
 }
+
+/* Mobile attendance: reliable inner roster scrolling */
+@media (max-width:900px){
+  .ref-att-base{
+    overflow:visible!important;
+    max-height:none!important;
+    height:auto!important;
+  }
+  .ref-att-base .ref-members{
+    display:block!important;
+    height:396px!important;
+    max-height:396px!important;
+    min-height:396px!important;
+    overflow-y:scroll!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+    touch-action:pan-y!important;
+    padding-right:4px!important;
+    padding-bottom:12px!important;
+    box-sizing:border-box!important;
+  }
+  .ref-att-base .ref-member{
+    flex:none!important;
+    flex-shrink:0!important;
+  }
+  .ref-att-base .ref-member:last-child{
+    margin-bottom:10px!important;
+  }
+}
