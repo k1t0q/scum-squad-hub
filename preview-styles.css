@@ -1538,3 +1538,13 @@ header .ref-brand h1,#pageTitle{font-size:13px!important;font-weight:800!importa
 .task-detail-actions .danger{border-color:#743036!important;background:#2a1215!important;color:#ff686e!important}
 .task-detail-actions .danger:hover{background:#3b181c!important;border-color:#a33d45!important}
 .task-detail-actions .ghost{margin-left:auto!important;background:#0b1413!important;color:#aebbb8!important}
+
+/* FURY PREVIEW v8.4 — unified profile modal actions */
+.modal .profile-actions,.modal .dialogfoot{gap:8px!important}
+.modal .profile-actions button,.modal .dialogfoot button{min-height:38px!important;padding:0 14px!important;border-radius:6px!important;font-size:12px!important;font-weight:700!important;cursor:pointer!important;transition:.15s!important}
+.modal .profile-actions .danger{background:#2a1215!important;border:1px solid #743036!important;color:#ff686e!important}
+.modal .profile-actions .danger:hover{background:#3b181c!important;border-color:#a33d45!important}
+.modal .profile-actions .ghost{background:#0b1413!important;border:1px solid #30433f!important;color:#aebbb8!important}
+.modal .profile-actions .ghost:hover{background:#142521!important;border-color:#49645e!important;color:#fff!important}
+.modal .profile-actions .primary{background:#0c241d!important;border:1px solid #257558!important;color:#62e5b0!important;box-shadow:none!important}
+.modal .profile-actions .primary:hover{background:#12382c!important;border-color:#39a87d!important;color:#8bf0c6!important}
