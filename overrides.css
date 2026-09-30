@@ -1758,3 +1758,44 @@ textarea::-webkit-scrollbar{
     max-height:none!important;
   }
 }
+
+/* Explosives compact card: title above, stock + controls on one line */
+.ref-expl-item .ref-expl-bottom{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:6px!important;
+  min-width:0!important;
+}
+.ref-expl-item .ref-expl-bottom>small{
+  margin:0!important;
+  min-width:0!important;
+  font-size:9px!important;
+  line-height:14px!important;
+  white-space:nowrap!important;
+}
+.ref-expl-item .ref-expl-bottom>small>b{
+  color:#dfe5e2!important;
+  font-weight:900!important;
+}
+.ref-expl-item .ref-expl-bottom .ref-expl-edit{
+  display:flex!important;
+  align-items:center!important;
+  flex:0 0 auto!important;
+  gap:4px!important;
+}
+.ref-expl-item .ref-expl-bottom .ref-expl-edit input{
+  order:0!important;
+  width:38px!important;
+}
+.ref-expl-item .ref-expl-bottom .ref-expl-edit button:first-child{order:-1!important}
+.ref-expl-item .ref-expl-bottom .ref-expl-edit button:last-child{order:1!important}
+@media (min-width:901px){
+  .ref-expl-item{
+    grid-template-rows:18px 27px!important;
+    align-content:center!important;
+    gap:5px!important;
+  }
+  .ref-expl-item .ref-expl-main{height:18px!important}
+  .ref-expl-item .ref-expl-main>b{margin:0!important}
+}
