@@ -805,3 +805,20 @@ textarea::-webkit-scrollbar{
 .ref-expl .ref-title small{font-size:11px!important}
 .ref-expl-title-link{cursor:pointer!important;transition:.15s ease!important}
 .ref-expl-title-link:hover{color:#ff5b63!important}
+
+/* Explosives: align labels with quantity/control row */
+@media (min-width:901px){
+  .ref-expl-item .ref-expl-main>b{
+    padding-left:1px!important;
+  }
+  .ref-expl-item>.ref-expl-edit{
+    padding-left:0!important;
+  }
+  .ref-expl-item>small{
+    padding-left:0!important;
+  }
+  .ref-expl-item>.ref-expl-edit input{
+    width:38px!important;
+    box-sizing:border-box!important;
+  }
+}
