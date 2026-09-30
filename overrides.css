@@ -1410,3 +1410,21 @@ textarea::-webkit-scrollbar{
     font-size:13px!important;
   }
 }
+
+/* Mobile attendance: remove dead space and show more roster rows */
+@media (max-width:900px){
+  .ref-att-base .ref-att-divider{
+    margin:10px 0 10px!important;
+  }
+  .ref-att-base .ref-my-presence{
+    padding-bottom:0!important;
+    margin-bottom:0!important;
+  }
+  .ref-att-base .ref-att-head{
+    margin-top:0!important;
+  }
+  .ref-att-base .ref-members{
+    height:396px!important;
+    max-height:396px!important;
+  }
+}
