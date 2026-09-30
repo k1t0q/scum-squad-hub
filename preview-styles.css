@@ -1431,3 +1431,17 @@ header h1{color:#647872!important;font-size:10px!important}
  nav button:hover,nav button.active{background:linear-gradient(90deg,#311718,#171313)!important;border-color:#5d2427!important;color:#fff!important;box-shadow:inset 3px 0 #ef3941!important;transform:none!important}
  nav button.active:after{display:block!important;content:"";position:absolute;right:10px;top:50%;width:5px;height:5px;border-radius:50%;background:#ef4148;transform:translateY(-50%);box-shadow:0 0 10px #ef4148}
 }
+
+
+/* FURY PREVIEW v6.4 — server card alignment + SCUM atmosphere */
+@media(min-width:901px){
+ aside{
+  background:
+   linear-gradient(180deg,rgba(5,12,15,.90) 0%,rgba(5,13,16,.84) 31%,rgba(5,12,15,.28) 57%,rgba(5,12,15,.82) 100%),
+   url("https://clan.fastly.steamstatic.com/images/44931964/72281504baa8b77a7d472ad06a4b6b0d9704b4af.png") center 67%/cover no-repeat!important;
+ }
+ .server-label{display:flex!important;align-items:center!important;gap:6px!important;height:14px!important}
+ .server-label .server-dot{margin:0!important;flex:0 0 7px!important}
+ .server-label small{line-height:14px!important;margin:0!important}
+ .server-ip{font-size:10px!important;line-height:1.25!important;color:#a4b2b5!important;margin:5px 0 10px 16px!important;letter-spacing:.05px!important}
+}
