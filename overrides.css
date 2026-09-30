@@ -1634,3 +1634,26 @@ textarea::-webkit-scrollbar{
     padding-bottom:0!important;
   }
 }
+
+/* Desktop: lock main page viewport; keep scrolling only inside blocks */
+@media (min-width:901px){
+  html,body{
+    height:100%!important;
+    overflow:hidden!important;
+  }
+  .app{
+    height:100vh!important;
+    max-height:100vh!important;
+    overflow:hidden!important;
+  }
+  main{
+    height:calc(100vh - 72px)!important;
+    max-height:calc(100vh - 72px)!important;
+    overflow:hidden!important;
+  }
+  #view{
+    height:100%!important;
+    max-height:100%!important;
+    overflow:hidden!important;
+  }
+}
