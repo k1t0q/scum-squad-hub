@@ -1454,3 +1454,19 @@ header h1{color:#647872!important;font-size:10px!important}
  .server-link:before,.server-link:after{display:none!important;content:none!important}
  .server-link{background:#081416!important}
 }
+
+
+/* FURY PREVIEW v6.6 — restore production sidebar proportions */
+@media(min-width:901px){
+ .app{grid-template-columns:240px minmax(0,1fr)!important}
+ .app>aside{width:auto!important;padding:18px 16px 16px!important}
+ .app>main{margin-left:0!important}
+ .logo{height:auto!important;padding:8px 8px 26px!important}
+ .logo i{font-size:34px!important;letter-spacing:-2px!important}
+ .logo>div{margin-top:5px!important}
+ .logo b{font-size:11px!important;letter-spacing:2px!important}
+ .logo small{font-size:9px!important;letter-spacing:.7px!important}
+ nav{gap:7px!important}
+ nav button{height:auto!important;padding:13px 14px!important;font-size:13px!important;font-weight:700!important;line-height:1.2!important}
+ .server-link{margin-left:0!important;margin-right:0!important}
+}
