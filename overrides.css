@@ -1657,3 +1657,36 @@ textarea::-webkit-scrollbar{
     overflow:hidden!important;
   }
 }
+
+/* Mobile home: Photo/Comments and Explosives same outer size as Attendance */
+@media (max-width:900px){
+  .ref-home .ref-att-base,
+  .ref-home .ref-feed,
+  .ref-home .ref-expl{
+    width:100%!important;
+    min-height:0!important;
+    height:560px!important;
+    max-height:560px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  .ref-home .ref-feed{
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  .ref-home .ref-feed #homePlaceBody{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  .ref-home .ref-expl{
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  .ref-home .ref-expl #refExplosiveStrip{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+}
