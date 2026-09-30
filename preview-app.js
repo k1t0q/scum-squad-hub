@@ -262,7 +262,7 @@ sb.from('protect_updates').select('*').eq('squad_id',onlineMember.squad_id).orde
 async function bootOnline(){try{sb=supabase.createClient(SUPA_URL,SUPA_KEY);await joinOnline()}catch(e){console.error(e);toast('Supabase недоступен')}}
 $('#pageTitle').textContent=page;nav();render();bootOnline();
 
-document.addEventListener('paste',async e=>{if(page!=='Схрон'&&page!=='Базы')return;let files=[...(e.clipboardData?.items||[])].filter(x=>x.kind==='file'&&x.type.startsWith('image/')).map(x=>x.getAsFile()).filter(Boolean);if(!files.length)return;e.preventDefault();if(placeEdit){await uploadPlaceEditFiles(files)}else{await uploadPlaceFiles(page==='Схрон'?'stash':'base',files)}});
+document.addEventListener('paste',async e=>{if(page!=='Главная'&&page!=='Сегодня'&&page!=='Схрон'&&page!=='Базы')return;let files=[...(e.clipboardData?.items||[])].filter(x=>x.kind==='file'&&x.type.startsWith('image/')).map(x=>x.getAsFile()).filter(Boolean);if(!files.length)return;e.preventDefault();if(placeEdit){await uploadPlaceEditFiles(files)}else{await uploadPlaceFiles((page==='Главная'||page==='Сегодня')?'home':page==='Схрон'?'stash':'base',files)}});
 
 function togglePlacePostMenu(id,e){if(e)e.stopPropagation();document.querySelectorAll('.ref-post-menu-pop.open').forEach(x=>{if(x.id!=='placePostMenu'+id)x.classList.remove('open')});document.getElementById('placePostMenu'+id)?.classList.toggle('open')}
 document.addEventListener('click',e=>{if(!e.target.closest('.ref-post-menu'))document.querySelectorAll('.ref-post-menu-pop.open').forEach(x=>x.classList.remove('open'))});
