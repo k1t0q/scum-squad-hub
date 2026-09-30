@@ -744,3 +744,14 @@
     line-height:20px!important;
   }
 }
+
+/* Hide native textarea scrollbars everywhere */
+textarea{
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+textarea::-webkit-scrollbar{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
