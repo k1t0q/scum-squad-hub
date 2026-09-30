@@ -774,3 +774,13 @@ textarea::-webkit-scrollbar{
 .ref-expl-edit input{width:38px!important;height:25px!important;padding:0 3px!important;text-align:center!important;border:1px solid #263633!important;border-radius:4px!important;background:#09100f!important;color:#f2f5f3!important;font-size:15px!important;font-weight:900!important;-moz-appearance:textfield!important}
 .ref-expl-edit input::-webkit-inner-spin-button,.ref-expl-edit input::-webkit-outer-spin-button{-webkit-appearance:none!important;margin:0!important}
 .ref-expl-item>small{display:block!important;margin-top:7px!important}
+
+/* Explosives cards: original reference layout, minus icon */
+.ref-expl-item{display:grid!important;grid-template-columns:1fr!important;align-content:center!important;padding:10px 10px!important}
+.ref-expl-item .ref-expl-main{display:block!important}
+.ref-expl-item .ref-expl-main>b{display:block!important;margin-bottom:5px!important;font-size:12px!important}
+.ref-expl-item>.ref-expl-edit{justify-content:flex-start!important;gap:5px!important}
+.ref-expl-item>.ref-expl-edit input{order:0!important}
+.ref-expl-item>.ref-expl-edit button:first-of-type{order:1!important}
+.ref-expl-item>.ref-expl-edit button:last-of-type{order:2!important}
+.ref-expl-item>small{margin-top:7px!important;white-space:nowrap!important}
