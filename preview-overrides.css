@@ -333,3 +333,38 @@
     line-height:1!important;
   }
 }
+
+/* Attendance hover: same restrained interaction as standard action buttons */
+.ref-presence-buttons .presencechoice,
+.ref-time-change{
+  cursor:pointer!important;
+  transition:.15s ease!important;
+}
+.ref-presence-buttons .presencechoice:hover,
+.ref-time-change:hover{
+  transform:none!important;
+  filter:none!important;
+  box-shadow:none!important;
+}
+.ref-presence-buttons .presencechoice.yes:hover{
+  background:#12382c!important;
+  border-color:#39a87d!important;
+  color:#8bf0c6!important;
+}
+.ref-presence-buttons .presencechoice.maybe:hover{
+  background:#332711!important;
+  border-color:#a47725!important;
+  color:#ffd77b!important;
+}
+.ref-presence-buttons .presencechoice.no:hover{
+  background:#391a1d!important;
+  border-color:#a9434b!important;
+  color:#ff8b90!important;
+}
+.ref-time-change:hover{
+  background:#2b1d20!important;
+  border-color:#774047!important;
+  color:#fff!important;
+}
+.ref-presence-buttons .presencechoice:active,
+.ref-time-change:active{transform:none!important}
