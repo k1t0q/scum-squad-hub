@@ -1528,3 +1528,4 @@ header .ref-brand h1,#pageTitle{font-size:13px!important;font-weight:800!importa
 .ref-create{margin-left:auto!important;height:28px!important;padding:0 10px!important;border:1px solid #31504a!important;border-radius:5px!important;background:#0d1b1a!important;color:#dbe5e3!important;font-size:9px!important;font-weight:800!important;cursor:pointer!important;transition:.15s!important}
 .ref-create:hover{background:#15302b!important;border-color:#3d7567!important;color:#fff!important}
 .ref-plan .ref-icon,.ref-tasks .ref-icon{display:none!important}
+.ref-section-link{cursor:pointer!important;transition:.15s!important}.ref-section-link:hover{color:#fff!important}
