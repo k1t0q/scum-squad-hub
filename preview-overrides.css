@@ -225,3 +225,8 @@
   .ref-att-base .ref-avatar{width:25px!important;height:25px!important}
   .ref-att-base .ref-member-time{font-size:9px!important}
 }
+
+/* Attendance without avatars */
+@media (min-width:901px){
+  .ref-att-base .ref-member{grid-template-columns:1fr 96px 62px!important}
+}
