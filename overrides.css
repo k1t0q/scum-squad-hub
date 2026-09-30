@@ -2048,3 +2048,38 @@ textarea::-webkit-scrollbar{
   body{overflow-x:hidden!important;overflow-y:auto!important}
   .card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 }
+
+/* Mobile profile shortcut next to hamburger */
+.mobile-profile-btn{display:none}
+@media(max-width:900px){
+  .app>aside{position:relative!important}
+  .app>aside>.mobile-profile-btn{
+    display:flex!important;
+    order:1!important;
+    margin-left:auto!important;
+    margin-right:10px!important;
+    height:48px!important;
+    max-width:150px!important;
+    padding:0 12px!important;
+    align-items:center!important;
+    gap:8px!important;
+    border:1px solid #30433f!important;
+    border-radius:8px!important;
+    background:#0c1715!important;
+    color:#dfe8e5!important;
+    font-size:12px!important;
+    font-weight:900!important;
+    cursor:pointer!important;
+  }
+  .app>aside>.mobile-menu-btn{order:2!important}
+  .mobile-profile-icon{
+    font-size:20px!important;
+    line-height:1!important;
+    color:#52d58c!important;
+  }
+  #mobileProfileNick{
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+}
