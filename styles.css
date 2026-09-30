@@ -1222,3 +1222,37 @@ body.photo-open{position:fixed!important;left:0!important;right:0!important;widt
 
 /* per explosive wall count */
 .itemwalls{color:#ff5b5f;font-weight:800}
+
+
+/* FURY UI REDESIGN — cinematic squad-control shell */
+:root{--bg:#050a0a;--side:#071010;--card:#0b1413;--card2:#0e1917;--line:#1b2b28;--muted:#81918d;--text:#f2f5f3;--acid:#ef3941;--red:#ff5b5f;--amber:#e7a82f}
+body{background:radial-gradient(circle at 75% -10%,#10221d 0,transparent 34%),linear-gradient(180deg,#050a0a,#07100f 55%,#050909);font-family:Inter,Segoe UI,Arial,sans-serif}
+.app{grid-template-columns:200px minmax(0,1fr)}
+aside{padding:18px 14px;background:linear-gradient(180deg,rgba(5,12,12,.97),rgba(8,15,14,.96));border-right:1px solid #1b2927;box-shadow:18px 0 50px #0005}
+.logo{padding:8px 8px 28px;gap:10px}
+.logo i{background:transparent;color:#fff;padding:0;font-size:30px;font-weight:1000;font-style:italic;letter-spacing:-2px;text-shadow:0 0 22px #fff2}
+.logo b{font-size:10px;letter-spacing:2px}.logo small{font-size:8px}
+nav{gap:7px}nav button{padding:12px 13px;border:1px solid transparent;border-radius:6px;font-size:13px;font-weight:700;transition:.18s}
+nav button:hover,nav button.active{background:linear-gradient(90deg,#311718,#171313);border-color:#5d2427;color:#fff;box-shadow:inset 3px 0 #ef3941}
+.server{border:1px solid #1d2d2a;border-radius:8px;padding:14px 12px;margin-top:auto;background:#091211}
+main{padding:18px 28px 32px;max-width:1700px}
+header{height:62px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #182421}
+header .eyebrow{font-size:15px;font-weight:900;letter-spacing:2px;color:#687b76}
+h1{font-size:12px;color:#9aaba6;text-transform:uppercase;letter-spacing:1.6px;margin-top:5px}
+.me button,.ghost{background:#0b1413;border-color:#22322f}
+.grid{gap:10px}
+.card{background:linear-gradient(180deg,rgba(12,22,20,.96),rgba(8,17,16,.96));border-color:#20302d;border-radius:7px;padding:16px;box-shadow:0 12px 30px #0002}
+.card h2{font-size:15px;letter-spacing:.25px;text-transform:uppercase}
+.item{background:#0c1715;border-color:#1e302c;border-radius:6px}
+.primary{background:linear-gradient(180deg,#f0474e,#c92d34);color:#fff;border:1px solid #ff6268;box-shadow:0 5px 18px #ef394126}
+.metric{font-size:27px}
+.progress{background:#14201d}.progress i{background:#2ddf98}
+.badge.status.yes{background:#0c2c22;color:#70e7b0;border-color:#17895d}
+.badge.status.maybe{background:#2c2110;color:#ffc457;border-color:#8b5d17}
+.badge.status.no{background:#2b1416;color:#ff777b;border-color:#8b2c31}
+.explosiveitem{background:linear-gradient(180deg,#101b19,#0b1513)!important;border-color:#233530!important}
+.itemwalls{color:#f1b83c!important}
+.home-feed-card,.attendance-combined{min-height:100%}
+.place-comment{background:#08100f!important;border-color:#243633!important}
+@media(min-width:1100px){main{padding-left:14px}.grid{grid-auto-flow:row}.attendance-combined,.home-feed-card{align-self:stretch!important}}
+@media(max-width:900px){.app{display:block}.logo i{font-size:25px}main{padding:14px!important}header{height:auto}.card{border-radius:8px}}
