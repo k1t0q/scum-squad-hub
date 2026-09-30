@@ -784,3 +784,19 @@ textarea::-webkit-scrollbar{
 .ref-expl-item>.ref-expl-edit button:first-of-type{order:1!important}
 .ref-expl-item>.ref-expl-edit button:last-of-type{order:2!important}
 .ref-expl-item>small{margin-top:7px!important;white-space:nowrap!important}
+
+/* Explosives strip alignment cleanup */
+@media (min-width:901px){
+ .ref-expl .ref-title{height:34px!important;min-height:34px!important;display:flex!important;align-items:center!important;gap:10px!important}
+ .ref-expl .ref-title h2{font-size:17px!important;font-weight:900!important;line-height:1!important;margin:0!important}
+ .ref-expl .ref-title small{margin:0!important;line-height:1!important}
+ .ref-expl .ref-title .ghost{margin-left:auto!important}
+ .ref-expl-items{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:8px!important;align-items:stretch!important}
+ .ref-expl-item{height:78px!important;min-height:78px!important;padding:8px 10px!important;box-sizing:border-box!important;display:grid!important;grid-template-rows:16px 27px 14px!important;align-content:center!important;gap:3px!important}
+ .ref-expl-item .ref-expl-main{height:16px!important;display:flex!important;align-items:center!important}
+ .ref-expl-item .ref-expl-main>b{margin:0!important;font-size:12px!important;line-height:16px!important}
+ .ref-expl-item>.ref-expl-edit{height:27px!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:5px!important}
+ .ref-expl-item>.ref-expl-edit input,.ref-expl-item>.ref-expl-edit button{height:25px!important;margin:0!important}
+ .ref-expl-item>small{height:14px!important;margin:0!important;display:flex!important;align-items:center!important;font-size:9px!important;line-height:14px!important}
+ .ref-wall-total{height:78px!important;min-height:78px!important;box-sizing:border-box!important;align-self:stretch!important}
+}
