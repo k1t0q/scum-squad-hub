@@ -1998,3 +1998,53 @@ textarea::-webkit-scrollbar{
     white-space:nowrap!important;
   }
 }
+
+/* Roster final: horizontal admin actions + same hub styling on desktop/mobile */
+#view .list .item .itemtop>.member-actions-row{
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:8px!important;
+  min-width:0!important;
+  width:auto!important;
+}
+#view .list .item .itemtop>.member-actions-row button{
+  flex:0 0 auto!important;
+  width:auto!important;
+  height:32px!important;
+  min-height:32px!important;
+  margin:0!important;
+  padding:0 12px!important;
+  border-radius:6px!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+  box-shadow:none!important;
+}
+#view .list .item .itemtop>.member-actions-row button:not(.danger){
+  border:1px solid #245f45!important;
+  background:#0d2118!important;
+  color:#52d58c!important;
+}
+#view .list .item .itemtop>.member-actions-row button.danger{
+  border:1px solid #67252b!important;
+  background:#261315!important;
+  color:#ff6269!important;
+}
+@media(max-width:900px){
+  #view .list .item .itemtop>.member-actions-row{gap:5px!important}
+  #view .list .item .itemtop>.member-actions-row button{
+    height:30px!important;
+    min-height:30px!important;
+    padding:0 8px!important;
+    font-size:10px!important;
+  }
+}
+/* Desktop performance: native wheel scroll, remove expensive blur during page scroll */
+@media(min-width:901px){
+  html{scroll-behavior:auto!important}
+  body{overflow-x:hidden!important;overflow-y:auto!important}
+  .card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+}
