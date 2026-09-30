@@ -432,3 +432,16 @@
     overflow:hidden!important;
   }
 }
+
+/* Place join time directly to the right of No button */
+@media (min-width:901px){
+  .ref-presence-row{display:flex!important;align-items:center!important;gap:16px!important;flex-wrap:nowrap!important}
+  .ref-presence-row .ref-presence-buttons{flex:0 0 auto!important}
+  .ref-presence-row .ref-join-time{
+    margin-top:0!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:4px!important;
+    white-space:nowrap!important;
+  }
+}
