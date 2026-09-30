@@ -1596,3 +1596,28 @@ textarea::-webkit-scrollbar{
     padding-top:0!important;
   }
 }
+
+/* Mobile home: unified 14px spacing between every main block */
+@media (max-width:900px){
+  .ref-home{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:14px!important;
+  }
+  .ref-home>.mobile-home-protect,
+  .ref-home>.ref-top,
+  .ref-home>.ref-middle,
+  .ref-home>.ref-expl{
+    margin-top:0!important;
+    margin-bottom:0!important;
+  }
+  .ref-home>.ref-top,
+  .ref-home>.ref-middle{
+    gap:14px!important;
+  }
+  .ref-home>.ref-top>.ref-card,
+  .ref-home>.ref-middle>.ref-card{
+    margin-top:0!important;
+    margin-bottom:0!important;
+  }
+}
