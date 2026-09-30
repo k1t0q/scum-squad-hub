@@ -377,3 +377,58 @@
   }
   .ref-att-divider{margin-bottom:6px!important}
 }
+
+/* Attendance list compact 6-row viewport + matched feed height */
+@media (min-width:901px){
+  .ref-att-base,.ref-feed{
+    height:455px!important;
+    min-height:455px!important;
+    max-height:455px!important;
+  }
+  .ref-att-base{
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  .ref-att-base .ref-members{
+    flex:0 0 222px!important;
+    height:222px!important;
+    min-height:0!important;
+    max-height:222px!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding-top:2px!important;
+    padding-right:4px!important;
+    scrollbar-width:thin!important;
+    scrollbar-color:#5b2428 transparent!important;
+  }
+  .ref-att-base .ref-members::-webkit-scrollbar{width:5px!important}
+  .ref-att-base .ref-members::-webkit-scrollbar-track{background:transparent!important}
+  .ref-att-base .ref-members::-webkit-scrollbar-thumb{background:#5b2428!important;border-radius:8px!important}
+  .ref-att-base .ref-member{
+    height:37px!important;
+    min-height:37px!important;
+    grid-template-columns:minmax(0,1fr) 92px 48px!important;
+    gap:4px!important;
+  }
+  .ref-att-base .ref-member-info>b{font-size:12px!important}
+  .ref-att-base .ref-member-info>small{
+    font-size:10px!important;
+    line-height:1.05!important;
+    margin-top:2px!important;
+  }
+  .ref-att-base .ref-member-time{
+    font-size:11px!important;
+    text-align:right!important;
+  }
+  .ref-att-base .ref-statuses{justify-content:flex-end!important}
+  .ref-att-base .ref-statuses .ref-status{
+    width:92px!important;
+    min-width:92px!important;
+  }
+  .ref-att-base .ref-att-head>b{
+    font-size:12px!important;
+  }
+  .ref-feed{
+    overflow:hidden!important;
+  }
+}
