@@ -1619,3 +1619,11 @@ html.modal-lock,body.modal-lock{overflow:hidden!important;height:100%!important}
 .dialogfoot .danger:hover,.profile-actions .danger:hover,button[onclick*="deleteOp"]:hover,button[onclick*="deleteTask"]:hover{
  background:#3b181c!important;border-color:#a33d45!important;color:#ff858a!important
 }
+
+/* FURY PREVIEW v9.3 — larger home plan/task typography and create actions */
+.ref-plan .ref-title h2,.ref-tasks .ref-title h2{font-size:17px!important;letter-spacing:.15px!important}
+.ref-plan .ref-count,.ref-tasks .ref-count{min-width:25px!important;height:25px!important;font-size:13px!important}
+.ref-plan .ref-create,.ref-tasks .ref-create{height:34px!important;padding:0 14px!important;font-size:11px!important;font-weight:900!important}
+.ref-plan .ref-list,.ref-tasks .ref-list{font-size:13px!important}
+.ref-plan .ref-row,.ref-tasks .ref-row{min-height:38px!important}
+.ref-plan .ref-row strong,.ref-tasks .ref-row strong{font-size:13px!important}
