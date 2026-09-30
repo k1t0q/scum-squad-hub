@@ -1224,3 +1224,12 @@ textarea::-webkit-scrollbar{
     line-height:17px!important;
   }
 }
+
+/* Mobile: add breathing room before first divider in plan/tasks */
+@media (max-width:900px){
+  .ref-plan .ref-title,
+  .ref-tasks .ref-title{
+    padding-bottom:10px!important;
+    margin-bottom:8px!important;
+  }
+}
