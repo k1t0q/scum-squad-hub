@@ -148,3 +148,17 @@
     padding-bottom:8px!important;
   }
 }
+
+/* Match raid rows density to task rows */
+@media (min-width:901px){
+  .ref-plan-row{
+    height:38px!important;
+    min-height:38px!important;
+    grid-template-columns:13px 58px 1fr auto!important;
+    gap:7px!important;
+  }
+  .ref-plan-row .ref-time{font-size:12px!important}
+  .ref-plan-row .ref-plan-name b{font-size:14px!important;line-height:1.2!important}
+  .ref-plan-row .ref-plan-name small{font-size:10px!important;line-height:1.15!important;margin-top:1px!important}
+  .ref-plan-row .ref-people-count{font-size:12px!important}
+}
