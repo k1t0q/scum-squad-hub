@@ -15,7 +15,7 @@ function today(){
  let protectText=db.protect?protectHomeHtml(db.protect):'—';
  refreshWallMetric();
  $('#view').innerHTML='<div class="ref-home">'+
- '<div class="ref-top">'+
+ '<section class="mobile-home-protect" onclick="confirmQuickProtect()" oncontextmenu="event.preventDefault();showProtectHistory()">'+protectText+'</section>'+\n '<div class="ref-top">'+
   '<section class="ref-card ref-plan"><div class="ref-title"><h2 class="ref-section-link" onclick="go(\'План на рейд\')">ПЛАН НА РЕЙД <span class="ref-count">'+db.ops.length+'</span></h2><button class="ref-create" onclick="event.stopPropagation();newOp()">+ СОЗДАТЬ ПЛАН</button></div><div class="ref-list">'+(plan||'<div class="empty">План пока не создан</div>')+'</div></section>'+
   '<section class="ref-card ref-tasks"><div class="ref-title"><h2 class="ref-section-link" onclick="go(\'Задачи\')">АКТИВНЫЕ ЗАДАЧИ <span class="ref-count">'+activeTasks.length+'</span></h2><button class="ref-create" onclick="event.stopPropagation();newTask()">+ СОЗДАТЬ ЗАДАЧУ</button></div><div class="ref-list">'+(taskRows||'<div class="empty">Задач пока нет</div>')+'</div></section>'+
  '</div>'+
