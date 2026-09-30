@@ -183,3 +183,45 @@
 .ref-att-base .ref-member{grid-template-columns:28px 1fr 96px 62px!important}
 .ref-member-info{display:grid}.ref-member-info>b{font-size:10px}.ref-member-info>small{font-size:8px;color:#69787a;margin-top:2px}
 .ref-att-base .ref-avatar{background:#251719!important;border-color:#4d292d!important;color:#f0d9da!important}
+
+/* Attendance density + sizing pass */
+@media (min-width:901px){
+  .ref-att-base .ref-title h2,
+  .ref-att-base .ref-att-head h3{
+    font-size:14px!important;
+    font-weight:900!important;
+    letter-spacing:.15px!important;
+  }
+  .ref-att-base .ref-att-head{height:34px!important;padding:0!important}
+  .ref-att-base .ref-att-head h3{margin:0!important}
+  .ref-presence-buttons .presencechoice{
+    height:29px!important;
+    min-width:92px!important;
+    padding:0 11px!important;
+    font-size:10px!important;
+    border-radius:4px!important;
+  }
+  .ref-att-base .ref-statuses .ref-status{
+    width:92px!important;
+    min-width:92px!important;
+    height:29px!important;
+    padding:0 8px!important;
+    display:grid!important;
+    place-items:center!important;
+    box-sizing:border-box!important;
+    font-size:10px!important;
+    font-weight:800!important;
+    border-radius:4px!important;
+  }
+  .ref-att-base .ref-members{padding-top:3px!important}
+  .ref-att-base .ref-member{
+    min-height:35px!important;
+    height:35px!important;
+    grid-template-columns:28px 1fr 96px 62px!important;
+    gap:7px!important;
+  }
+  .ref-att-base .ref-member-info>b{font-size:12px!important;line-height:1.05!important}
+  .ref-att-base .ref-member-info>small{font-size:8px!important;line-height:1!important;margin-top:2px!important}
+  .ref-att-base .ref-avatar{width:25px!important;height:25px!important}
+  .ref-att-base .ref-member-time{font-size:9px!important}
+}
