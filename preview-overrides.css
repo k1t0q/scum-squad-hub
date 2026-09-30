@@ -490,3 +490,16 @@
 .ref-post-menu-pop button{border:0;background:transparent;color:#d9e2df;text-align:left;padding:8px;border-radius:4px;font-size:10px;cursor:pointer}
 .ref-post-menu-pop button:hover{background:#142521}
 .ref-post-menu-pop button.danger{color:#ff6d73}
+
+/* Home feed post contrast and date sizing */
+.ref-feed-post{
+  background:#0d1715!important;
+  border:1px solid #20312d!important;
+  border-radius:6px!important;
+  padding:11px 12px!important;
+  margin-bottom:8px!important;
+}
+.ref-feed-post .ref-feed-date{
+  font-size:10px!important;
+  color:#77888b!important;
+}
