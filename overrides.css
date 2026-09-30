@@ -1537,3 +1537,17 @@ textarea::-webkit-scrollbar{
   .ref-feed-attach .attach-full{display:none!important}
   .ref-feed-attach .attach-mobile{display:inline!important}
 }
+
+/* Mobile home: equal vertical gaps between header/protect/cards */
+@media (max-width:900px){
+  .ref-home>.mobile-home-protect{
+    margin-top:0!important;
+    margin-bottom:14px!important;
+  }
+  .ref-home>.ref-top{
+    gap:14px!important;
+  }
+  .ref-home{
+    gap:14px!important;
+  }
+}
