@@ -1,0 +1,925 @@
+/* Preview home readability overrides */
+@media (min-width:901px){
+  .ref-plan .ref-title,.ref-tasks .ref-title{height:42px!important}
+  .ref-plan .ref-title h2,.ref-tasks .ref-title h2{font-size:17px!important;gap:8px!important}
+  .ref-plan .ref-count,.ref-tasks .ref-count{min-width:25px!important;height:25px!important;font-size:13px!important}
+  .ref-plan .ref-create,.ref-tasks .ref-create{
+    height:32px!important;padding:0 12px!important;font-size:10px!important;
+    font-weight:900!important;border-radius:5px!important
+  }
+
+  /* Actual content rows */
+  .ref-plan-row{height:49px!important;grid-template-columns:16px 58px 1fr auto!important;gap:9px!important}
+  .ref-plan-row .ref-time{font-size:14px!important}
+  .ref-plan-row .ref-plan-name b{font-size:14px!important;line-height:1.25!important}
+  .ref-plan-row .ref-plan-name small{font-size:11px!important;line-height:1.25!important}
+  .ref-task-row{height:38px!important;grid-template-columns:18px 1fr auto!important;gap:7px!important}
+  .ref-task-row b{font-size:14px!important;line-height:1.25!important}
+  .ref-task-row>span:last-child{font-size:12px!important}
+
+  /* Same status circle style in Plan and Tasks */
+  .ref-plan-row .ref-dot,.ref-task-row .ref-ring{
+    width:13px!important;height:13px!important;
+    border:2px solid #3ad398!important;border-radius:50%!important;
+    box-sizing:border-box!important
+  }
+  .ref-plan-row:nth-child(2) .ref-dot,.ref-plan-row:nth-child(3) .ref-dot{
+    border-color:#3ad398!important
+  }
+}
+
+/* Preview red accent pass */
+.ref-plan .ref-count,.ref-tasks .ref-count{
+  background:#351315!important;color:#ff666b!important
+}
+.ref-plan-row .ref-dot,.ref-task-row .ref-ring{
+  border-color:#ff3b43!important
+}
+.ref-plan-row:nth-child(2) .ref-dot,.ref-plan-row:nth-child(3) .ref-dot{
+  border-color:#ff3b43!important
+}
+.ref-create{border-color:#5f2b2f!important;background:#1b0e10!important}
+.ref-create:hover{background:#301316!important;border-color:#934047!important}
+
+/* Raid participation: join = green, leave = red */
+.raidactions .raid-participation.join,
+.actions .raid-participation.join,
+.raid-detail-actions .raid-participation.join{
+  background:#0c241d!important;border-color:#257558!important;color:#62e5b0!important
+}
+.raidactions .raid-participation.leave,
+.actions .raid-participation.leave,
+.raid-detail-actions .raid-participation.leave{
+  background:#2a1215!important;border-color:#743036!important;color:#ff686e!important
+}
+
+/* Raid participant count on Home */
+.ref-plan-row .ref-people-count{
+  justify-self:end!important;
+  color:#9aa8aa!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  letter-spacing:.1px!important
+}
+
+/* Narrower desktop sidebar */
+@media (min-width:901px){
+  .app{grid-template-columns:220px minmax(0,1fr)!important}
+  .app>aside{width:auto!important;padding-left:14px!important;padding-right:14px!important}
+}
+
+/* Live protect countdown in header */
+.ref-protect-countdown{
+ display:block!important;margin-top:3px!important;color:#ffb13b!important;
+ font-size:10px!important;font-weight:900!important;font-style:normal!important;
+ line-height:1.2!important;white-space:nowrap!important
+}
+
+/* Home plan/tasks header exact alignment */
+@media (min-width:901px){
+  .ref-plan .ref-title,.ref-tasks .ref-title{
+    height:56px!important;
+    display:flex!important;align-items:center!important;
+    padding-top:0!important;padding-bottom:0!important;
+  }
+  .ref-plan .ref-title h2,.ref-tasks .ref-title h2{
+    margin:0!important;display:flex!important;align-items:center!important;
+    line-height:1!important;
+  }
+  .ref-plan .ref-create,.ref-tasks .ref-create{
+    margin:0!important;align-self:center!important;
+  }
+}
+
+/* Keep create actions in original top-right corner */
+@media (min-width:901px){
+  .ref-plan .ref-title,.ref-tasks .ref-title{position:relative!important}
+  .ref-plan .ref-create,.ref-tasks .ref-create{
+    position:absolute!important;top:8px!important;right:8px!important;
+    margin:0!important;align-self:auto!important
+  }
+}
+
+/* Fixed-height Home plan/tasks cards with internal mouse-wheel scroll */
+@media (min-width:901px){
+  .ref-plan,.ref-tasks{
+    height:220px!important;
+    min-height:220px!important;
+    max-height:220px!important;
+    overflow:hidden!important;
+  }
+  .ref-plan .ref-title,.ref-tasks .ref-title{
+    height:56px!important;
+    min-height:56px!important;
+    flex:0 0 56px!important;
+  }
+  .ref-plan .ref-list,.ref-tasks .ref-list{
+    display:block!important;
+    height:calc(220px - 56px)!important;
+    max-height:calc(220px - 56px)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    scrollbar-width:thin!important;
+    scrollbar-color:#5b2428 transparent!important;
+    padding-right:4px!important;
+  }
+  .ref-plan .ref-list::-webkit-scrollbar,.ref-tasks .ref-list::-webkit-scrollbar{width:5px!important}
+  .ref-plan .ref-list::-webkit-scrollbar-track,.ref-tasks .ref-list::-webkit-scrollbar-track{background:transparent!important}
+  .ref-plan .ref-list::-webkit-scrollbar-thumb,.ref-tasks .ref-list::-webkit-scrollbar-thumb{background:#5b2428!important;border-radius:10px!important}
+}
+
+/* Correct scroll viewport: account for card padding/title margin */
+@media (min-width:901px){
+  .ref-plan,.ref-tasks{
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  .ref-plan .ref-title,.ref-tasks .ref-title{
+    flex:0 0 56px!important;
+    margin-bottom:8px!important;
+  }
+  .ref-plan .ref-list,.ref-tasks .ref-list{
+    flex:1 1 auto!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow-y:auto!important;
+    padding-bottom:8px!important;
+  }
+}
+
+/* Match raid rows density to task rows */
+@media (min-width:901px){
+  .ref-plan-row{
+    height:38px!important;
+    min-height:38px!important;
+    grid-template-columns:13px 58px 1fr auto!important;
+    gap:7px!important;
+  }
+  .ref-plan-row .ref-time{font-size:12px!important}
+  .ref-plan-row .ref-plan-name b{font-size:14px!important;line-height:1.2!important}
+  .ref-plan-row .ref-plan-name small{font-size:10px!important;line-height:1.15!important;margin-top:1px!important}
+  .ref-plan-row .ref-people-count{font-size:12px!important}
+}
+
+/* Base attendance structure restyled for black/red preview */
+.ref-att-base{height:505px!important;overflow:hidden!important}
+.ref-att-base .ref-title{border-bottom:1px solid #2d2022!important}
+.ref-my-presence{padding:5px 0 15px}
+.ref-me-line{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ref-me-line>b{font-size:14px}.ref-me-line>span{font-size:10px;color:#7f8b8d}
+.ref-presence-buttons{display:flex;gap:7px;flex-wrap:wrap}
+.ref-presence-buttons .presencechoice{height:31px!important;padding:0 12px!important;border-radius:5px!important;font-size:10px!important;font-weight:800!important}
+.ref-presence-buttons .presencechoice.yes{border-color:#286c55!important;color:#6ee4b1!important;background:#0d211c!important}
+.ref-presence-buttons .presencechoice.maybe{border-color:#725623!important;color:#f1bd5a!important;background:#261e10!important}
+.ref-presence-buttons .presencechoice.no{border-color:#713036!important;color:#ff6c72!important;background:#281315!important}
+.ref-presence-buttons .presencechoice.active{box-shadow:inset 0 0 0 1px currentColor!important}
+.ref-join-time{margin-top:10px;font-size:10px;color:#8d999b}
+.ref-join-time b{color:#ff555d;font-size:11px}
+.ref-time-change{margin-left:8px;background:#1b1516;border:1px solid #4c292c;color:#d7c9ca;border-radius:5px;padding:5px 8px;font-size:9px;cursor:pointer}
+.ref-att-divider{height:1px;background:#2d2022;margin:0 0 13px}
+.ref-att-base .ref-att-head{border-bottom:1px solid #2d2022!important}
+.ref-att-base .ref-member{grid-template-columns:28px 1fr 96px 62px!important}
+.ref-member-info{display:grid}.ref-member-info>b{font-size:10px}.ref-member-info>small{font-size:8px;color:#69787a;margin-top:2px}
+.ref-att-base .ref-avatar{background:#251719!important;border-color:#4d292d!important;color:#f0d9da!important}
+
+/* Attendance density + sizing pass */
+@media (min-width:901px){
+  .ref-att-base .ref-title h2,
+  .ref-att-base .ref-att-head h3{
+    font-size:14px!important;
+    font-weight:900!important;
+    letter-spacing:.15px!important;
+  }
+  .ref-att-base .ref-att-head{height:34px!important;padding:0!important}
+  .ref-att-base .ref-att-head h3{margin:0!important}
+  .ref-presence-buttons .presencechoice{
+    height:29px!important;
+    min-width:92px!important;
+    padding:0 11px!important;
+    font-size:10px!important;
+    border-radius:4px!important;
+  }
+  .ref-att-base .ref-statuses .ref-status{
+    width:92px!important;
+    min-width:92px!important;
+    height:29px!important;
+    padding:0 8px!important;
+    display:grid!important;
+    place-items:center!important;
+    box-sizing:border-box!important;
+    font-size:10px!important;
+    font-weight:800!important;
+    border-radius:4px!important;
+  }
+  .ref-att-base .ref-members{padding-top:3px!important}
+  .ref-att-base .ref-member{
+    min-height:35px!important;
+    height:35px!important;
+    grid-template-columns:28px 1fr 96px 62px!important;
+    gap:7px!important;
+  }
+  .ref-att-base .ref-member-info>b{font-size:12px!important;line-height:1.05!important}
+  .ref-att-base .ref-member-info>small{font-size:8px!important;line-height:1!important;margin-top:2px!important}
+  .ref-att-base .ref-avatar{width:25px!important;height:25px!important}
+  .ref-att-base .ref-member-time{font-size:9px!important}
+}
+
+/* Attendance without avatars */
+@media (min-width:901px){
+  .ref-att-base .ref-member{grid-template-columns:1fr 96px 62px!important}
+}
+
+/* Attendance headings exactly match Plan/Tasks headings */
+@media (min-width:901px){
+  .ref-att-base .ref-title h2,
+  .ref-att-base .ref-att-head h3{
+    font-size:17px!important;
+    font-weight:900!important;
+    line-height:1!important;
+    letter-spacing:0!important;
+  }
+}
+
+/* Attendance row separators like task rows */
+.ref-att-base .ref-member{
+  border-bottom:1px solid #1b292c!important;
+}
+.ref-att-base .ref-member:last-child{
+  border-bottom:0!important;
+}
+
+/* My attendance: larger controls + cleaner black/red styling */
+@media (min-width:901px){
+  .ref-my-presence{padding:9px 0 18px!important}
+  .ref-me-line{gap:9px!important;margin-bottom:13px!important}
+  .ref-me-line>b{font-size:16px!important;line-height:1!important}
+  .ref-me-line>span{font-size:11px!important}
+  .ref-presence-buttons{gap:9px!important}
+  .ref-presence-buttons .presencechoice{
+    min-width:112px!important;
+    height:36px!important;
+    padding:0 16px!important;
+    border-radius:6px!important;
+    font-size:11px!important;
+    font-weight:900!important;
+    background:#151718!important;
+    box-shadow:none!important;
+    transition:.15s ease!important;
+  }
+  .ref-presence-buttons .presencechoice.yes{
+    color:#66e7b0!important;border:1px solid #26785a!important;background:#10201b!important;
+  }
+  .ref-presence-buttons .presencechoice.maybe{
+    color:#f2c25f!important;border:1px solid #76551d!important;background:#221b10!important;
+  }
+  .ref-presence-buttons .presencechoice.no{
+    color:#ff6c72!important;border:1px solid #783137!important;background:#251315!important;
+  }
+  .ref-presence-buttons .presencechoice.active{
+    border-width:2px!important;
+    box-shadow:0 0 0 1px rgba(255,255,255,.03) inset!important;
+  }
+  .ref-presence-buttons .presencechoice:hover{filter:brightness(1.12)!important}
+  .ref-join-time{margin-top:14px!important;font-size:11px!important}
+  .ref-join-time b{font-size:13px!important;margin-left:3px!important}
+  .ref-time-change{
+    height:30px!important;margin-left:10px!important;padding:0 12px!important;
+    border-radius:5px!important;font-size:10px!important;font-weight:800!important;
+    background:#201719!important;border:1px solid #573034!important;color:#d9cacc!important;
+  }
+}
+
+/* Align attendance card directly under raid-plan card */
+@media (min-width:901px){
+  .ref-middle{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  }
+}
+
+/* My attendance button hover interaction */
+.ref-presence-buttons .presencechoice,
+.ref-time-change{
+  cursor:pointer!important;
+  transition:transform .16s ease,filter .16s ease,box-shadow .16s ease,border-color .16s ease!important;
+}
+.ref-presence-buttons .presencechoice:hover,
+.ref-time-change:hover{
+  transform:translateY(-2px)!important;
+  filter:brightness(1.16)!important;
+  box-shadow:0 5px 14px rgba(0,0,0,.28)!important;
+}
+.ref-presence-buttons .presencechoice:active,
+.ref-time-change:active{
+  transform:translateY(0) scale(.98)!important;
+  transition-duration:.06s!important;
+}
+
+/* Vertically center attendance subheader between its divider lines */
+@media (min-width:901px){
+  .ref-att-base .ref-att-head{
+    height:46px!important;
+    min-height:46px!important;
+    padding:0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    box-sizing:border-box!important;
+  }
+  .ref-att-base .ref-att-head h3,
+  .ref-att-base .ref-att-head>b{
+    margin:0!important;
+    line-height:1!important;
+  }
+}
+
+/* Attendance hover: same restrained interaction as standard action buttons */
+.ref-presence-buttons .presencechoice,
+.ref-time-change{
+  cursor:pointer!important;
+  transition:.15s ease!important;
+}
+.ref-presence-buttons .presencechoice:hover,
+.ref-time-change:hover{
+  transform:none!important;
+  filter:none!important;
+  box-shadow:none!important;
+}
+.ref-presence-buttons .presencechoice.yes:hover{
+  background:#12382c!important;
+  border-color:#39a87d!important;
+  color:#8bf0c6!important;
+}
+.ref-presence-buttons .presencechoice.maybe:hover{
+  background:#332711!important;
+  border-color:#a47725!important;
+  color:#ffd77b!important;
+}
+.ref-presence-buttons .presencechoice.no:hover{
+  background:#391a1d!important;
+  border-color:#a9434b!important;
+  color:#ff8b90!important;
+}
+.ref-time-change:hover{
+  background:#2b1d20!important;
+  border-color:#774047!important;
+  color:#fff!important;
+}
+.ref-presence-buttons .presencechoice:active,
+.ref-time-change:active{transform:none!important}
+
+/* Tighten attendance subheader spacing */
+@media (min-width:901px){
+  .ref-att-base .ref-att-head{
+    height:34px!important;
+    min-height:34px!important;
+  }
+  .ref-att-divider{margin-bottom:6px!important}
+}
+
+/* Attendance list compact 6-row viewport + matched feed height */
+@media (min-width:901px){
+  .ref-att-base,.ref-feed{
+    height:455px!important;
+    min-height:455px!important;
+    max-height:455px!important;
+  }
+  .ref-att-base{
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  .ref-att-base .ref-members{
+    flex:0 0 222px!important;
+    height:222px!important;
+    min-height:0!important;
+    max-height:222px!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding-top:2px!important;
+    padding-right:4px!important;
+    scrollbar-width:thin!important;
+    scrollbar-color:#5b2428 transparent!important;
+  }
+  .ref-att-base .ref-members::-webkit-scrollbar{width:5px!important}
+  .ref-att-base .ref-members::-webkit-scrollbar-track{background:transparent!important}
+  .ref-att-base .ref-members::-webkit-scrollbar-thumb{background:#5b2428!important;border-radius:8px!important}
+  .ref-att-base .ref-member{
+    height:37px!important;
+    min-height:37px!important;
+    grid-template-columns:minmax(0,1fr) 92px 48px!important;
+    gap:4px!important;
+  }
+  .ref-att-base .ref-member-info>b{font-size:12px!important}
+  .ref-att-base .ref-member-info>small{
+    font-size:10px!important;
+    line-height:1.05!important;
+    margin-top:2px!important;
+  }
+  .ref-att-base .ref-member-time{
+    font-size:11px!important;
+    text-align:right!important;
+  }
+  .ref-att-base .ref-statuses{justify-content:flex-end!important}
+  .ref-att-base .ref-statuses .ref-status{
+    width:92px!important;
+    min-width:92px!important;
+  }
+  .ref-att-base .ref-att-head>b{
+    font-size:12px!important;
+  }
+  .ref-feed{
+    overflow:hidden!important;
+  }
+}
+
+/* Place join time directly to the right of No button */
+@media (min-width:901px){
+  .ref-presence-row{display:flex!important;align-items:center!important;gap:16px!important;flex-wrap:nowrap!important}
+  .ref-presence-row .ref-presence-buttons{flex:0 0 auto!important}
+  .ref-presence-row .ref-join-time{
+    margin-top:0!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:4px!important;
+    white-space:nowrap!important;
+  }
+}
+
+/* Attendance: exact six-member viewport */
+@media (min-width:901px){
+  .ref-att-base,.ref-feed{
+    height:430px!important;
+    min-height:430px!important;
+    max-height:430px!important;
+  }
+  .ref-att-base .ref-members{
+    flex:0 0 210px!important;
+    height:210px!important;
+    max-height:210px!important;
+  }
+  .ref-att-base .ref-member{
+    height:35px!important;
+    min-height:35px!important;
+  }
+}
+
+/* Photo/comments redesign */
+@media (min-width:901px){
+ .ref-feed .ref-title h2{font-size:17px!important;font-weight:900!important;line-height:1!important}
+ .ref-feed .ref-title{height:34px!important}
+ .ref-feed #homePlaceBody{height:calc(100% - 42px)!important;overflow-y:auto!important;overflow-x:hidden!important;padding-right:4px!important;scrollbar-width:thin!important;scrollbar-color:#5b2428 transparent!important}
+}
+.ref-feed-compose-row{display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:10px;align-items:stretch}
+.ref-feed-compose-row .place-comment{min-height:42px!important;height:42px!important;resize:none!important;padding:11px 12px!important}
+.ref-feed-send{height:42px!important;margin:0!important;width:100%!important}
+.ref-feed-attach-row{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:10px}
+.ref-feed-attach{height:30px;padding:0 11px;display:flex;align-items:center;border:1px solid #30433f;border-radius:6px;background:#0c1715;color:#dfe8e5;font-size:10px;font-weight:700;cursor:pointer;transition:.15s}
+.ref-feed-attach:hover{background:#142521;border-color:#49645e;color:#fff}
+.ref-feed-attach input{display:none}
+.ref-feed-list{margin-top:12px!important;gap:0!important}
+.ref-feed-post{position:relative;background:transparent!important;border:0!important;border-top:1px solid #1b292c!important;border-radius:0!important;padding:11px 4px!important}
+.ref-feed-post .itemtop{align-items:center!important}
+.ref-feed-post .itemtop>div:first-child{display:flex;align-items:center;gap:10px}
+.ref-feed-date{font-size:9px;color:#77888b}
+.ref-feed-comment{margin-top:7px;font-size:11px}
+.ref-post-menu{position:relative}
+.ref-post-dots{border:0;background:transparent;color:#9eacad;font-weight:900;letter-spacing:2px;cursor:pointer;padding:4px 2px}
+.ref-post-menu-pop{display:none;position:absolute;right:0;top:24px;z-index:20;width:142px;padding:5px;background:#0c1413;border:1px solid #30403d;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.ref-post-menu-pop.open{display:grid}
+.ref-post-menu-pop button{border:0;background:transparent;color:#d9e2df;text-align:left;padding:8px;border-radius:4px;font-size:10px;cursor:pointer}
+.ref-post-menu-pop button:hover{background:#142521}
+.ref-post-menu-pop button.danger{color:#ff6d73}
+
+/* Home feed post contrast and date sizing */
+.ref-feed-post{
+  background:#0d1715!important;
+  border:1px solid #20312d!important;
+  border-radius:6px!important;
+  padding:11px 12px!important;
+  margin-bottom:8px!important;
+}
+.ref-feed-post .ref-feed-date{
+  font-size:10px!important;
+  color:#77888b!important;
+}
+
+/* Feed scrolling starts with posts; composer stays fixed */
+@media (min-width:901px){
+  .ref-feed #homePlaceBody{
+    height:calc(100% - 42px)!important;
+    overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  .ref-feed .place-compose{
+    flex:0 0 auto!important;
+  }
+  .ref-feed .ref-feed-list{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding-right:4px!important;
+    scrollbar-width:thin!important;
+    scrollbar-color:#5b2428 transparent!important;
+  }
+  .ref-feed .ref-feed-list::-webkit-scrollbar{width:5px!important}
+  .ref-feed .ref-feed-list::-webkit-scrollbar-track{background:transparent!important}
+  .ref-feed .ref-feed-list::-webkit-scrollbar-thumb{background:#5b2428!important;border-radius:8px!important}
+}
+
+/* Feed post auto-height + keep three-dot menu above neighboring posts */
+.ref-feed .ref-feed-list{
+  overflow-y:auto!important;
+  overflow-x:visible!important;
+}
+.ref-feed-post{
+  min-height:0!important;
+  height:auto!important;
+  padding:8px 10px!important;
+  margin-bottom:7px!important;
+  overflow:visible!important;
+}
+.ref-feed-post .itemtop{min-height:18px!important}
+.ref-feed-comment{
+  margin-top:5px!important;
+  line-height:1.25!important;
+}
+.ref-feed-post .placephotos:empty{display:none!important}
+.ref-post-menu{z-index:50!important}
+.ref-post-menu-pop{
+  z-index:1000!important;
+  top:22px!important;
+  right:0!important;
+}
+.ref-feed-post:has(.ref-post-menu-pop.open){z-index:100!important}
+
+/* Feed post balanced minimum height: compact but never clips text */
+.ref-feed-post{
+  min-height:58px!important;
+  height:auto!important;
+  box-sizing:border-box!important;
+  padding:9px 10px 10px!important;
+}
+.ref-feed-post .itemtop{
+  min-height:18px!important;
+  margin-bottom:5px!important;
+}
+.ref-feed-comment{
+  display:block!important;
+  margin-top:0!important;
+  padding-bottom:1px!important;
+  line-height:1.35!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  word-break:break-word!important;
+}
+.ref-feed-post .placephotos:not(:empty){
+  margin-top:8px!important;
+}
+
+/* Feed short post height */
+.ref-feed-post{min-height:60px!important;}
+
+/* Attendance card: remove unused bottom space */
+@media (min-width:901px){
+  .ref-att-base{
+    height:390px!important;
+    min-height:390px!important;
+    max-height:390px!important;
+  }
+  .ref-att-base .ref-members{
+    flex:1 1 auto!important;
+    height:auto!important;
+    max-height:none!important;
+  }
+}
+
+/* Home feed photos: make edited post visibly grow with its images */
+.ref-feed-post .placephotos:not(:empty){
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:7px!important;
+  width:100%!important;
+  margin-top:8px!important;
+  overflow:visible!important;
+}
+.ref-feed-post .placephotos .placephoto{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+}
+.ref-feed-post .placephotos img{
+  display:block!important;
+  width:100%!important;
+  height:82px!important;
+  max-width:100%!important;
+  object-fit:cover!important;
+  border-radius:5px!important;
+}
+
+/* Match middle home cards at 410px */
+@media (min-width:901px){
+  .ref-att-base,.ref-feed{
+    height:410px!important;
+    min-height:410px!important;
+    max-height:410px!important;
+  }
+}
+
+/* Home feed photos: use the same natural thumbnail behavior as Stash/Base */
+.ref-feed-post{
+  overflow:visible!important;
+}
+.ref-feed-post .placephotos:not(:empty){
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:flex-start!important;
+  gap:8px!important;
+  width:100%!important;
+  height:auto!important;
+  max-height:none!important;
+  margin:8px 0 0!important;
+  overflow:visible!important;
+}
+.ref-feed-post .placephotos .placephoto{
+  position:relative!important;
+  display:block!important;
+  flex:0 0 110px!important;
+  width:110px!important;
+  height:72px!important;
+  min-width:110px!important;
+  min-height:72px!important;
+}
+.ref-feed-post .placephotos .placephoto img{
+  display:block!important;
+  width:110px!important;
+  height:72px!important;
+  min-width:110px!important;
+  min-height:72px!important;
+  max-width:110px!important;
+  object-fit:cover!important;
+  border-radius:7px!important;
+}
+
+/* Definitive home feed sizing: posts must not shrink inside the scroll flex column */
+@media (min-width:901px){
+  .ref-feed .ref-feed-list{
+    display:block!important;
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+  .ref-feed .ref-feed-list>.ref-feed-post{
+    display:block!important;
+    flex:none!important;
+    flex-shrink:0!important;
+    width:calc(100% - 2px)!important;
+    min-height:60px!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  .ref-feed .ref-feed-list>.ref-feed-post .placephotos:not(:empty){
+    display:flex!important;
+    flex-flow:row wrap!important;
+    min-height:72px!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+}
+
+/* Stash/Base: same publication UI and behavior as home photo/comments */
+.place-page-card #placeBody{min-width:0!important}
+.place-page-card #placeBody>.place-compose{margin-bottom:0!important;padding:8px!important}
+.place-page-card #placeBody>.ref-feed-list{display:block!important;margin-top:12px!important}
+.place-page-card #placeBody>.ref-feed-list>.ref-feed-post{
+ display:block!important;flex:none!important;flex-shrink:0!important;width:100%!important;
+ min-height:60px!important;height:auto!important;max-height:none!important;overflow:visible!important;
+ box-sizing:border-box!important
+}
+.place-page-card #placeBody>.ref-feed-list>.ref-feed-post .placephotos:not(:empty){
+ display:flex!important;flex-flow:row wrap!important;align-items:flex-start!important;gap:8px!important;
+ width:100%!important;min-height:72px!important;height:auto!important;max-height:none!important;
+ margin:8px 0 0!important;overflow:visible!important
+}
+.place-page-card #placeBody>.ref-feed-list>.ref-feed-post .placephotos .placephoto{
+ display:block!important;flex:0 0 110px!important;width:110px!important;height:72px!important;
+ min-width:110px!important;min-height:72px!important
+}
+.place-page-card #placeBody>.ref-feed-list>.ref-feed-post .placephotos img{
+ display:block!important;width:110px!important;height:72px!important;min-width:110px!important;
+ min-height:72px!important;max-width:110px!important;object-fit:cover!important;border-radius:7px!important
+}
+
+/* Stash/Base composer: same compact comment field as Home */
+.place-page-card #placeBody .ref-feed-compose-row .place-comment{
+  min-height:42px!important;
+  height:42px!important;
+  max-height:42px!important;
+  resize:none!important;
+  padding:11px 12px!important;
+}
+.place-page-card #placeBody .ref-feed-compose-row{
+  align-items:stretch!important;
+}
+.place-page-card #placeBody .ref-feed-send{
+  height:42px!important;
+}
+
+/* Stash/Base compact composer — override legacy #placeBody textarea rules */
+@media (min-width:701px){
+  .place-page-card #placeBody .place-compose textarea#placeComment.place-comment{
+    display:block!important;
+    width:100%!important;
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    padding:11px 12px!important;
+    resize:none!important;
+    font-size:inherit!important;
+    line-height:20px!important;
+  }
+}
+
+/* Hide native textarea scrollbars everywhere */
+textarea{
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+textarea::-webkit-scrollbar{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+
+/* Stash/Base publication text slightly larger */
+.place-page-card #placeBody .ref-feed-post .ref-feed-comment{
+  font-size:12px!important;
+  line-height:1.4!important;
+}
+
+/* Explosives home strip: hide decorative item icons only */
+.ref-expl .ref-expl-pic{
+  display:none!important;
+}
+
+/* Home explosives quantity controls */
+.ref-expl-main{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
+.ref-expl-edit{display:flex!important;align-items:center!important;gap:5px!important}
+.ref-expl-edit button{width:25px!important;height:25px!important;min-width:25px!important;padding:0!important;border:1px solid #67252b!important;border-radius:5px!important;background:#261315!important;color:#ff5c64!important;font-size:17px!important;font-weight:900!important;cursor:pointer!important}
+.ref-expl-edit input{width:38px!important;height:25px!important;padding:0 3px!important;text-align:center!important;border:1px solid #263633!important;border-radius:4px!important;background:#09100f!important;color:#f2f5f3!important;font-size:15px!important;font-weight:900!important;-moz-appearance:textfield!important}
+.ref-expl-edit input::-webkit-inner-spin-button,.ref-expl-edit input::-webkit-outer-spin-button{-webkit-appearance:none!important;margin:0!important}
+.ref-expl-item>small{display:block!important;margin-top:7px!important}
+
+/* Explosives cards: original reference layout, minus icon */
+.ref-expl-item{display:grid!important;grid-template-columns:1fr!important;align-content:center!important;padding:10px 10px!important}
+.ref-expl-item .ref-expl-main{display:block!important}
+.ref-expl-item .ref-expl-main>b{display:block!important;margin-bottom:5px!important;font-size:12px!important}
+.ref-expl-item>.ref-expl-edit{justify-content:flex-start!important;gap:5px!important}
+.ref-expl-item>.ref-expl-edit input{order:0!important}
+.ref-expl-item>.ref-expl-edit button:first-of-type{order:1!important}
+.ref-expl-item>.ref-expl-edit button:last-of-type{order:2!important}
+.ref-expl-item>small{margin-top:7px!important;white-space:nowrap!important}
+
+/* Explosives strip alignment cleanup */
+@media (min-width:901px){
+ .ref-expl .ref-title{height:34px!important;min-height:34px!important;display:flex!important;align-items:center!important;gap:10px!important}
+ .ref-expl .ref-title h2{font-size:17px!important;font-weight:900!important;line-height:1!important;margin:0!important}
+ .ref-expl .ref-title small{margin:0!important;line-height:1!important}
+ .ref-expl .ref-title .ghost{margin-left:auto!important}
+ .ref-expl-items{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:8px!important;align-items:stretch!important}
+ .ref-expl-item{height:78px!important;min-height:78px!important;padding:8px 10px!important;box-sizing:border-box!important;display:grid!important;grid-template-rows:16px 27px 14px!important;align-content:center!important;gap:3px!important}
+ .ref-expl-item .ref-expl-main{height:16px!important;display:flex!important;align-items:center!important}
+ .ref-expl-item .ref-expl-main>b{margin:0!important;font-size:12px!important;line-height:16px!important}
+ .ref-expl-item>.ref-expl-edit{height:27px!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:5px!important}
+ .ref-expl-item>.ref-expl-edit input,.ref-expl-item>.ref-expl-edit button{height:25px!important;margin:0!important}
+ .ref-expl-item>small{height:14px!important;margin:0!important;display:flex!important;align-items:center!important;font-size:9px!important;line-height:14px!important}
+ .ref-wall-total{height:78px!important;min-height:78px!important;box-sizing:border-box!important;align-self:stretch!important}
+}
+
+/* Explosives header interaction */
+.ref-expl .ref-title small{font-size:11px!important}
+.ref-expl-title-link{cursor:pointer!important;transition:.15s ease!important}
+.ref-expl-title-link:hover{color:#ff5b63!important}
+
+/* Explosives: align labels with quantity/control row */
+@media (min-width:901px){
+  .ref-expl-item .ref-expl-main>b{
+    padding-left:1px!important;
+  }
+  .ref-expl-item>.ref-expl-edit{
+    padding-left:0!important;
+  }
+  .ref-expl-item>small{
+    padding-left:0!important;
+  }
+  .ref-expl-item>.ref-expl-edit input{
+    width:38px!important;
+    box-sizing:border-box!important;
+  }
+}
+
+/* Plan/tasks headings: same hover behavior as EXPLOSIVES */
+.ref-plan .ref-section-link,
+.ref-tasks .ref-section-link{
+  cursor:pointer!important;
+  transition:.15s ease!important;
+}
+.ref-plan .ref-section-link:hover,
+.ref-tasks .ref-section-link:hover{
+  color:#ff5b63!important;
+}
+.ref-plan .ref-section-link:hover .ref-count,
+.ref-tasks .ref-section-link:hover .ref-count{
+  color:#ff5b63!important;
+}
+
+/* Explosives exact left alignment: label, quantity and availability */
+@media (min-width:901px){
+  .ref-expl-item{
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+  .ref-expl-item .ref-expl-main,
+  .ref-expl-item>.ref-expl-edit,
+  .ref-expl-item>small{
+    margin-left:0!important;
+    padding-left:0!important;
+  }
+  .ref-expl-item .ref-expl-main>b{
+    margin-left:0!important;
+    padding-left:0!important;
+  }
+  .ref-expl-item>.ref-expl-edit input{
+    margin-left:0!important;
+  }
+}
+
+/* Unified main action buttons: send / create plan / create task */
+.ref-feed-send,
+.card>.toolbar>.primary{
+  height:34px!important;
+  min-height:34px!important;
+  padding:0 14px!important;
+  border:1px solid #67252b!important;
+  border-radius:6px!important;
+  background:#261315!important;
+  color:#ff6269!important;
+  box-shadow:none!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  line-height:32px!important;
+  letter-spacing:.15px!important;
+  cursor:pointer!important;
+  transition:background .15s ease,border-color .15s ease,color .15s ease!important;
+}
+.ref-feed-send:hover,
+.card>.toolbar>.primary:hover{
+  background:#35181b!important;
+  border-color:#8a3037!important;
+  color:#ff777d!important;
+  transform:none!important;
+  box-shadow:none!important;
+}
+.ref-feed-send:active,
+.card>.toolbar>.primary:active{
+  background:#421b1f!important;
+  transform:none!important;
+}
+
+/* Unified action height — match Stash/Base send button */
+.ref-feed-send,
+.card>.toolbar>.primary{
+  height:42px!important;
+  min-height:42px!important;
+  line-height:40px!important;
+}
+
+/* Sidebar protect duplicate for layout comparison */
+@media (min-width:901px){
+  .sidebar-protect{
+    margin-top:auto!important;
+    margin-bottom:8px!important;
+    padding:10px 12px!important;
+    border:1px solid #253a36!important;
+    border-radius:7px!important;
+    background:#091312!important;
+    cursor:pointer!important;
+    display:grid!important;
+    gap:3px!important;
+    transition:.15s ease!important;
+  }
+  .sidebar-protect small{font-size:9px!important;color:#81918d!important}
+  .sidebar-protect b{font-size:12px!important;line-height:1.2!important}
+  .sidebar-protect span{font-size:9px!important;color:#91a09c!important}
+  .sidebar-protect em{font-size:10px!important;font-style:normal!important;font-weight:800!important;color:#e8b84f!important;margin-top:2px!important}
+  .sidebar-protect.protect-green b{color:#51e5b0!important}
+  .sidebar-protect.protect-orange b{color:#e8b84f!important}
+  .sidebar-protect.protect-red b{color:#ff5962!important}
+  .sidebar-protect:hover{background:#0d1a18!important;border-color:#38504b!important}
+  .server.server-link{margin-top:0!important}
+}
