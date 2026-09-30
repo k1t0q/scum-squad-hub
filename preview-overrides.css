@@ -595,3 +595,26 @@
     max-height:none!important;
   }
 }
+
+/* Home feed photos: make edited post visibly grow with its images */
+.ref-feed-post .placephotos:not(:empty){
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:7px!important;
+  width:100%!important;
+  margin-top:8px!important;
+  overflow:visible!important;
+}
+.ref-feed-post .placephotos .placephoto{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+}
+.ref-feed-post .placephotos img{
+  display:block!important;
+  width:100%!important;
+  height:82px!important;
+  max-width:100%!important;
+  object-fit:cover!important;
+  border-radius:5px!important;
+}
