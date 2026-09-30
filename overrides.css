@@ -1018,3 +1018,12 @@ textarea::-webkit-scrollbar{
  .sidebar-protect .sidebar-protect-times strong{color:#c3cfcc!important;font-weight:800!important}
  .sidebar-protect em{margin-top:2px!important}
 }
+
+/* Sidebar protect readability */
+@media (min-width:901px){
+  .sidebar-protect small{font-size:9px!important;line-height:12px!important}
+  .sidebar-protect .sidebar-protect-who{font-size:10px!important;line-height:14px!important;color:#a8b6b2!important}
+  .sidebar-protect .sidebar-protect-times span{font-size:10px!important;line-height:15px!important;color:#94a49f!important}
+  .sidebar-protect .sidebar-protect-times strong{font-size:10px!important;color:#d2dcda!important}
+  .sidebar-protect em{font-size:10px!important;line-height:14px!important}
+}
