@@ -578,3 +578,6 @@
 .ref-feed-post .placephotos:not(:empty){
   margin-top:8px!important;
 }
+
+/* Feed short post height */
+.ref-feed-post{min-height:60px!important;}
