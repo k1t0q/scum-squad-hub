@@ -1582,3 +1582,17 @@ textarea::-webkit-scrollbar{
     color:#ff6269!important;
   }
 }
+
+/* Mobile home: remove extra top whitespace before protect */
+@media (max-width:900px){
+  .ref-home{
+    padding-top:0!important;
+    margin-top:0!important;
+  }
+  .ref-home>.mobile-home-protect{
+    margin-top:14px!important;
+  }
+  #view{
+    padding-top:0!important;
+  }
+}
