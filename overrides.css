@@ -1337,3 +1337,76 @@ textarea::-webkit-scrollbar{
     line-height:18px!important;
   }
 }
+
+/* Mobile attendance: compact 5-row roster, info left / status right */
+@media (max-width:900px){
+  .ref-att-base .ref-join-time{
+    font-size:16px!important;
+    line-height:20px!important;
+  }
+  .ref-att-base .ref-join-time>b{
+    font-size:17px!important;
+  }
+  .ref-att-base .ref-members{
+    display:block!important;
+    height:330px!important;
+    max-height:330px!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    scrollbar-width:thin!important;
+    padding-right:4px!important;
+  }
+  .ref-att-base .ref-member{
+    min-height:66px!important;
+    height:66px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 118px!important;
+    grid-template-rows:22px 18px 18px!important;
+    column-gap:12px!important;
+    row-gap:0!important;
+    padding:4px 0!important;
+    box-sizing:border-box!important;
+    align-items:center!important;
+  }
+  .ref-att-base .ref-member-info{
+    grid-column:1!important;
+    grid-row:1 / span 2!important;
+    align-self:start!important;
+    min-width:0!important;
+  }
+  .ref-att-base .ref-member-info b{
+    display:block!important;
+    font-size:14px!important;
+    line-height:18px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .ref-att-base .ref-member-info small{
+    display:block!important;
+    margin-top:0!important;
+    font-size:11px!important;
+    line-height:15px!important;
+  }
+  .ref-att-base .ref-member-time{
+    grid-column:1!important;
+    grid-row:3!important;
+    width:auto!important;
+    text-align:left!important;
+    font-size:11px!important;
+    line-height:16px!important;
+    color:#9eaaa7!important;
+  }
+  .ref-att-base .ref-statuses{
+    grid-column:2!important;
+    grid-row:1 / span 3!important;
+    align-self:center!important;
+    justify-self:end!important;
+  }
+  .ref-att-base .ref-status{
+    width:118px!important;
+    min-width:118px!important;
+    height:38px!important;
+    font-size:13px!important;
+  }
+}
