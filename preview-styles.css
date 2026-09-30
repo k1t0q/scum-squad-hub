@@ -1398,3 +1398,14 @@ header h1{color:#647872!important;font-size:10px!important}
  .server-online{display:block!important;color:#50e2aa!important;font-size:18px!important;margin-top:4px!important}.server-online::first-letter{color:#50e2aa}
 }
 @media(max-width:900px){.server-link{text-decoration:none;color:inherit}.server-online{color:#50e2aa}}
+
+
+/* FURY PREVIEW v6.1 — sidebar layout hotfix */
+@media(min-width:901px){
+ .app{display:grid!important;grid-template-columns:202px minmax(0,1fr)!important;width:100%!important;min-height:100vh!important}
+ .app>aside{position:sticky!important;left:auto!important;top:0!important;bottom:auto!important;width:auto!important;height:100vh!important;min-height:100vh!important;grid-column:1!important;grid-row:1!important}
+ .app>main{grid-column:2!important;grid-row:1!important;margin-left:0!important;width:auto!important;min-width:0!important;max-width:none!important}
+ #view{width:100%!important;max-width:none!important}
+ .ref-home{width:100%!important;max-width:none!important}
+ .ref-top,.ref-middle{width:100%!important;min-width:0!important}
+}
