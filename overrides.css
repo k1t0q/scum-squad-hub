@@ -1076,3 +1076,58 @@ textarea::-webkit-scrollbar{
     margin-top:5px!important;
   }
 }
+
+/* Mobile header/protect cleanup */
+@media (max-width:900px){
+  .ref-header .ref-protect-head{display:none!important}
+  .ref-header{
+    min-height:112px!important;
+    height:112px!important;
+    padding:18px 20px!important;
+    justify-content:flex-start!important;
+  }
+  .ref-header .ref-brand{margin:0!important}
+  .ref-header .ref-brand .eyebrow{display:none!important}
+  .ref-header .ref-brand h1{
+    font-size:0!important;
+    line-height:1!important;
+    margin:0!important;
+  }
+  .ref-header .ref-brand h1:after{
+    content:"ДУБЛЬ"!important;
+    display:block!important;
+    font-size:38px!important;
+    font-style:italic!important;
+    font-weight:1000!important;
+    letter-spacing:-1.5px!important;
+    color:#f4f6f5!important;
+  }
+  .ref-header-right{margin-left:auto!important}
+  .sidebar-protect{
+    margin:14px 20px 12px!important;
+    padding:12px 14px!important;
+    min-height:72px!important;
+    display:grid!important;
+    grid-template-columns:1fr auto!important;
+    grid-template-rows:auto auto auto!important;
+    gap:3px 12px!important;
+    border-radius:8px!important;
+  }
+  .sidebar-protect small{grid-column:1 / -1!important;font-size:10px!important;line-height:12px!important}
+  .sidebar-protect b{grid-column:1 / -1!important;font-size:15px!important;line-height:18px!important}
+  .sidebar-protect .sidebar-protect-who{font-size:11px!important;line-height:15px!important}
+  .sidebar-protect .sidebar-protect-times{
+    grid-column:1 / -1!important;
+    display:flex!important;
+    gap:16px!important;
+    margin-top:3px!important;
+  }
+  .sidebar-protect .sidebar-protect-times span,
+  .sidebar-protect .sidebar-protect-times strong{font-size:11px!important;line-height:15px!important}
+  .sidebar-protect em{
+    grid-column:1 / -1!important;
+    font-size:12px!important;
+    line-height:16px!important;
+    margin-top:3px!important;
+  }
+}
