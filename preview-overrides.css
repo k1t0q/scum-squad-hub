@@ -761,3 +761,8 @@ textarea::-webkit-scrollbar{
   font-size:12px!important;
   line-height:1.4!important;
 }
+
+/* Explosives home strip: hide decorative item icons only */
+.ref-expl .ref-expl-pic{
+  display:none!important;
+}
