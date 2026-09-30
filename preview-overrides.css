@@ -230,3 +230,14 @@
 @media (min-width:901px){
   .ref-att-base .ref-member{grid-template-columns:1fr 96px 62px!important}
 }
+
+/* Attendance headings exactly match Plan/Tasks headings */
+@media (min-width:901px){
+  .ref-att-base .ref-title h2,
+  .ref-att-base .ref-att-head h3{
+    font-size:17px!important;
+    font-weight:900!important;
+    line-height:1!important;
+    letter-spacing:0!important;
+  }
+}
