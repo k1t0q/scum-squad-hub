@@ -729,3 +729,18 @@
 .place-page-card #placeBody .ref-feed-send{
   height:42px!important;
 }
+
+/* Stash/Base compact composer — override legacy #placeBody textarea rules */
+@media (min-width:701px){
+  .place-page-card #placeBody .place-compose textarea#placeComment.place-comment{
+    display:block!important;
+    width:100%!important;
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    padding:11px 12px!important;
+    resize:none!important;
+    font-size:inherit!important;
+    line-height:20px!important;
+  }
+}
