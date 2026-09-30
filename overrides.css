@@ -1131,3 +1131,9 @@ textarea::-webkit-scrollbar{
     margin-top:3px!important;
   }
 }
+
+/* Mobile: keep original header protect, hide sidebar duplicate */
+@media (max-width:900px){
+  .ref-header .ref-protect-head{display:flex!important}
+  .sidebar-protect{display:none!important}
+}
