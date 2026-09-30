@@ -1741,3 +1741,20 @@ textarea::-webkit-scrollbar{
     overflow:visible!important;
   }
 }
+
+/* Desktop: restore native smooth page scrolling */
+@media (min-width:901px){
+  html{
+    scroll-behavior:smooth!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+  }
+  body{
+    overflow:visible!important;
+    overscroll-behavior-y:auto!important;
+  }
+  .app,main,#view{
+    overflow:visible!important;
+    max-height:none!important;
+  }
+}
