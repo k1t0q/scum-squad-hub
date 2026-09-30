@@ -1548,3 +1548,13 @@ header .ref-brand h1,#pageTitle{font-size:13px!important;font-weight:800!importa
 .modal .profile-actions .ghost:hover{background:#142521!important;border-color:#49645e!important;color:#fff!important}
 .modal .profile-actions .primary{background:#0c241d!important;border:1px solid #257558!important;color:#62e5b0!important;box-shadow:none!important}
 .modal .profile-actions .primary:hover{background:#12382c!important;border-color:#39a87d!important;color:#8bf0c6!important}
+
+/* FURY PREVIEW v8.5 — raid detail actions */
+.raid-detail-actions{display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:wrap!important;margin-top:14px!important}
+.raid-detail-actions button{height:38px!important;padding:0 14px!important;border-radius:6px!important;border:1px solid #30433f!important;background:#0c1715!important;color:#dfe8e5!important;font-size:12px!important;font-weight:700!important;cursor:pointer!important;transition:.15s!important}
+.raid-detail-actions button:hover{background:#142521!important;border-color:#49645e!important;color:#fff!important}
+.raid-detail-actions .raid-join{border-color:#257558!important;background:#0c241d!important;color:#62e5b0!important}
+.raid-detail-actions .raid-join:hover{background:#12382c!important;border-color:#39a87d!important}
+.raid-detail-actions .danger{border-color:#743036!important;background:#2a1215!important;color:#ff686e!important}
+.raid-detail-actions .danger:hover{background:#3b181c!important;border-color:#a33d45!important}
+.raid-detail-actions .ghost{margin-left:auto!important;color:#aebbb8!important}
