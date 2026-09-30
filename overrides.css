@@ -1467,3 +1467,20 @@ textarea::-webkit-scrollbar{
     letter-spacing:0!important;
   }
 }
+
+/* Mobile: scroll plan/tasks lists when they overflow */
+@media (max-width:900px){
+  .ref-plan .ref-list,
+  .ref-tasks .ref-list{
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+    touch-action:pan-y!important;
+    padding-right:3px!important;
+    padding-bottom:6px!important;
+    box-sizing:border-box!important;
+  }
+  .ref-plan .ref-list{max-height:230px!important}
+  .ref-tasks .ref-list{max-height:310px!important}
+}
