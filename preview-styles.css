@@ -1278,3 +1278,56 @@ header .me span:before{content:"";display:inline-block;width:7px;height:7px;bord
 .place-post,.raidcard{box-shadow:inset 0 1px rgba(255,255,255,.018)}
 .raidphotos img,.placephotos img{border-radius:5px;filter:saturate(.88) contrast(1.04)}
 .empty{background:#091210;border-color:#273a35}
+
+
+/* FURY PREVIEW v3 — full concept pass */
+:root{--fury-green:#38df9a;--fury-gold:#e7ad39;--fury-red:#ef4148}
+@media(min-width:901px){
+ .app{grid-template-columns:190px minmax(0,1fr)!important}
+ aside{width:190px!important}
+ main{padding:16px 22px 34px!important}
+ header{height:68px!important;margin-bottom:12px!important}
+ #view>.grid{grid-template-columns:repeat(12,minmax(0,1fr))!important;gap:9px!important}
+ #view>.grid>.card.span3{grid-column:span 3!important}
+ #view>.grid>.card.span6{grid-column:span 6!important}
+ #view>.grid>.card.span8{grid-column:span 6!important}
+ #view>.grid>.card.span4{grid-column:span 6!important}
+ .attendance-combined,.home-feed-card{grid-column:span 6!important}
+}
+aside:before{content:"FURY";position:absolute;left:14px;bottom:92px;font-size:54px;font-weight:1000;font-style:italic;letter-spacing:-5px;color:#fff;opacity:.018;pointer-events:none}
+.logo i{position:relative}.logo i:after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:linear-gradient(90deg,var(--fury-red),transparent)}
+nav button{position:relative;letter-spacing:.2px}
+nav button.active:after{content:"";position:absolute;right:10px;top:50%;width:5px;height:5px;border-radius:50%;background:var(--fury-red);transform:translateY(-50%);box-shadow:0 0 10px #ef4148}
+.server>span{background:var(--fury-green)!important;box-shadow:0 0 12px #38df9a88!important}
+header{background:linear-gradient(90deg,rgba(9,18,16,.45),transparent);padding-left:4px}
+header .eyebrow{color:#dce6e2!important;font-size:12px!important}
+header h1{color:#647872!important;font-size:10px!important}
+.card{backdrop-filter:blur(8px)}
+.card>h2,.toolbar h2{font-weight:900;letter-spacing:.65px}
+.card>h2:before,.toolbar h2:before{content:"";display:inline-block;width:3px;height:13px;background:var(--fury-red);border-radius:3px;margin-right:8px;vertical-align:-2px}
+.metric{font-weight:1000!important}
+#view>.grid>.card.span3:nth-child(1) .metric{color:var(--fury-green)}
+#view>.grid>.card.span3:nth-child(2) .metric{color:#fff}
+.primary{letter-spacing:.35px;text-transform:uppercase}
+.primary:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.itemtop h3{font-weight:850}
+.badge{letter-spacing:.25px}
+.progress{height:5px!important}
+.progress i{box-shadow:0 0 10px #38df9a55}
+.attendance-combined{background:linear-gradient(145deg,rgba(12,24,21,.98),rgba(7,15,14,.98))}
+.home-feed-card{background:linear-gradient(145deg,rgba(12,22,20,.98),rgba(7,14,13,.98))}
+.place-compose{background:#081210;border:1px solid #1e302c;border-radius:6px;padding:12px!important}
+.place-comment{min-height:72px!important}
+.explosiveitem h3{font-size:16px!important;letter-spacing:.4px}
+.explosiveitem .muted{font-size:11px}
+.itemwalls{display:inline-block;margin-left:4px;color:var(--fury-gold)!important}
+.protect-active{color:var(--fury-green)!important;text-shadow:0 0 12px #38df9a44}
+#toast{background:#0c1715;border-color:#294039;box-shadow:0 16px 40px #0008}
+@media(max-width:900px){
+ body{background:linear-gradient(180deg,#050a0a,#07100f)!important}
+ aside:before{display:none}
+ .app>aside{background:#07100f!important;border-bottom:1px solid #1d2d29!important}
+ .card{padding:16px!important}
+ .metric{font-size:24px!important}
+ .place-compose{padding:10px!important}
+}
