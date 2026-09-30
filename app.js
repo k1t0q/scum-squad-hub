@@ -15,7 +15,7 @@ function render(){if(page==='Сегодня')page='Главная'; headerProtec
 function today(){
  let playing=db.members.filter(x=>x[3]==='Буду').length,walls=Number(window.furyWalls||0),activeTasks=db.tasks.filter(t=>t.status!=='Выполнено'&&t.status!=='Выполнена');
  let plan=db.ops.slice(0,3).map(o=>{let p=Array.isArray(o.participants)?o.participants:[];return '<div class="ref-plan-row raidclick" onclick="viewOp('+o.id+')"><span class="ref-dot"></span><b class="ref-time">'+esc(o.time)+'</b><div class="ref-plan-name"><b>'+esc(o.title)+'</b><small>'+esc(o.note||'')+'</small></div><div class="ref-people-count">'+p.length+' '+participantWord(p.length)+'</div></div>'}).join('');
- let taskRows=activeTasks.slice(0,5).map(t=>'<div class="ref-task-row" onclick="taskDetails('+t.id+',event)"><span class="ref-ring"></span><b>'+esc(t.title)+'</b><span>'+Number(t.done||0)+' / '+Number(t.need||0)+'</span></div>').join('');
+ let taskRows=activeTasks.map(t=>'<div class="ref-task-row" onclick="taskDetails('+t.id+',event)"><span class="ref-ring"></span><b>'+esc(t.title)+'</b><span>'+Number(t.done||0)+' / '+Number(t.need||0)+'</span></div>').join('');
  let choices=['Буду','Под вопросом','Не буду'].map(x=>'<button class="presencechoice '+(x==='Буду'?'yes':x==='Под вопросом'?'maybe':'no')+' '+(db.presence.status===x?'active':'')+'" onclick="setPresence(\''+x+'\')">'+x+'</button>').join('');
  let protectText=db.protect?protectHomeHtml(db.protect):'—';
  refreshWallMetric();
