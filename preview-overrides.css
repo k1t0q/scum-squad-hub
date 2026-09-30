@@ -837,3 +837,24 @@ textarea::-webkit-scrollbar{
 .ref-tasks .ref-section-link:hover .ref-count{
   color:#ff5b63!important;
 }
+
+/* Explosives exact left alignment: label, quantity and availability */
+@media (min-width:901px){
+  .ref-expl-item{
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+  .ref-expl-item .ref-expl-main,
+  .ref-expl-item>.ref-expl-edit,
+  .ref-expl-item>small{
+    margin-left:0!important;
+    padding-left:0!important;
+  }
+  .ref-expl-item .ref-expl-main>b{
+    margin-left:0!important;
+    padding-left:0!important;
+  }
+  .ref-expl-item>.ref-expl-edit input{
+    margin-left:0!important;
+  }
+}
