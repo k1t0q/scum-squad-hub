@@ -714,3 +714,18 @@
  display:block!important;width:110px!important;height:72px!important;min-width:110px!important;
  min-height:72px!important;max-width:110px!important;object-fit:cover!important;border-radius:7px!important
 }
+
+/* Stash/Base composer: same compact comment field as Home */
+.place-page-card #placeBody .ref-feed-compose-row .place-comment{
+  min-height:42px!important;
+  height:42px!important;
+  max-height:42px!important;
+  resize:none!important;
+  padding:11px 12px!important;
+}
+.place-page-card #placeBody .ref-feed-compose-row{
+  align-items:stretch!important;
+}
+.place-page-card #placeBody .ref-feed-send{
+  height:42px!important;
+}
