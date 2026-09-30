@@ -1445,3 +1445,12 @@ header h1{color:#647872!important;font-size:10px!important}
  .server-label small{line-height:14px!important;margin:0!important}
  .server-ip{font-size:10px!important;line-height:1.25!important;color:#a4b2b5!important;margin:5px 0 10px 16px!important;letter-spacing:.05px!important}
 }
+
+
+/* FURY PREVIEW v6.5 — clean sidebar, remove background ghost */
+@media(min-width:901px){
+ aside{background:#111a1d!important}
+ aside:before{display:none!important;content:none!important}
+ .server-link:before,.server-link:after{display:none!important;content:none!important}
+ .server-link{background:#081416!important}
+}
