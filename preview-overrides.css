@@ -554,3 +554,27 @@
   right:0!important;
 }
 .ref-feed-post:has(.ref-post-menu-pop.open){z-index:100!important}
+
+/* Feed post balanced minimum height: compact but never clips text */
+.ref-feed-post{
+  min-height:58px!important;
+  height:auto!important;
+  box-sizing:border-box!important;
+  padding:9px 10px 10px!important;
+}
+.ref-feed-post .itemtop{
+  min-height:18px!important;
+  margin-bottom:5px!important;
+}
+.ref-feed-comment{
+  display:block!important;
+  margin-top:0!important;
+  padding-bottom:1px!important;
+  line-height:1.35!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  word-break:break-word!important;
+}
+.ref-feed-post .placephotos:not(:empty){
+  margin-top:8px!important;
+}
