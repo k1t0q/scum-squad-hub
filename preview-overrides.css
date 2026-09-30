@@ -691,3 +691,26 @@
     overflow:visible!important;
   }
 }
+
+/* Stash/Base: same publication UI and behavior as home photo/comments */
+.place-page-card #placeBody{min-width:0!important}
+.place-page-card #placeBody>.place-compose{margin-bottom:0!important;padding:8px!important}
+.place-page-card #placeBody>.ref-feed-list{display:block!important;margin-top:12px!important}
+.place-page-card #placeBody>.ref-feed-list>.ref-feed-post{
+ display:block!important;flex:none!important;flex-shrink:0!important;width:100%!important;
+ min-height:60px!important;height:auto!important;max-height:none!important;overflow:visible!important;
+ box-sizing:border-box!important
+}
+.place-page-card #placeBody>.ref-feed-list>.ref-feed-post .placephotos:not(:empty){
+ display:flex!important;flex-flow:row wrap!important;align-items:flex-start!important;gap:8px!important;
+ width:100%!important;min-height:72px!important;height:auto!important;max-height:none!important;
+ margin:8px 0 0!important;overflow:visible!important
+}
+.place-page-card #placeBody>.ref-feed-list>.ref-feed-post .placephotos .placephoto{
+ display:block!important;flex:0 0 110px!important;width:110px!important;height:72px!important;
+ min-width:110px!important;min-height:72px!important
+}
+.place-page-card #placeBody>.ref-feed-list>.ref-feed-post .placephotos img{
+ display:block!important;width:110px!important;height:72px!important;min-width:110px!important;
+ min-height:72px!important;max-width:110px!important;object-fit:cover!important;border-radius:7px!important
+}
