@@ -62,3 +62,9 @@
   white-space:nowrap!important;
   letter-spacing:.1px!important
 }
+
+/* Narrower desktop sidebar */
+@media (min-width:901px){
+  .app{grid-template-columns:220px minmax(0,1fr)!important}
+  .app>aside{width:auto!important;padding-left:14px!important;padding-right:14px!important}
+}
