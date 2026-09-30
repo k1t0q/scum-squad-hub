@@ -297,3 +297,21 @@
     grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
   }
 }
+
+/* My attendance button hover interaction */
+.ref-presence-buttons .presencechoice,
+.ref-time-change{
+  cursor:pointer!important;
+  transition:transform .16s ease,filter .16s ease,box-shadow .16s ease,border-color .16s ease!important;
+}
+.ref-presence-buttons .presencechoice:hover,
+.ref-time-change:hover{
+  transform:translateY(-2px)!important;
+  filter:brightness(1.16)!important;
+  box-shadow:0 5px 14px rgba(0,0,0,.28)!important;
+}
+.ref-presence-buttons .presencechoice:active,
+.ref-time-change:active{
+  transform:translateY(0) scale(.98)!important;
+  transition-duration:.06s!important;
+}
