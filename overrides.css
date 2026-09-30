@@ -1671,3 +1671,19 @@ textarea::-webkit-scrollbar{
     margin:0!important;
   }
 }
+
+/* Desktop fixed viewport: fill area below compact header without bottom gap */
+@media (min-width:901px){
+  main{
+    height:calc(100vh - 72px)!important;
+    max-height:calc(100vh - 72px)!important;
+    min-height:calc(100vh - 72px)!important;
+    box-sizing:border-box!important;
+  }
+  #view{
+    height:100%!important;
+    max-height:100%!important;
+    min-height:100%!important;
+    box-sizing:border-box!important;
+  }
+}
