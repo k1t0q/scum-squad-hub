@@ -1933,3 +1933,33 @@ textarea::-webkit-scrollbar{
     border-color:#8a3037!important;
   }
 }
+
+/* Desktop roster: keep status + admin buttons strictly in one horizontal row */
+@media (min-width:901px){
+  #view>.card>.list>.item .itemtop{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+  }
+  #view>.card>.list>.item .member-actions-row{
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:8px!important;
+    width:max-content!important;
+    min-width:max-content!important;
+  }
+  #view>.card>.list>.item .member-actions-row>*{
+    display:inline-flex!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    margin:0!important;
+  }
+  #view>.card>.list>.item .member-actions-row .status{
+    min-width:82px!important;
+    justify-content:center!important;
+  }
+}
