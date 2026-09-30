@@ -1564,3 +1564,10 @@ header .ref-brand h1,#pageTitle{font-size:13px!important;font-weight:800!importa
 .raid-detail-people>span{display:block!important;margin-bottom:8px!important;color:#82928e!important;font-size:10px!important;font-weight:800!important;letter-spacing:.7px!important}
 .raid-detail-people>div{display:flex!important;gap:6px!important;flex-wrap:wrap!important}
 .raid-detail-people .badge.work{padding:5px 9px!important;border-radius:5px!important;background:#0c241d!important;border:1px solid #255a48!important;color:#65ddb0!important;font-size:11px!important}
+
+/* FURY PREVIEW v8.7 — full squad raid roster */
+.raid-detail-people .raid-roster{display:block!important;line-height:1.8!important}
+.raid-roster-name{font-size:12px!important;font-weight:800!important}
+.raid-roster-name.is-out{color:#ff6268!important}
+.raid-roster-name.is-in{color:#55e6aa!important;text-shadow:0 0 9px rgba(85,230,170,.18)!important}
+.raid-comma{color:#758581!important;font-size:12px!important}
