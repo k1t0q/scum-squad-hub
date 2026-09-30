@@ -1484,3 +1484,15 @@ textarea::-webkit-scrollbar{
   .ref-plan .ref-list{max-height:230px!important}
   .ref-tasks .ref-list{max-height:310px!important}
 }
+
+/* Mobile: force attendance title to exact same typography as plan/tasks */
+@media (max-width:900px){
+  .ref-plan .ref-title h2,
+  .ref-tasks .ref-title h2,
+  .ref-att-base>.ref-title h2{
+    font-size:17px!important;
+    line-height:17px!important;
+    font-weight:900!important;
+    letter-spacing:0!important;
+  }
+}
