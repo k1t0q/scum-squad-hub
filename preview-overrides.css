@@ -368,3 +368,12 @@
 }
 .ref-presence-buttons .presencechoice:active,
 .ref-time-change:active{transform:none!important}
+
+/* Tighten attendance subheader spacing */
+@media (min-width:901px){
+  .ref-att-base .ref-att-head{
+    height:34px!important;
+    min-height:34px!important;
+  }
+  .ref-att-divider{margin-bottom:6px!important}
+}
