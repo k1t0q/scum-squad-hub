@@ -269,7 +269,7 @@ sb.from('task_contributions').select('*').order('created_at'),
 sb.from('raids').select('*').eq('squad_id',onlineMember.squad_id).order('created_at',{ascending:false}),
 sb.from('raid_participants').select('*'),
 sb.from('protect_updates').select('*').eq('squad_id',onlineMember.squad_id).order('updated_at',{ascending:false})
-]);if(mr.error||pr.error||tr.error||cr.error||rr.error||rpr.error||por.error){toast('Ошибка синхронизации');return}let ms=mr.data||[],ph=pr.data||[],nameById=Object.fromEntries(ms.map(m=>[m.id,m.nick]));db.members=ms.map(m=>{let p=ph.find(x=>x.member_id===m.id);return[m.nick,m.game_role,p?.join_time?.slice(0,5)||'',p?.status||'Не буду']});db.tasks=(tr.data||[]).map(t=>{let hs=(cr.data||[]).filter(c=>c.task_id===t.id).map(c=>({id:c.id,nick:nameById[c.member_id]||'Боец',qty:c.amount}));let done=hs.reduce((n,h)=>n+h.qty,0);return{id:t.id,title:t.title,need:t.quantity||0,done,unit:t.unit||'шт.',place:t.place||'',priority:t.priority,deadline:t.deadline||'',owner:nameById[t.assignee_id]||'',comment:t.comment||'',status:t.status,creator:nameById[t.creator_id]||'',history:hs}});db.ops=(rr.data||[]).map(r=>({id:r.id,title:r.title,date:r.raid_date||'',time:r.raid_time?.slice(0,5)||'20:00',note:r.note||'',sector:r.sector||'',walls:r.walls||0,loadout:r.loadout||'',transport:r.transport||'',rally_point:r.rally_point||'',images:r.target_images||[],creator:nameById[r.creator_id]||'',participants:(rpr.data||[]).filter(x=>x.raid_id===r.id).map(x=>nameById[x.member_id]).filter(Boolean)})).sort((a,b)=>{let av=a.date?(a.date+'T'+(a.time||'00:00')):'9999-12-31T23:59',bv=b.date?(b.date+'T'+(b.time||'00:00')):'9999-12-31T23:59';return av.localeCompare(bv)});db.protectHistory=(por.data||[]).map(x=>({member_id:x.member_id,nick:nameById[x.member_id]||'—',time:x.updated_at}));db.protect=db.protectHistory[0]||null;let me=ms.find(x=>x.id===onlineMember.id);if(me){onlineMember=me;db.profile={nick:me.nick,role:me.game_role,access:me.access_role};let mp=$('#mobileProfileNick');if(mp)mp.textContent=me.nick}let p=ph.find(x=>x.member_id===onlineMember.id);db.presence=p?{status:p.status,time:p.join_time?.slice(0,5)||''}:{status:'Не буду',time:''};save();if(!window.furySilentSync)render();startSharedSync()}
+]);if(mr.error||pr.error||tr.error||cr.error||rr.error||rpr.error||por.error){toast('Ошибка синхронизации');return}let ms=mr.data||[],ph=pr.data||[],nameById=Object.fromEntries(ms.map(m=>[m.id,m.nick]));db.members=ms.map(m=>{let p=ph.find(x=>x.member_id===m.id);return[m.nick,m.game_role,p?.join_time?.slice(0,5)||'',p?.status||'Не буду']});db.tasks=(tr.data||[]).map(t=>{let hs=(cr.data||[]).filter(c=>c.task_id===t.id).map(c=>({id:c.id,nick:nameById[c.member_id]||'Боец',qty:c.amount}));let done=hs.reduce((n,h)=>n+h.qty,0);return{id:t.id,title:t.title,need:t.quantity||0,done,unit:t.unit||'шт.',place:t.place||'',priority:t.priority,deadline:t.deadline||'',owner:nameById[t.assignee_id]||'',comment:t.comment||'',status:t.status,creator:nameById[t.creator_id]||'',history:hs}});db.ops=(rr.data||[]).map(r=>({id:r.id,title:r.title,date:r.raid_date||'',time:r.raid_time?.slice(0,5)||'20:00',note:r.note||'',sector:r.sector||'',walls:r.walls||0,loadout:r.loadout||'',transport:r.transport||'',rally_point:r.rally_point||'',images:r.target_images||[],creator:nameById[r.creator_id]||'',participants:(rpr.data||[]).filter(x=>x.raid_id===r.id).map(x=>nameById[x.member_id]).filter(Boolean)})).sort((a,b)=>{let av=a.date?(a.date+'T'+(a.time||'00:00')):'9999-12-31T23:59',bv=b.date?(b.date+'T'+(b.time||'00:00')):'9999-12-31T23:59';return av.localeCompare(bv)});db.protectHistory=(por.data||[]).map(x=>({member_id:x.member_id,nick:nameById[x.member_id]||'—',time:x.updated_at}));db.protect=db.protectHistory[0]||null;let me=ms.find(x=>x.id===onlineMember.id);if(me){onlineMember=me;db.profile={nick:me.nick,role:me.game_role,access:me.access_role};let mp=$('#mobileProfileNick');if(mp)mp.textContent=me.nick}let p=ph.find(x=>x.member_id===onlineMember.id);db.presence=p?{status:p.status,time:p.join_time?.slice(0,5)||''}:{status:'Не буду',time:''};save();if(!window.furySilentSync)render();startSharedSync();if(localStorage.getItem('fury_push_requested')==='yes')furySyncSubscription().catch(console.error)}
 async function bootOnline(){try{sb=supabase.createClient(SUPA_URL,SUPA_KEY);await joinOnline()}catch(e){console.error(e);toast('Supabase недоступен')}}
 $('#pageTitle').textContent=page;nav();render();bootOnline();
 
@@ -280,17 +280,46 @@ document.addEventListener('click',e=>{if(!e.target.closest('.ref-post-menu'))doc
 
 const furyNoticeCategories=[['protect','Протект','За час, за 15 минут и при окончании'],['stash','Схрон','Новые записи, фотографии и комментарии'],['base','Базы','Новые записи, фотографии и комментарии'],['tasks','Задачи','Новые задачи'],['raids','Рейды','Новые планы рейдов'],['presence','Моё участие','Каждый день в 15:00 МСК']];
 function furyNoticeEnabled(k){return localStorage.getItem('fury_notice_'+k)!=='off'}
-function furyNoticeToggle(k,on){localStorage.setItem('fury_notice_'+k,on?'on':'off');settingsPage()}
+function furyNoticeToggle(k,on){localStorage.setItem('fury_notice_'+k,on?'on':'off');furySyncSubscription().catch(console.error);settingsPage()}
+const FURY_VAPID_PUBLIC='BMqTv-h0JU-rtMtn4VdaQpe7CBuOeyoW2EQAc8pdu439DqZs8A6pa_Og1mF8vOKy-WzThR9iHsz3Naw0fxrZe4k';
+function furyPushKey(base64){const p='='.repeat((4-base64.length%4)%4);const raw=atob((base64+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(raw,c=>c.charCodeAt(0))}
+async function furyPushRequest(body){
+ if(!sb||!onlineMember)throw Error('Сначала войдите в отряд');
+ const {data:{session}}=await sb.auth.getSession();
+ if(!session?.access_token)throw Error('Нет активной сессии');
+ const r=await fetch(SUPA_URL+'/functions/v1/fury-web-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({...body,member_id:onlineMember.id})});
+ if(!r.ok)throw Error('Ошибка сервера ('+r.status+')');
+ return r.json();
+}
+async function furySyncSubscription(){
+ if(localStorage.getItem('fury_push_requested')!=='yes'||!('serviceWorker' in navigator)||!onlineMember)return;
+ const reg=await navigator.serviceWorker.register('./sw.js');
+ const sub=await reg.pushManager.getSubscription();
+ if(sub)await furyPushRequest({action:'subscribe',subscription:sub.toJSON(),preferences:Object.fromEntries(furyNoticeCategories.map(([k])=>[k,furyNoticeEnabled(k)]))});
+}
 function settingsPage(){
- const supported=('Notification' in window)&&('serviceWorker' in navigator)&&window.isSecureContext;
+ const supported=('Notification' in window)&&('serviceWorker' in navigator)&&window.isSecureContext&&('PushManager' in window);
  const granted=supported&&Notification.permission==='granted';
  const installed=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
  const requested=localStorage.getItem('fury_push_requested')==='yes';
- $('#view').innerHTML='<div class="card fury-settings"><h2>НАСТРОЙКИ</h2><div class="settings-row"><div><b>Пуш-уведомления</b><p class="muted">Общие разрешения для этого устройства</p></div><button class="ghost" onclick="togglePushPreference()">'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div><div class="muted">Статус: '+(!supported?'не поддерживается браузером':!granted?'нет разрешения':requested?'разрешение получено; рассылка ещё не подключена':'выключено')+'</div><h3 style="margin:24px 0 12px">КАТЕГОРИИ УВЕДОМЛЕНИЙ</h3>'+furyNoticeCategories.map(([key,name,desc])=>'<label class="settings-row fury-notice-row"><span><b>'+name+'</b><p class="muted">'+desc+'</p></span><input type="checkbox" '+(furyNoticeEnabled(key)?'checked':'')+' onchange="furyNoticeToggle(\''+key+'\',this.checked)"></label>').join('')+(!installed?'<p class="muted">iPhone: Safari → Поделиться → На экран «Домой». Откройте сайт с иконки и разрешите уведомления.</p>':'')+'<p class="muted">Выбранные категории сохраняются на этом устройстве. Серверная доставка при закрытом сайте пока не подключена.</p></div>';
+ $('#view').innerHTML='<div class="card fury-settings"><h2>НАСТРОЙКИ</h2><div class="settings-row"><div><b>Пуш-уведомления</b><p class="muted">Получать сообщения, даже когда сайт закрыт</p></div><button class="ghost" onclick="togglePushPreference()">'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div><div class="muted">Статус: '+(!supported?'не поддерживается браузером':!granted?'нет разрешения':requested?'включены на этом устройстве':'выключены')+'</div><h3 style="margin:24px 0 12px">КАТЕГОРИИ УВЕДОМЛЕНИЙ</h3>'+furyNoticeCategories.map(([key,name,desc])=>'<label class="settings-row fury-notice-row"><span><b>'+name+'</b><p class="muted">'+desc+'</p></span><input type="checkbox" '+(furyNoticeEnabled(key)?'checked':'')+' onchange="furyNoticeToggle(\''+key+'\',this.checked)"></label>').join('')+(!installed?'<p class="muted">iPhone: Safari → Поделиться → На экран «Домой». Откройте сайт с иконки и разрешите уведомления.</p>':'')+'<p class="muted">Каждый участник включает уведомления на своём устройстве отдельно.</p></div>';
 }
 async function togglePushPreference(){
- if(localStorage.getItem('fury_push_requested')==='yes'){localStorage.setItem('fury_push_requested','no');settingsPage();return}
- if(!('Notification' in window)||!('serviceWorker' in navigator)||!window.isSecureContext){toast('Уведомления недоступны в этом браузере');return}
- try{let permission=await Notification.requestPermission();if(permission==='granted'){localStorage.setItem('fury_push_requested','yes')}else toast('Разрешение не предоставлено')}catch(e){toast('Не удалось запросить разрешение')}
+ if(!('Notification' in window)||!('serviceWorker' in navigator)||!('PushManager' in window)||!window.isSecureContext){toast('Откройте установленный сайт на поддерживаемом устройстве');return}
+ try{
+  const reg=await navigator.serviceWorker.register('./sw.js');
+  if(localStorage.getItem('fury_push_requested')==='yes'){
+   const sub=await reg.pushManager.getSubscription();
+   if(sub){await furyPushRequest({action:'unsubscribe',endpoint:sub.endpoint});await sub.unsubscribe()}
+   localStorage.setItem('fury_push_requested','no');toast('Уведомления выключены');
+  }else{
+   const permission=await Notification.requestPermission();
+   if(permission!=='granted'){toast('Разрешение не предоставлено');settingsPage();return}
+   let sub=await reg.pushManager.getSubscription();
+   if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:furyPushKey(FURY_VAPID_PUBLIC)});
+   await furyPushRequest({action:'subscribe',subscription:sub.toJSON(),preferences:Object.fromEntries(furyNoticeCategories.map(([k])=>[k,furyNoticeEnabled(k)]))});
+   localStorage.setItem('fury_push_requested','yes');toast('Уведомления включены');
+  }
+ }catch(e){console.error(e);toast('Не удалось подключить: '+String(e.message||e).slice(0,70))}
  settingsPage();
 }
