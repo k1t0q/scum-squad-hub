@@ -278,7 +278,7 @@ document.addEventListener('paste',async e=>{if(page!=='Главная'&&page!=='
 function togglePlacePostMenu(id,e){if(e)e.stopPropagation();document.querySelectorAll('.ref-post-menu-pop.open').forEach(x=>{if(x.id!=='placePostMenu'+id)x.classList.remove('open')});document.getElementById('placePostMenu'+id)?.classList.toggle('open')}
 document.addEventListener('click',e=>{if(!e.target.closest('.ref-post-menu'))document.querySelectorAll('.ref-post-menu-pop.open').forEach(x=>x.classList.remove('open'))});
 
-const furyNoticeCategories=[['protect','Протект','За час, за 15 минут и при окончании'],['stash','Схрон','Новые записи, фотографии и комментарии'],['base','Базы','Новые записи, фотографии и комментарии'],['tasks','Задачи','Новые задачи'],['raids','Рейды','Новые планы рейдов'],['presence','Моё участие','Каждый день в 15:00 МСК']];
+const furyNoticeCategories=[['protect','Протект','За час, за 15 минут и при окончании'],['protect_updated','Обновление протекта','Когда другой участник обновил протект'],['stash','Схрон','Новые записи, фотографии и комментарии'],['base','Базы','Новые записи, фотографии и комментарии'],['tasks','Задачи','Новые задачи'],['raids','Рейды','Новые планы рейдов'],['presence','Моё участие','Каждый день в 15:00 МСК']];
 function furyNoticeEnabled(k){return localStorage.getItem('fury_notice_'+k)!=='off'}
 function furyNoticeToggle(k,on){localStorage.setItem('fury_notice_'+k,on?'on':'off');furySyncSubscription().catch(console.error);settingsPage()}
 const FURY_VAPID_PUBLIC='BMqTv-h0JU-rtMtn4VdaQpe7CBuOeyoW2EQAc8pdu439DqZs8A6pa_Og1mF8vOKy-WzThR9iHsz3Naw0fxrZe4k';
