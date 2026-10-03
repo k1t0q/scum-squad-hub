@@ -12,6 +12,15 @@ function taskCard(t){let pct=t.need?Math.min(100,Math.round(t.done/t.need*100)):
 function showTaskComplete(){let d=document.createElement('div');d.className='task-complete-flash';d.textContent='ВЫПОЛНЕНО';document.body.appendChild(d);requestAnimationFrame(()=>d.classList.add('show'));setTimeout(()=>{d.classList.remove('show');setTimeout(()=>d.remove(),250)},1800)}
 function taskDetails(id,e){if(e&&e.target.closest('button'))return;let t=db.tasks.find(x=>x.id===id);if(!t)return;let hist=t.history||[];modal('<h2>'+esc(t.title)+'</h2><div class="muted">'+(t.need?('Нужно: '+t.need+' '+unitForm(t.need,t.unit)+' · Собрано: '+t.done+' '+unitForm(t.done,t.unit)):'Без количества')+'</div>'+(t.place?'<p>Место: '+esc(t.place)+'</p>':'')+(t.deadline?'<p>До: '+esc(t.deadline)+'</p>':'')+(t.comment?'<p>'+esc(t.comment)+'</p>':'')+'<h3 style="margin-top:20px">История</h3><div class="list">'+(hist.length?hist.map(h=>'<div class="item itemtop"><span>'+esc(h.nick)+' · +'+h.qty+' '+unitForm(h.qty,t.unit)+'</span><button class="ghost" onclick="undoContribution('+id+','+h.id+')">Отменить</button></div>').join(''):'<div class="empty">Вкладов пока нет</div>')+'</div><div class="dialogfoot task-detail-actions">'+(t.need?'<button onclick="addContribution('+t.id+')">+ Добавить количество</button>':'')+((t.creator===db.profile.nick||db.profile.access==='admin')?'<button onclick="editTask('+t.id+')">Редактировать</button>':'')+(db.profile.access==='admin'?'<button class="danger" onclick="deleteTask('+t.id+')">Удалить</button>':'')+'<button class="ghost" onclick="closeModal()">Закрыть</button></div>')}
 function render(){if(page==='Сегодня')page='Главная'; headerProtectHtml();sidebarProtectHtml(); $('#myNick').textContent=db.profile.nick;let sc=$('#squadCount');if(sc){let n=db.members.length;sc.textContent=n+' '+(n%10===1&&n%100!==11?'УЧАСТНИК':(n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?'УЧАСТНИКА':'УЧАСТНИКОВ'));}if(page==='Главная'||page==='Сегодня')today();if(page==='Задачи')tasks();if(page==='План на рейд'||page==='Рейд')ops();if(page==='Состав')members();if(page==='Настройки')settingsPage();if(page==='Взрыв')stats();if(page==='Схрон')placePage('stash');if(page==='Базы')placePage('base')}
+async function raiseRaidAlarm(){
+ if(!sb||!onlineMember){toast('Сначала войдите в отряд');return}
+ if(!confirm('Отправить всем участникам экстренное уведомление «НАС РЕЙДЯТ»?'))return;
+ try{
+  const {error}=await sb.rpc('raise_raid_alarm');
+  if(error)throw error;
+  toast('Тревога отправлена отряду');
+ }catch(e){console.error(e);toast(String(e.message||'Ошибка тревоги').slice(0,100))}
+}
 function today(){
  let playing=db.members.filter(x=>x[3]==='Буду').length,walls=Number(window.furyWalls||0),activeTasks=db.tasks.filter(t=>t.status!=='Выполнено'&&t.status!=='Выполнена');
  let plan=db.ops.slice(0,3).map(o=>{let p=Array.isArray(o.participants)?o.participants:[];return '<div class="ref-plan-row raidclick" onclick="viewOp('+o.id+')"><span class="ref-dot"></span><b class="ref-time">'+esc(o.time)+'</b><div class="ref-plan-name"><b>'+esc(o.title)+'</b><small>'+esc(o.note||'')+'</small></div><div class="ref-people-count">'+p.length+' '+participantWord(p.length)+'</div></div>'}).join('');
@@ -21,6 +30,7 @@ function today(){
  refreshWallMetric();
  $('#view').innerHTML='<div class="ref-home">'+
  '<section class="mobile-home-protect" onclick="confirmQuickProtect()" oncontextmenu="event.preventDefault();showProtectHistory()">'+protectText+'</section>'+ 
+ '<div style="margin:0 0 14px"><button onclick="raiseRaidAlarm()" style="width:100%;padding:14px 18px;background:#a92c2c;color:white;border:1px solid #d35a5a;border-radius:12px;font-weight:800;letter-spacing:.06em;cursor:pointer">⚠ НАС РЕЙДЯТ — ОТПРАВИТЬ ТРЕВОГУ</button></div>'+ 
  '<div class="ref-top">'+
   '<section class="ref-card ref-plan"><div class="ref-title"><h2 class="ref-section-link" onclick="go(\'План на рейд\')">ПЛАН НА РЕЙД <span class="ref-count">'+db.ops.length+'</span></h2><button class="ref-create" onclick="event.stopPropagation();newOp()">+ СОЗДАТЬ ПЛАН</button></div><div class="ref-list">'+(plan||'<div class="empty">План пока не создан</div>')+'</div></section>'+
   '<section class="ref-card ref-tasks"><div class="ref-title"><h2 class="ref-section-link" onclick="go(\'Задачи\')">АКТИВНЫЕ ЗАДАЧИ <span class="ref-count">'+activeTasks.length+'</span></h2><button class="ref-create" onclick="event.stopPropagation();newTask()">+ СОЗДАТЬ ЗАДАЧУ</button></div><div class="ref-list">'+(taskRows||'<div class="empty">Задач пока нет</div>')+'</div></section>'+
@@ -297,7 +307,7 @@ async function refreshStash(id,button){
 function togglePlacePostMenu(id,e){if(e)e.stopPropagation();document.querySelectorAll('.ref-post-menu-pop.open').forEach(x=>{if(x.id!=='placePostMenu'+id)x.classList.remove('open')});document.getElementById('placePostMenu'+id)?.classList.toggle('open')}
 document.addEventListener('click',e=>{if(!e.target.closest('.ref-post-menu'))document.querySelectorAll('.ref-post-menu-pop.open').forEach(x=>x.classList.remove('open'))});
 
-const furyNoticeCategories=[['protect','Протект','За час, за 15 минут и при окончании'],['protect_updated','Обновление протекта','Когда другой участник обновил протект'],['stash','Схрон','Новые записи, фотографии и комментарии'],['base','Базы','Новые записи, фотографии и комментарии'],['tasks','Задачи','Новые задачи'],['raids','Рейды','Новые планы рейдов'],['presence','Моё участие','Каждый день в 15:00 МСК']];
+const furyNoticeCategories=[['protect','Протект','За час, за 15 минут и при окончании'],['protect_updated','Обновление протекта','Когда другой участник обновил протект'],['stash','Схрон','Новые записи, фотографии и комментарии'],['base','Базы','Новые записи, фотографии и комментарии'],['tasks','Задачи','Новые задачи'],['raids','Рейды','Новые планы рейдов'],['presence','Моё участие','Каждый день в 15:00 МСК'],['alarm','Экстренная тревога','Уведомление «НАС РЕЙДЯТ»']];
 function furyNoticeEnabled(k){return localStorage.getItem('fury_notice_'+k)!=='off'}
 function furyNoticeToggle(k,on){localStorage.setItem('fury_notice_'+k,on?'on':'off');furySyncSubscription().catch(console.error);settingsPage()}
 const FURY_VAPID_PUBLIC='BMqTv-h0JU-rtMtn4VdaQpe7CBuOeyoW2EQAc8pdu439DqZs8A6pa_Og1mF8vOKy-WzThR9iHsz3Naw0fxrZe4k';
