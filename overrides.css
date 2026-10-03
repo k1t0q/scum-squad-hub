@@ -2115,7 +2115,6 @@ textarea::-webkit-scrollbar{
 
 .fury-settings{max-width:780px}.fury-settings .settings-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:20px 0;padding:16px;background:#101e20;border:1px solid #26383a;border-radius:8px}.fury-settings .settings-row p{margin:8px 0 0}.fury-settings .settings-row button{white-space:nowrap;cursor:pointer}@media(max-width:520px){.fury-settings .settings-row{flex-direction:column;align-items:stretch}}
 
-/* 
 /* Mobile emergency action fixed immediately before profile icon */
 .mobile-raid-alarm{display:none!important}
 @media(max-width:900px){
