@@ -30,7 +30,7 @@ function today(){
  refreshWallMetric();
  $('#view').innerHTML='<div class="ref-home">'+
  '<section class="mobile-home-protect" onclick="confirmQuickProtect()" oncontextmenu="event.preventDefault();showProtectHistory()">'+protectText+'</section>'+ 
- '<div style="margin:0 0 14px"><button onclick="raiseRaidAlarm()" style="width:100%;padding:14px 18px;background:#a92c2c;color:white;border:1px solid #d35a5a;border-radius:12px;font-weight:800;letter-spacing:.06em;cursor:pointer">⚠ НАС РЕЙДЯТ — ОТПРАВИТЬ ТРЕВОГУ</button></div>'+ 
+
  '<div class="ref-top">'+
   '<section class="ref-card ref-plan"><div class="ref-title"><h2 class="ref-section-link" onclick="go(\'План на рейд\')">ПЛАН НА РЕЙД <span class="ref-count">'+db.ops.length+'</span></h2><button class="ref-create" onclick="event.stopPropagation();newOp()">+ СОЗДАТЬ ПЛАН</button></div><div class="ref-list">'+(plan||'<div class="empty">План пока не создан</div>')+'</div></section>'+
   '<section class="ref-card ref-tasks"><div class="ref-title"><h2 class="ref-section-link" onclick="go(\'Задачи\')">АКТИВНЫЕ ЗАДАЧИ <span class="ref-count">'+activeTasks.length+'</span></h2><button class="ref-create" onclick="event.stopPropagation();newTask()">+ СОЗДАТЬ ЗАДАЧУ</button></div><div class="ref-list">'+(taskRows||'<div class="empty">Задач пока нет</div>')+'</div></section>'+
