@@ -2115,24 +2115,34 @@ textarea::-webkit-scrollbar{
 
 .fury-settings{max-width:780px}.fury-settings .settings-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:20px 0;padding:16px;background:#101e20;border:1px solid #26383a;border-radius:8px}.fury-settings .settings-row p{margin:8px 0 0}.fury-settings .settings-row button{white-space:nowrap;cursor:pointer}@media(max-width:520px){.fury-settings .settings-row{flex-direction:column;align-items:stretch}}
 
-/* Emergency alarm in mobile header, immediately left of profile */
+/* 
+/* Mobile emergency action fixed immediately before profile icon */
 .mobile-raid-alarm{display:none!important}
 @media(max-width:900px){
+ .app>aside{position:relative!important}
  .app>aside>.mobile-raid-alarm{
-  display:flex!important;order:2!important;flex:0 0 auto!important;
+  display:flex!important;position:absolute!important;z-index:20!important;
+  top:50%!important;right:132px!important;left:auto!important;
+  transform:translateY(-50%)!important;
+  width:44px!important;height:44px!important;min-width:44px!important;
+  padding:0!important;margin:0!important;
   align-items:center!important;justify-content:center!important;
-  min-width:0!important;height:40px!important;padding:0 9px!important;
-  margin:0 7px 0 auto!important;border:1px solid #ec5d5d!important;
-  border-radius:8px!important;background:#a52b2b!important;color:#fff!important;
-  font-size:11px!important;font-weight:900!important;letter-spacing:.02em!important;
-  cursor:pointer!important;
+  background:#b52b35!important;border:1px solid #ef626a!important;
+  color:#fff!important;border-radius:9px!important;
+  font-size:0!important;line-height:1!important;
+  box-shadow:0 0 0 1px rgba(255,70,80,.1)!important;
  }
- .app>aside>.mobile-profile-btn{order:3!important;margin-left:0!important;margin-right:8px!important}
- .app>aside>.mobile-menu-btn{order:4!important}
- .app>aside>.logo{order:1!important;margin-right:auto!important}
- .app>aside>nav{order:5!important}
+ .app>aside>.mobile-raid-alarm::before{
+  content:"!"!important;font-size:24px!important;font-weight:900!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:26px!important;height:26px!important;border:2px solid #fff!important;
+  border-radius:50%!important;
+ }
+ .app>aside>.logo{order:1!important}
+ .app>aside>.mobile-profile-btn{order:2!important;margin-left:auto!important;margin-right:10px!important}
+ .app>aside>.mobile-menu-btn{order:3!important;margin:0!important}
+ .app>aside>nav{order:4!important}
 }
-@media(max-width:390px){
- .app>aside>.mobile-raid-alarm{font-size:10px!important;padding:0 6px!important;margin-right:5px!important}
- .app>aside>.mobile-profile-btn{padding:0 7px!important;gap:4px!important;max-width:90px!important;margin-right:5px!important}
+@media(max-width:430px){
+ .app>aside>.mobile-raid-alarm{right:122px!important;width:40px!important;height:40px!important;min-width:40px!important}
 }
