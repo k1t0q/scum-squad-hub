@@ -33,7 +33,7 @@ function today(){
  let protectText=db.protect?protectHomeHtml(db.protect):'—';
  refreshWallMetric();
  $('#view').innerHTML='<div class="ref-home">'+
- '<section class="mobile-home-protect" onclick="confirmQuickProtect()" oncontextmenu="event.preventDefault();showProtectHistory()">'+protectText+'</section>'+ 
+ '<section class="mobile-home-protect" onclick="confirmQuickProtect()" oncontextmenu="event.preventDefault();showProtectHistory()"><div class="mobile-protect-info">'+protectText+'</div><button type="button" class="mobile-protect-history-btn" onclick="event.stopPropagation();showProtectHistory()" aria-label="История протекта" title="История протекта"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg></button></section>'+ 
 
  '<div class="ref-top">'+
   '<section class="ref-card ref-plan"><div class="ref-title"><h2 class="ref-section-link" onclick="go(\'План на рейд\')">ПЛАН НА РЕЙД <span class="ref-count">'+db.ops.length+'</span></h2><button class="ref-create" onclick="event.stopPropagation();newOp()">+ СОЗДАТЬ ПЛАН</button></div><div class="ref-list">'+(plan||'<div class="empty">План пока не создан</div>')+'</div></section>'+
