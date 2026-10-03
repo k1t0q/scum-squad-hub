@@ -11,7 +11,16 @@
 .app>aside>nav{order:5!important}
 }
 @media(max-width:390px){.app>aside>.mobile-raid-alarm{flex-basis:38px!important;width:38px!important;min-width:38px!important;margin-right:5px!important}.app>aside>.mobile-profile-btn{margin-right:5px!important}}
+@media(max-width:900px){
+.app>aside>.mobile-raid-alarm,.app>aside>.mobile-profile-btn,.app>aside>.mobile-menu-btn{
+box-sizing:border-box!important;flex:0 0 48px!important;width:48px!important;min-width:48px!important;max-width:48px!important;height:48px!important;min-height:48px!important;max-height:48px!important;margin-top:0!important;margin-bottom:0!important;border-radius:9px!important;
+}
+.app>aside>.mobile-raid-alarm{margin-right:8px!important}
+}
+@media(max-width:390px){
+.app>aside>.mobile-raid-alarm,.app>aside>.mobile-profile-btn,.app>aside>.mobile-menu-btn{flex-basis:44px!important;width:44px!important;min-width:44px!important;max-width:44px!important;height:44px!important;min-height:44px!important;max-height:44px!important}
+}
 </style></head><body>
 <div class="app"><aside><button class="mobile-raid-alarm" onclick="raiseRaidAlarm()" aria-label="Нас рейдят" title="НАС РЕЙДЯТ">!</button><button class="mobile-profile-btn" onclick="editProfile()" aria-label="Профиль" title="Профиль"><span class="mobile-profile-icon">♙</span><span id="mobileProfileNick">k1t0</span></button><button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="Меню"><span></span><span></span><span></span></button><div class="logo logo-home" role="button" tabindex="0" aria-label="На главную" onclick="go('Главная')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('Главная')}"><i>ДУБЛЬ</i><div><b>ШТАБ ОТРЯДА</b><small>SCUM SQUAD HUB</small></div></div><nav id="nav"></nav><div id="sidebarProtect" class="sidebar-protect" onclick="confirmQuickProtect()" oncontextmenu="event.preventDefault();showProtectHistory()" title="Нажать — обновить протект. ПКМ — история"></div><a class="server server-link" href="https://wargm.ru/server/59332" target="_blank" rel="noopener noreferrer" title="Открыть FURY на WARGM"><div class="server-label"><span class="server-dot"></span><small>ОСНОВНОЙ СЕРВЕР</small></div><b class="server-name">FURY</b><div class="server-ip">185.207.214.80:7002</div><div class="server-rule"></div><div class="server-online-row server-wargm-row"><span>WARGM.RU</span><b class="server-wargm-open">ОТКРЫТЬ ↗</b></div></a></aside>
 <main><header class="ref-header"><div class="ref-brand"><div class="eyebrow">SQUAD CONTROL</div><h1 id="pageTitle">FURY</h1></div><div class="ref-header-right"><div class="ref-protect-head" id="headerProtect" onclick="confirmQuickProtect()" oncontextmenu="event.preventDefault();showProtectHistory()" title="Нажать — обновить протект. ПКМ — история"></div><button class="ref-profile" onclick="editProfile()"><span id="myNick">k1t0</span><b>ПРОФИЛЬ</b></button></div></header><section id="view"></section></main></div>
-<div class="modal" id="modal"><div class="dialog" id="dialog"></div></div><div id="toast"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=14.1"></script></body></html>
+<div class="modal" id="modal"><div class="dialog" id="dialog"></div></div><div id="toast"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js?v=14.5"></script></body></html>
