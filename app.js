@@ -316,8 +316,8 @@ async function furyPushRequest(body){
  if(!sb||!onlineMember)throw Error('Сначала войдите в отряд');
  const {data:{session}}=await sb.auth.getSession();
  if(!session?.access_token)throw Error('Нет активной сессии');
- const r=await fetch(SUPA_URL+'/functions/v1/fury-web-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({...body,member_id:onlineMember.id})});
- if(!r.ok)throw Error('Ошибка сервера ('+r.status+')');
+ const r=await fetch(SUPA_URL+'/functions/v1/fury-push-register',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({...body,member_id:onlineMember.id})});
+ if(!r.ok){let details={};try{details=await r.json()}catch(e){}throw Error(details.error||'Ошибка сервера ('+r.status+')')}
  return r.json();
 }
 async function furySyncSubscription(){
