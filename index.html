@@ -65,6 +65,23 @@ cursor:pointer!important;transition:background .15s ease,border-color .15s ease!
 .fury-settings .fury-notice-row input[type="checkbox"]:checked{border-color:#42d7a1!important;background:#163e32!important}
 .fury-settings .fury-notice-row input[type="checkbox"]:checked:after{content:"";position:absolute;left:6px;top:2px;width:6px;height:11px;border:solid #63e7b5;border-width:0 2px 2px 0;transform:rotate(45deg)}
 }
+
+/* Settings: match roster visual language */
+@media(min-width:901px){
+.fury-settings{padding:16px!important;border:1px solid #284039!important;border-radius:7px!important;background:rgba(9,24,20,.82)!important}
+.fury-settings>.toolbar{margin:0 0 12px!important;padding:0!important;border:0!important}
+.fury-settings>.toolbar h2{margin:0!important;font-size:15px!important;text-transform:uppercase!important}
+.fury-settings>.toolbar h2:before{content:"";display:inline-block;width:3px;height:14px;margin-right:9px;vertical-align:-2px;border-radius:1px;background:#ff4856}
+.fury-settings>.toolbar .muted{display:block;margin-top:8px!important;font-size:12px!important}
+.fury-settings>.settings-row{min-height:58px!important;margin:0 0 8px!important;padding:10px 12px!important;border:1px solid #263d36!important;border-radius:7px!important;background:rgba(9,27,22,.62)!important}
+.fury-settings>.settings-row:hover{border-color:#365248!important;background:rgba(10,30,25,.78)!important}
+.fury-settings>.settings-row+ .muted{margin:10px 1px 18px!important}
+.fury-settings>h3{margin:14px 0 10px!important;font-size:12px!important}
+.fury-settings .fury-notice-row{min-height:58px!important;margin:0 0 8px!important;padding:10px 12px!important}
+.fury-settings .settings-row b{font-size:12px!important}
+.fury-settings .settings-row p{margin:3px 0 0!important;font-size:11px!important}
+.fury-settings .ghost{height:34px!important}
+}
 </style></head><body>
 <div class="app"><aside><button class="mobile-raid-alarm" onclick="raiseRaidAlarm()" aria-label="Нас рейдят" title="НАС РЕЙДЯТ">!</button><button class="mobile-profile-btn" onclick="editProfile()" aria-label="Профиль" title="Профиль"><span class="mobile-profile-icon">♙</span><span id="mobileProfileNick">k1t0</span></button><button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="Меню"><span></span><span></span><span></span></button><div class="logo logo-home" role="button" tabindex="0" aria-label="На главную" onclick="go('Главная')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('Главная')}"><i>ДУБЛЬ</i><div><b>ШТАБ ОТРЯДА</b><small>SCUM SQUAD HUB</small></div></div><nav id="nav"></nav><button class="desktop-raid-alarm" type="button" onclick="raiseRaidAlarm()" aria-label="Отправить тревогу: нас рейдят"><span class="desktop-raid-icon">!</span><span>НАС РЕЙДЯТ</span></button><div id="sidebarProtect" class="sidebar-protect" onclick="confirmQuickProtect()" oncontextmenu="event.preventDefault();showProtectHistory()" title="Нажать — обновить протект. ПКМ — история"></div><a class="server server-link" href="https://wargm.ru/server/59332" target="_blank" rel="noopener noreferrer" title="Открыть FURY на WARGM"><div class="server-label"><span class="server-dot"></span><small>ОСНОВНОЙ СЕРВЕР</small></div><b class="server-name">FURY</b><div class="server-ip">185.207.214.80:7002</div><div class="server-rule"></div><div class="server-online-row server-wargm-row"><span>WARGM.RU</span><b class="server-wargm-open">ОТКРЫТЬ ↗</b></div></a></aside>
 <main><header class="ref-header"><div class="ref-brand"><div class="eyebrow">SQUAD CONTROL</div><h1 id="pageTitle">FURY</h1></div><div class="ref-header-right"><div class="ref-protect-head" id="headerProtect" onclick="confirmQuickProtect()" oncontextmenu="event.preventDefault();showProtectHistory()" title="Нажать — обновить протект. ПКМ — история"></div><button class="ref-profile" onclick="editProfile()"><span id="myNick">k1t0</span><b>ПРОФИЛЬ</b></button></div></header><section id="view"></section></main></div>
