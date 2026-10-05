@@ -70,34 +70,12 @@ function openRaidPhoto(url){
  document.body.style.position='fixed';
  document.body.style.top='-'+photoScrollY+'px';
  document.body.style.width='100%';
-
  const d=document.createElement('div');
- d.id='photoViewer';
- d.setAttribute('style','position:fixed!important;inset:0!important;z-index:2147483647!important;background:#000!important;overflow:hidden!important;overscroll-behavior:none!important;margin:0!important;padding:0!important;box-sizing:border-box!important;');
-
+ d.id='photoViewer';d.className='photooverlay';
  const img=document.createElement('img');
- img.src=url;img.alt='Фото';img.onclick=closeRaidPhoto;
- img.setAttribute('style','position:absolute!important;display:block!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;max-width:none!important;max-height:none!important;min-width:0!important;min-height:0!important;object-fit:fill!important;object-position:center!important;transform:none!important;');
+ img.src=url;img.alt='Фото';img.onclick=e=>e.stopPropagation();
  d.appendChild(img);document.body.appendChild(d);
-
- const fit=()=>{
-   if(!img.naturalWidth||!img.naturalHeight)return;
-   const vv=window.visualViewport;
-   const vw=Math.max(1,Math.floor(vv?.width||window.innerWidth));
-   const vh=Math.max(1,Math.floor(vv?.height||window.innerHeight));
-   const pad=16,aw=Math.max(1,vw-pad*2),ah=Math.max(1,vh-pad*2);
-   const scale=Math.min(aw/img.naturalWidth,ah/img.naturalHeight);
-   const w=Math.floor(img.naturalWidth*scale),hh=Math.floor(img.naturalHeight*scale);
-   d.style.width=vw+'px';d.style.height=vh+'px';
-   img.style.setProperty('width',w+'px','important');
-   img.style.setProperty('height',hh+'px','important');
-   img.style.setProperty('left',Math.floor((vw-w)/2)+'px','important');
-   img.style.setProperty('top',Math.floor((vh-hh)/2)+'px','important');
- };
- img.onload=()=>requestAnimationFrame(fit);
- fit();
- if(window.visualViewport)window.visualViewport.addEventListener('resize',fit,{once:true});
- d.addEventListener('click',e=>{if(e.target===d)closeRaidPhoto()});
+ d.addEventListener('click',closeRaidPhoto);
 }
 function viewOp(id){let o=db.ops.find(x=>x.id===id);if(!o)return;modal('<h2>'+esc(o.title)+'</h2><p>'+(o.date?formatPlanDate(o.date)+' · ':'')+esc(o.time)+'</p>'+(o.sector?'<p>Сектор: '+esc(o.sector)+'</p>':'')+(o.walls?'<p>Стены: '+o.walls+'</p>':'')+(o.transport?'<p>Транспорт: '+esc(o.transport)+'</p>':'')+(o.loadout?'<p>Что взять: '+esc(o.loadout)+'</p>':'')+(o.rally_point?'<p>Точка сбора: '+esc(o.rally_point)+'</p>':'')+(o.note?'<p>Комментарий: '+esc(o.note)+'</p>':'')+(o.images&&o.images.length?'<div class="raidphotos">'+o.images.map(u=>'<img src="'+esc(u)+'" alt="Фото для рейда" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in">').join('')+'</div>':'')+'<div class="raid-detail-people"><span>УЧАСТНИКИ</span><div class="raid-roster">'+db.members.map(m=>'<span class="raid-roster-name '+((o.participants||[]).includes(m[0])?'is-in':'is-out')+'">'+esc(m[0])+'</span>').join('<span class="raid-comma">, </span>')+'</div></div><div class="dialogfoot raid-detail-actions"><button class="raid-join raid-participation '+((o.participants||[]).includes(db.profile.nick)?'leave':'join')+'" onclick="toggleRaid('+o.id+',true)">'+((o.participants||[]).includes(db.profile.nick)?'Не участвую':'Участвую')+'</button>'+((o.creator===db.profile.nick||db.profile.access==='admin')?'<button onclick="editOp('+o.id+')">Редактировать</button>':'')+((o.creator===db.profile.nick||db.profile.access==='admin')?'<button class="danger" onclick="deleteOp('+o.id+');closeModal()">Удалить</button>':'')+'<button class="ghost" onclick="closeModal()">Закрыть</button></div>')}
 function members(){let admin=db.profile.access==='admin'||db.profile.nick==='k1t0';$('#view').innerHTML='<div class="card"><div class="toolbar"><div><h2>Состав FURY</h2><span class="muted">Ник, роль, время захода и статус на сегодня.</span></div>'+(admin?'<button class="ghost" onclick="changeInviteCode()">СМЕНИТЬ КОД ВСТУПЛЕНИЯ</button>':'')+'</div><div class="list">'+db.members.map(m=>'<div class="item"><div class="itemtop"><div><h3>'+esc(m[0])+(m[0]===db.profile.nick&&admin?' <span class="badge work">АДМИН</span>':'')+'</h3><span class="muted">'+esc(m[1])+'</span></div><div class="member-actions-row" style="display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important">'+(admin&&m[0]!==db.profile.nick?'<button onclick="editMemberNick(\''+esc(m[0]).replace(/'/g,"\\'")+'\')">Изменить ник</button><button class="danger" onclick="kickMemberByNick(\''+esc(m[0]).replace(/'/g,"\\'")+'\')">Выгнать</button>':'')+'</div></div></div>').join('')+'</div></div>'}
