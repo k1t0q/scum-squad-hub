@@ -71,9 +71,12 @@ function openRaidPhoto(url){
  document.body.style.top='-'+photoScrollY+'px';
  document.body.style.width='100%';
  const d=document.createElement('div');
- d.id='photoViewer';d.className='photooverlay';
+ d.id='photoViewer';
+ d.setAttribute('style','position:fixed!important;left:0!important;top:0!important;width:100%!important;height:100%!important;z-index:2147483647!important;background:#000!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:12px!important;box-sizing:border-box!important;overflow:hidden!important;');
  const img=document.createElement('img');
- img.src=url;img.alt='Фото';img.onclick=e=>e.stopPropagation();
+ img.src=url;img.alt='Фото';
+ img.setAttribute('style','display:block!important;position:static!important;width:auto!important;height:auto!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center!important;margin:auto!important;border:0!important;border-radius:0!important;transform:none!important;');
+ img.onclick=e=>e.stopPropagation();
  d.appendChild(img);document.body.appendChild(d);
  d.addEventListener('click',closeRaidPhoto);
 }
