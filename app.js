@@ -71,7 +71,7 @@ function openRaidPhoto(url){
  const img=document.createElement('img');
  img.src=url;img.alt='Фото';
  img.setAttribute('style','position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;display:block!important;width:auto!important;height:auto!important;max-width:calc(100vw - 24px)!important;max-height:calc(100vh - 24px)!important;object-fit:contain!important;margin:0!important;touch-action:auto!important;');
- img.onclick=e=>e.stopPropagation();
+ img.onclick=e=>{e.stopPropagation();closeRaidPhoto()};
  d.appendChild(img);document.body.appendChild(d);
  d.addEventListener('click',closeRaidPhoto);
 }
