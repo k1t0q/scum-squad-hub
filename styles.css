@@ -1627,3 +1627,15 @@ html.modal-lock,body.modal-lock{overflow:hidden!important;height:100%!important}
 .ref-plan .ref-list,.ref-tasks .ref-list{font-size:13px!important}
 .ref-plan .ref-row,.ref-tasks .ref-row{min-height:38px!important}
 .ref-plan .ref-row strong,.ref-tasks .ref-row strong{font-size:13px!important}
+
+
+/* v12.1 desktop-safe time picker: avoid oversized native select popup */
+.timepicker.fury-time-inputs .timefield>input{
+ width:100%!important;height:48px!important;min-height:48px!important;box-sizing:border-box!important;
+ margin:0!important;padding:0 12px!important;border:1px solid var(--line)!important;border-radius:8px!important;
+ background:#080c0a!important;color:#f2f4f2!important;font:inherit!important;font-size:18px!important;font-weight:800!important;
+ text-align:center!important;outline:none!important;-moz-appearance:textfield!important;appearance:textfield!important;
+}
+.timepicker.fury-time-inputs .timefield>input:focus{border-color:#476158!important;box-shadow:0 0 0 2px rgba(66,215,161,.08)!important}
+.timepicker.fury-time-inputs .timefield>input::-webkit-outer-spin-button,.timepicker.fury-time-inputs .timefield>input::-webkit-inner-spin-button{-webkit-appearance:none!important;margin:0!important}
+.timepicker.fury-time-inputs>b{height:48px!important;display:flex!important;align-items:center!important;justify-content:center!important;color:#f2f4f2!important}
