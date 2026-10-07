@@ -1688,3 +1688,7 @@ html.modal-lock,body.modal-lock{overflow:hidden!important;height:100%!important}
 
 /* v12.5 keep long custom selects inside viewport */
 .fury-select.drop-up .fury-select-menu{top:auto!important;bottom:calc(100% + 5px)!important}
+
+
+/* v12.6 custom select menus use viewport positioning so modal never scrolls because of an open list */
+.fury-select.open .fury-select-menu{z-index:2147483647!important}
