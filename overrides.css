@@ -2145,3 +2145,49 @@ textarea::-webkit-scrollbar{
 @media(max-width:430px){
  .app>aside>.mobile-raid-alarm{right:122px!important;width:40px!important;height:40px!important;min-width:40px!important}
 }
+
+/* v6.1: readable plan and task entries on phones */
+@media(max-width:900px){
+ .ref-home .ref-plan-row{
+  min-height:52px!important;
+  height:auto!important;
+  grid-template-columns:14px 49px minmax(0,1fr) auto!important;
+  gap:8px!important;
+  padding:9px 0!important;
+ }
+ .ref-home .ref-plan-row .ref-time{
+  font-size:14px!important;
+  font-weight:700!important;
+ }
+ .ref-home .ref-plan-row .ref-plan-name{min-width:0!important}
+ .ref-home .ref-plan-row .ref-plan-name b{
+  font-size:15px!important;
+  line-height:1.3!important;
+  overflow-wrap:anywhere!important;
+ }
+ .ref-home .ref-plan-row .ref-plan-name small{
+  font-size:12px!important;
+  line-height:1.3!important;
+ }
+ .ref-home .ref-plan-row .ref-people-count{
+  font-size:13px!important;
+  white-space:nowrap!important;
+ }
+ .ref-home .ref-task-row{
+  min-height:48px!important;
+  height:auto!important;
+  grid-template-columns:17px minmax(0,1fr) auto!important;
+  gap:8px!important;
+  padding:9px 0!important;
+ }
+ .ref-home .ref-task-row b{
+  min-width:0!important;
+  font-size:15px!important;
+  line-height:1.3!important;
+  overflow-wrap:anywhere!important;
+ }
+ .ref-home .ref-task-row>span:last-child{
+  font-size:13px!important;
+  white-space:nowrap!important;
+ }
+}
