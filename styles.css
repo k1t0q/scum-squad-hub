@@ -1692,3 +1692,7 @@ html.modal-lock,body.modal-lock{overflow:hidden!important;height:100%!important}
 
 /* v12.6 custom select menus use viewport positioning so modal never scrolls because of an open list */
 .fury-select.open .fury-select-menu{z-index:2147483647!important}
+
+
+/* v12.7 time menus use viewport positioning and never stretch task dialogs */
+.fury-timefield-open .fury-time-menu{z-index:2147483647!important}
