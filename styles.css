@@ -1684,3 +1684,7 @@ html.modal-lock,body.modal-lock{overflow:hidden!important;height:100%!important}
 .fury-select-option.active{background:#17352b!important;color:#5de2b3!important}
 .formrow>.fury-select{width:100%!important}
 @media(max-width:520px){.fury-select-menu{max-height:220px!important}.fury-select-option{min-height:40px!important}}
+
+
+/* v12.5 keep long custom selects inside viewport */
+.fury-select.drop-up .fury-select-menu{top:auto!important;bottom:calc(100% + 5px)!important}
