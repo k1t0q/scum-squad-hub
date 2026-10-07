@@ -40,7 +40,7 @@ function today(){
  let protectText=db.protect?protectHomeHtml(db.protect):'—';
  refreshWallMetric();
  $('#view').innerHTML='<div class="ref-home">'+
- '<section class="mobile-home-protect" onclick="confirmQuickProtect()" oncontextmenu="event.preventDefault();showProtectHistory()"><div class="mobile-protect-info">'+protectText+'</div><button type="button" class="mobile-protect-history-btn" onclick="event.stopPropagation();showProtectHistory()" aria-label="История протекта" title="История протекта"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg></button></section>'+ 
+ '<section class="mobile-home-protect" onclick="confirmQuickProtect()" oncontextmenu="event.preventDefault();showProtectHistory()"><div class="mobile-protect-info">'+protectText+'</div><button type="button" class="mobile-protect-history-btn" onclick="event.stopPropagation();showProtectHistory()" aria-label="Управление протектом" title="Управление протектом"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg></button></section>'+ 
 
  '<div class="ref-top">'+
   '<section class="ref-card ref-plan"><div class="ref-title"><h2 class="ref-section-link" onclick="go(\'План на рейд\')">ПЛАН НА РЕЙД <span class="ref-count">'+db.ops.length+'</span></h2><button class="ref-create" onclick="event.stopPropagation();newOp()">+ СОЗДАТЬ ПЛАН</button></div><div class="ref-list">'+(plan||'<div class="empty">План пока не создан</div>')+'</div></section>'+
@@ -252,19 +252,44 @@ async function quickProtect(){
  if(error){toast('Не удалось обновить протект');return}
  await syncOnline();toast('Протект обновлён')
 }
-function showProtectHistory(){
- let hs=db.protectHistory||[];
- let rows=hs.length?hs.map(x=>'<div class="item protect-history-item"><div><b>'+esc(x.nick)+'</b><div class="muted">'+new Date(x.time).toLocaleString('ru-RU',{timeZone:'Europe/Moscow',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})+'</div></div><button class="danger protect-delete-btn" onclick="deleteProtectAt(\''+x.time+'\')">Удалить</button></div>').join(''):'<div class="empty">История пока пустая</div>';
- modal('<h2>История протекта</h2><div class="list protect-history-list">'+rows+'</div><div class="modalactions"><button class="protect-close-btn" onclick="closeModal()">Закрыть</button></div>')
+function protectFormatDate(iso){return new Date(iso).toLocaleString('ru-RU',{timeZone:'Europe/Moscow',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+function protectMoscowParts(iso){let parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Moscow',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(iso));let p=Object.fromEntries(parts.map(x=>[x.type,x.value]));return{date:p.year+'-'+p.month+'-'+p.day,time:p.hour+':'+p.minute}}
+async function showProtectHistory(){
+ let hs=db.protectHistory||[],edits=[];
+ if(onlineMember){let res=await sb.from('protect_update_edits').select('*').eq('squad_id',onlineMember.squad_id).order('edited_at',{ascending:false});if(res.error){console.warn('Protect edit history:',res.error);toast('Не удалось загрузить историю изменений')}else edits=res.data||[]}
+ let names=Object.fromEntries((db.members||[]).map(x=>[x[0],x[0]])),members=db.protectMemberNames||{};
+ let rows=hs.length?hs.map(x=>{
+  let changes=edits.filter(y=>String(y.protect_update_id)===String(x.id));
+  let details=changes.length?'<div class="protect-edit-log">'+changes.map(y=>'<div class="muted">Изменил: <b>'+esc(members[y.edited_by]||'Участник')+'</b> · '+protectFormatDate(y.edited_at)+'<div>'+protectFormatDate(y.old_effective_at)+' → '+protectFormatDate(y.new_effective_at)+'</div></div>').join('')+'</div>':'';
+  let corrected=x.time!==x.pressedAt;
+  return '<div class="item protect-history-item"><div class="protect-history-info"><b>'+esc(x.nick)+'</b><div class="muted">Время выхода: '+protectFormatDate(x.time)+'</div>'+(corrected?'<div class="muted">Нажатие: '+protectFormatDate(x.pressedAt)+'</div>':'')+details+'</div><div class="protect-history-actions"><button type="button" class="ghost" onclick="editProtectTime('+Number(x.id)+')">Изменить время</button><button type="button" class="danger protect-delete-btn" onclick="deleteProtectAt('+Number(x.id)+')">Удалить</button></div></div>'
+ }).join(''):'<div class="empty">История пока пустая</div>';
+ modal('<h2>Управление протектом</h2><p class="muted">Время выхода можно исправить. Начало защиты — через 1 час после выхода.</p><div class="list protect-history-list">'+rows+'</div><div class="modalactions"><button class="protect-close-btn" onclick="closeModal()">Закрыть</button></div>')
 }
-async function deleteProtectAt(time){
+function editProtectTime(id){
+ let x=(db.protectHistory||[]).find(y=>Number(y.id)===Number(id));if(!x){toast('Отметка не найдена');return}
+ let p=protectMoscowParts(x.time);
+ modal('<h2>Изменить время протекта</h2><p class="muted">Нажал: '+esc(x.nick)+' · '+protectFormatDate(x.pressedAt)+'</p><form class="form" onsubmit="saveProtectTime(event,'+Number(x.id)+')"><label class="muted">Фактическое время выхода из игры (МСК)</label><input class="datepick" type="date" name="protect_date" value="'+esc(p.date)+'" required>'+timePicker('protect_time',p.time)+'<div class="dialogfoot"><button type="button" class="ghost" onclick="showProtectHistory()">Отмена</button><button class="primary">Сохранить</button></div></form>')
+}
+async function saveProtectTime(e,id){
+ e.preventDefault();if(!onlineMember)return;
+ let f=new FormData(e.target),date=String(f.get('protect_date')||''),time=getPickedTime(f,'protect_time');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){toast('Выбери дату');return}
+ let ms=Date.parse(date+'T'+time+':00+03:00');
+ if(!Number.isFinite(ms)||ms>Date.now()){toast('Время выхода не может быть в будущем');return}
+ let button=e.target.querySelector('button.primary');if(button)button.disabled=true;
+ let {data,error}=await sb.from('protect_updates').update({effective_at:new Date(ms).toISOString()}).eq('squad_id',onlineMember.squad_id).eq('id',id).select('id').single();
+ if(error||!data){toast('Не удалось изменить время протекта');if(button)button.disabled=false;return}
+ await syncOnline();await showProtectHistory();toast('Время протекта изменено')
+}
+async function deleteProtectAt(id){
  if(!confirm('Удалить эту отметку об обновлении протекта?'))return;
- let {error}=await sb.from('protect_updates').delete().eq('squad_id',onlineMember.squad_id).eq('updated_at',time);
+ let {error}=await sb.from('protect_updates').delete().eq('squad_id',onlineMember.squad_id).eq('id',id);
  if(error){toast('Не удалось удалить');return}
- await syncOnline();showProtectHistory();toast('Отметка удалена')
+ await syncOnline();await showProtectHistory();toast('Отметка удалена')
 }
 function protect(){let opts=(db.members||[]).map(m=>'<option value="'+esc(m[0])+'">'+esc(m[0])+'</option>').join('');let last=db.protect?('<div class="item"><div class="muted">ПОСЛЕДНЕЕ ОБНОВЛЕНИЕ</div><h3>'+esc(db.protect.nick)+'</h3><div>'+new Date(db.protect.time).toLocaleString('ru-RU',{timeZone:'Europe/Moscow',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})+'</div><div class="actions"><button class="danger" onclick="deleteProtect()">Удалить</button></div></div>'):'<div class="empty">Протект ещё не обновляли</div>';$('#view').innerHTML='<div class="card"><h2>Протект</h2><p class="muted">Выберите участника, который обновил протект.</p><form class="protectquick" onsubmit="saveProtect(event)"><select name="nick" required>'+opts+'</select><button class="primary protectbtn">ОБНОВИЛ ПРОТЕКТ</button></form><div style="margin-top:18px">'+last+'</div></div>'}
-async function deleteProtect(){if(!db.protect)return;if(!confirm('Удалить отметку об обновлении протекта?'))return;let {error}=await sb.from('protect_updates').delete().eq('squad_id',onlineMember.squad_id).eq('updated_at',db.protect.time);if(error){toast('Не удалось удалить');return}await syncOnline();toast('Отметка удалена')}
+async function deleteProtect(){if(!db.protect)return;if(!confirm('Удалить отметку об обновлении протекта?'))return;let {error}=await sb.from('protect_updates').delete().eq('squad_id',onlineMember.squad_id).eq('id',db.protect.id);if(error){toast('Не удалось удалить');return}await syncOnline();toast('Отметка удалена')}
 async function saveProtect(e){e.preventDefault();let f=new FormData(e.target),nick=f.get('nick'),res=await sb.from('members').select('id').eq('squad_id',onlineMember.squad_id).eq('nick',nick).single(),member=res.data;if(!member){toast('Участник не найден');return}let {error}=await sb.from('protect_updates').insert({squad_id:onlineMember.squad_id,member_id:member.id});if(error){toast('Не удалось обновить протект');return}await syncOnline();toast('Протект обновлён')}
 async function syncOnline(){if(!sb||!onlineMember)return;let day=moscowPresenceDay();let [mr,pr,tr,cr,rr,rpr,por]=await Promise.all([
 sb.from('members').select('*').order('joined_at'),
@@ -274,7 +299,7 @@ sb.from('task_contributions').select('*').order('created_at'),
 sb.from('raids').select('*').eq('squad_id',onlineMember.squad_id).order('created_at',{ascending:false}),
 sb.from('raid_participants').select('*'),
 sb.from('protect_updates').select('*').eq('squad_id',onlineMember.squad_id).order('updated_at',{ascending:false})
-]);if(mr.error||pr.error||tr.error||cr.error||rr.error||rpr.error||por.error){toast('Ошибка синхронизации');return}let ms=mr.data||[],ph=pr.data||[],nameById=Object.fromEntries(ms.map(m=>[m.id,m.nick]));db.members=ms.map(m=>{let p=ph.find(x=>x.member_id===m.id);return[m.nick,m.game_role,p?.join_time?.slice(0,5)||'',p?.status||'Не буду']});db.tasks=(tr.data||[]).map(t=>{let hs=(cr.data||[]).filter(c=>c.task_id===t.id).map(c=>({id:c.id,nick:nameById[c.member_id]||'Боец',qty:c.amount}));let done=hs.reduce((n,h)=>n+h.qty,0);return{id:t.id,title:t.title,need:t.quantity||0,done,unit:t.unit||'шт.',place:t.place||'',priority:t.priority,deadline:t.deadline||'',owner:nameById[t.assignee_id]||'',comment:t.comment||'',status:t.status,creator:nameById[t.creator_id]||'',history:hs}});db.ops=(rr.data||[]).map(r=>({id:r.id,title:r.title,date:r.raid_date||'',time:r.raid_time?.slice(0,5)||'20:00',note:r.note||'',sector:r.sector||'',walls:r.walls||0,loadout:r.loadout||'',transport:r.transport||'',rally_point:r.rally_point||'',images:r.target_images||[],creator:nameById[r.creator_id]||'',participants:(rpr.data||[]).filter(x=>x.raid_id===r.id).map(x=>nameById[x.member_id]).filter(Boolean)})).sort((a,b)=>{let av=a.date?(a.date+'T'+(a.time||'00:00')):'9999-12-31T23:59',bv=b.date?(b.date+'T'+(b.time||'00:00')):'9999-12-31T23:59';return av.localeCompare(bv)});db.protectHistory=(por.data||[]).map(x=>({member_id:x.member_id,nick:nameById[x.member_id]||'—',time:x.updated_at}));db.protect=db.protectHistory[0]||null;let me=ms.find(x=>x.id===onlineMember.id);if(me){onlineMember=me;db.profile={nick:me.nick,role:me.game_role,access:me.access_role};let mp=$('#mobileProfileNick');if(mp)mp.textContent=me.nick}let p=ph.find(x=>x.member_id===onlineMember.id);db.presence=p?{status:p.status,time:p.join_time?.slice(0,5)||''}:{status:'Не буду',time:''};save();if(!window.furySilentSync)render();startSharedSync();if(localStorage.getItem('fury_push_requested')==='yes')furySyncSubscription().catch(console.error)}
+]);if(mr.error||pr.error||tr.error||cr.error||rr.error||rpr.error||por.error){toast('Ошибка синхронизации');return}let ms=mr.data||[],ph=pr.data||[],nameById=Object.fromEntries(ms.map(m=>[m.id,m.nick]));db.members=ms.map(m=>{let p=ph.find(x=>x.member_id===m.id);return[m.nick,m.game_role,p?.join_time?.slice(0,5)||'',p?.status||'Не буду']});db.tasks=(tr.data||[]).map(t=>{let hs=(cr.data||[]).filter(c=>c.task_id===t.id).map(c=>({id:c.id,nick:nameById[c.member_id]||'Боец',qty:c.amount}));let done=hs.reduce((n,h)=>n+h.qty,0);return{id:t.id,title:t.title,need:t.quantity||0,done,unit:t.unit||'шт.',place:t.place||'',priority:t.priority,deadline:t.deadline||'',owner:nameById[t.assignee_id]||'',comment:t.comment||'',status:t.status,creator:nameById[t.creator_id]||'',history:hs}});db.ops=(rr.data||[]).map(r=>({id:r.id,title:r.title,date:r.raid_date||'',time:r.raid_time?.slice(0,5)||'20:00',note:r.note||'',sector:r.sector||'',walls:r.walls||0,loadout:r.loadout||'',transport:r.transport||'',rally_point:r.rally_point||'',images:r.target_images||[],creator:nameById[r.creator_id]||'',participants:(rpr.data||[]).filter(x=>x.raid_id===r.id).map(x=>nameById[x.member_id]).filter(Boolean)})).sort((a,b)=>{let av=a.date?(a.date+'T'+(a.time||'00:00')):'9999-12-31T23:59',bv=b.date?(b.date+'T'+(b.time||'00:00')):'9999-12-31T23:59';return av.localeCompare(bv)});db.protectHistory=(por.data||[]).map(x=>({id:x.id,member_id:x.member_id,nick:nameById[x.member_id]||'—',pressedAt:x.updated_at,time:x.effective_at||x.updated_at}));db.protect=db.protectHistory[0]||null;db.protectMemberNames=nameById;let me=ms.find(x=>x.id===onlineMember.id);if(me){onlineMember=me;db.profile={nick:me.nick,role:me.game_role,access:me.access_role};let mp=$('#mobileProfileNick');if(mp)mp.textContent=me.nick}let p=ph.find(x=>x.member_id===onlineMember.id);db.presence=p?{status:p.status,time:p.join_time?.slice(0,5)||''}:{status:'Не буду',time:''};save();if(!window.furySilentSync)render();startSharedSync();if(localStorage.getItem('fury_push_requested')==='yes')furySyncSubscription().catch(console.error)}
 async function bootOnline(){try{sb=supabase.createClient(SUPA_URL,SUPA_KEY);await joinOnline()}catch(e){console.error(e);toast('Supabase недоступен')}}
 
 
