@@ -2191,3 +2191,32 @@ textarea::-webkit-scrollbar{
   white-space:nowrap!important;
  }
 }
+
+/* v6.2: three equally sized attendance buttons fit the phone card */
+@media(max-width:900px){
+ .ref-att-base .ref-presence-buttons{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  width:100%!important;
+  max-width:100%!important;
+  gap:7px!important;
+  flex-wrap:nowrap!important;
+ }
+ .ref-att-base .ref-presence-buttons .presencechoice{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:48px!important;
+  min-height:48px!important;
+  margin:0!important;
+  padding:0 3px!important;
+  box-sizing:border-box!important;
+  font-size:clamp(10px,3.1vw,15px)!important;
+  line-height:1.15!important;
+  white-space:nowrap!important;
+  text-align:center!important;
+ }
+}
