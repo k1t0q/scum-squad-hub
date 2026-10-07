@@ -1720,3 +1720,27 @@ body>.fury-time-menu.fury-time-portal .fury-time-option.active{background:#17352
 #dialog.fury-role-dialog{overflow:visible!important;overflow-x:visible!important;overflow-y:visible!important}
 #dialog.fury-role-dialog .fury-select{z-index:100!important}
 #dialog.fury-role-dialog .fury-select.open{z-index:2147483000!important}
+
+/* v13.1 mobile task detail: align all four actions in a balanced 2x2 grid */
+@media(max-width:700px){
+ #dialog .task-detail-actions{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:9px!important;
+  align-items:stretch!important;
+  width:100%!important;
+ }
+ #dialog .task-detail-actions>button{
+  width:100%!important;
+  min-width:0!important;
+  height:44px!important;
+  min-height:44px!important;
+  margin:0!important;
+  padding:0 7px!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  text-align:center!important;
+  white-space:normal!important;
+ }
+ #dialog .task-detail-actions>.ghost{margin-left:0!important}
+}
