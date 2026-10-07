@@ -1714,3 +1714,9 @@ body>.fury-time-menu.fury-time-portal .fury-time-option.active{background:#17352
 .protect-edit-log>.muted{margin:5px 0!important;font-size:11px!important}
 .protect-edit-log b{color:#dce5e1!important}
 @media(max-width:600px){.protect-history-item{display:block!important}.protect-history-actions{justify-content:flex-start!important;margin-top:12px!important}}
+
+
+/* v13.0 profile and squad registration use custom role dropdown */
+#dialog.fury-role-dialog{overflow:visible!important;overflow-x:visible!important;overflow-y:visible!important}
+#dialog.fury-role-dialog .fury-select{z-index:100!important}
+#dialog.fury-role-dialog .fury-select.open{z-index:2147483000!important}
