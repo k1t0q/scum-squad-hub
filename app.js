@@ -10,7 +10,38 @@ function timePicker(name,value='20:00',minuteStep=1){let a=(value||'20:00').spli
 let furyTimePortalField=null;
 function furyRestoreTimePortal(){if(!furyTimePortalField)return;let field=furyTimePortalField,menu=document.querySelector('.fury-time-menu.fury-time-portal');if(menu){menu.classList.remove('fury-time-portal');menu.removeAttribute('style');field.appendChild(menu)}furyTimePortalField=null}
 function furyCloseTimeMenus(except){document.querySelectorAll('.fury-timefield-open').forEach(x=>{if(x!==except){x.classList.remove('fury-timefield-open');if(x===furyTimePortalField)furyRestoreTimePortal();x.querySelector('.fury-time-menu')?.removeAttribute('style')}})}
-function furyToggleTime(btn,e){if(e)e.stopPropagation();let field=btn.closest('.timefield'),willOpen=!field.classList.contains('fury-timefield-open');furyCloseTimeMenus();furyCloseSelectMenus();if(!willOpen)return;field.classList.add('fury-timefield-open');let menu=field.querySelector('.fury-time-menu'),active=menu?.querySelector('.fury-time-option.active');if(!menu)return;let isDeadline=String(field.querySelector('input[type="hidden"]')?.name||'').startsWith('deadline_');if(isDeadline){let r=field.getBoundingClientRect(),gap=5,available=Math.max(80,window.innerHeight-r.bottom-gap-10);furyTimePortalField=field;menu.classList.add('fury-time-portal');document.body.appendChild(menu);menu.style.setProperty('position','fixed','important');menu.style.setProperty('left',r.left+'px','important');menu.style.setProperty('top',(r.bottom+gap)+'px','important');menu.style.setProperty('right','auto','important');menu.style.setProperty('bottom','auto','important');menu.style.setProperty('width',r.width+'px','important');menu.style.setProperty('max-height',Math.min(238,available)+'px','important')}else{let r=field.getBoundingClientRect(),gap=5,below=window.innerHeight-r.bottom-gap-8,above=r.top-gap-8,space=Math.max(120,Math.min(238,Math.max(below,above)));menu.style.setProperty('position','fixed','important');menu.style.setProperty('left',r.left+'px','important');menu.style.setProperty('right','auto','important');menu.style.setProperty('width',r.width+'px','important');menu.style.setProperty('max-height',space+'px','important');if(below>=Math.min(238,menu.scrollHeight)||below>=above){menu.style.setProperty('top',(r.bottom+gap)+'px','important');menu.style.removeProperty('bottom')}else{menu.style.setProperty('top','auto','important');menu.style.setProperty('bottom',(window.innerHeight-r.top+gap)+'px','important')}}if(active)menu.scrollTop=Math.max(0,active.offsetTop-(menu.clientHeight-active.offsetHeight)/2)}
+function furyToggleTime(btn,e){
+ if(e)e.stopPropagation();
+ const field=btn.closest('.timefield'),willOpen=!field.classList.contains('fury-timefield-open');
+ furyCloseTimeMenus();furyCloseSelectMenus();
+ if(!willOpen)return;
+ const menu=field.querySelector('.fury-time-menu');
+ if(!menu)return;
+ field.classList.add('fury-timefield-open');
+ // Always render the menu under body: modal overflow, transforms and stacking contexts cannot clip it.
+ furyTimePortalField=field;
+ menu.classList.add('fury-time-portal');
+ document.body.appendChild(menu);
+ const r=btn.getBoundingClientRect(),gap=6,pad=10;
+ const viewportTop=window.visualViewport?.offsetTop||0;
+ const viewportBottom=viewportTop+(window.visualViewport?.height||window.innerHeight);
+ const below=Math.max(0,viewportBottom-r.bottom-gap-pad);
+ const above=Math.max(0,r.top-viewportTop-gap-pad);
+ const openDown=below>=Math.min(200,menu.scrollHeight)||below>=above;
+ const space=openDown?below:above;
+ const maxHeight=Math.max(48,Math.min(238,space));
+ const height=Math.min(menu.scrollHeight,maxHeight);
+ const top=openDown?Math.min(r.bottom+gap,viewportBottom-pad-height):Math.max(viewportTop+pad,r.top-gap-height);
+ menu.style.setProperty('position','fixed','important');
+ menu.style.setProperty('left',Math.max(pad,Math.min(r.left,window.innerWidth-r.width-pad))+'px','important');
+ menu.style.setProperty('top',top+'px','important');
+ menu.style.setProperty('right','auto','important');
+ menu.style.setProperty('bottom','auto','important');
+ menu.style.setProperty('width',Math.min(r.width,window.innerWidth-2*pad)+'px','important');
+ menu.style.setProperty('max-height',maxHeight+'px','important');
+ const active=menu.querySelector('.fury-time-option.active');
+ if(active)menu.scrollTop=Math.max(0,active.offsetTop-(menu.clientHeight-active.offsetHeight)/2);
+}
 function furyPickTime(btn){let v=btn.dataset.value,field=btn.closest('.timefield')||furyTimePortalField;if(!field)return;field.querySelector('input[type="hidden"]').value=v;field.querySelector('.fury-time-trigger span').textContent=v;let menu=btn.closest('.fury-time-menu');menu.querySelectorAll('.fury-time-option').forEach(x=>x.classList.toggle('active',x===btn));field.classList.remove('fury-timefield-open');if(field===furyTimePortalField)furyRestoreTimePortal();else menu.removeAttribute('style')}
 function getPickedTime(f,name){return String(f.get(name+'_h')||'00').padStart(2,'0')+':'+String(f.get(name+'_m')||'00').padStart(2,'0')}
 
