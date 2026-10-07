@@ -1703,3 +1703,14 @@ body>.fury-time-menu.fury-time-portal{display:block!important;position:fixed!imp
 body>.fury-time-menu.fury-time-portal .fury-time-option{display:block!important;width:100%!important;height:36px!important;min-height:36px!important;margin:0!important;padding:0 10px!important;border:0!important;border-radius:6px!important;background:transparent!important;color:#dce5e1!important;font:inherit!important;font-size:15px!important;font-weight:700!important;text-align:center!important;cursor:pointer!important}
 body>.fury-time-menu.fury-time-portal .fury-time-option:hover{background:#14201c!important;color:#fff!important}
 body>.fury-time-menu.fury-time-portal .fury-time-option.active{background:#17352b!important;color:#5de2b3!important}
+
+
+/* v12.9 protect management editor and audit trail */
+.protect-history-item{align-items:flex-start!important;gap:14px!important}
+.protect-history-info{flex:1!important;min-width:0!important}
+.protect-history-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:7px!important;flex-wrap:wrap!important}
+.protect-history-actions button{font-size:12px!important;padding:9px 12px!important;white-space:nowrap!important}
+.protect-edit-log{margin-top:9px!important;padding:8px 10px!important;border-left:2px solid #37574b!important;background:#0b1814!important;border-radius:3px!important}
+.protect-edit-log>.muted{margin:5px 0!important;font-size:11px!important}
+.protect-edit-log b{color:#dce5e1!important}
+@media(max-width:600px){.protect-history-item{display:block!important}.protect-history-actions{justify-content:flex-start!important;margin-top:12px!important}}
