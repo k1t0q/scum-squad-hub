@@ -1696,3 +1696,10 @@ html.modal-lock,body.modal-lock{overflow:hidden!important;height:100%!important}
 
 /* v12.7 time menus use viewport positioning and never stretch task dialogs */
 .fury-timefield-open .fury-time-menu{z-index:2147483647!important}
+
+
+/* v12.8: task time dropdowns are portaled to body, above every dialog field */
+body>.fury-time-menu.fury-time-portal{display:block!important;position:fixed!important;overflow-y:auto!important;overscroll-behavior:contain!important;padding:5px!important;border:1px solid #30423b!important;border-radius:9px!important;background:#0b1210!important;box-shadow:0 14px 34px rgba(0,0,0,.65)!important;z-index:2147483647!important;scrollbar-color:#53655d #0b1210!important;scrollbar-width:thin!important;box-sizing:border-box!important}
+body>.fury-time-menu.fury-time-portal .fury-time-option{display:block!important;width:100%!important;height:36px!important;min-height:36px!important;margin:0!important;padding:0 10px!important;border:0!important;border-radius:6px!important;background:transparent!important;color:#dce5e1!important;font:inherit!important;font-size:15px!important;font-weight:700!important;text-align:center!important;cursor:pointer!important}
+body>.fury-time-menu.fury-time-portal .fury-time-option:hover{background:#14201c!important;color:#fff!important}
+body>.fury-time-menu.fury-time-portal .fury-time-option.active{background:#17352b!important;color:#5de2b3!important}
