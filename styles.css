@@ -1657,3 +1657,12 @@ html.modal-lock,body.modal-lock{overflow:hidden!important;height:100%!important}
 .timepicker.fury-time-dropdown .fury-time-option.active{background:#17352b!important;color:#5de2b3!important}
 .dialog,.form,.formrow{overflow:visible!important}
 @media(max-width:520px){.timepicker.fury-time-dropdown .fury-time-menu{max-height:216px!important}.timepicker.fury-time-dropdown .fury-time-option{height:40px!important;min-height:40px!important}}
+
+
+/* v12.3 participation time modal: dropdown overlays without stretching/scrolling dialog */
+#dialog.time-entry-dialog{overflow:visible!important;overflow-x:visible!important;overflow-y:visible!important;max-height:none!important;position:relative!important}
+#dialog.time-entry-dialog .form{overflow:visible!important;position:relative!important}
+#dialog.time-entry-dialog .timepicker.fury-time-dropdown{z-index:50!important}
+#dialog.time-entry-dialog .fury-time-menu{z-index:2147483647!important}
+#dialog.time-entry-dialog .dialogfoot{position:relative!important;z-index:1!important}
+@media(max-width:700px){#dialog.time-entry-dialog{max-height:none!important;overflow:visible!important}}
