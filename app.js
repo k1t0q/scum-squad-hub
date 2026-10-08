@@ -221,7 +221,6 @@ function wallWord(n){let a=Math.abs(Number(n)||0)%100,b=a%10;return a>=11&&a<=14
 async function refreshWallMetric(){if(!sb||!onlineMember)return;let r=await sb.from('explosives_inventory').select('item,quantity').eq('squad_id',onlineMember.squad_id);if(r.error)return;let dmg=0;(r.data||[]).forEach(x=>{let q=Number(x.quantity||0);if((x.item==='С4'||x.item==='C4'))dmg+=q*400;else if(x.item==='РПГ')dmg+=q*200;else if(x.item==='ГРАНАТА'||x.item==='Граната')dmg+=q*100;else if(x.item==='ДИНАМИТ')dmg+=q*200});window.furyWalls=Math.floor(dmg/1200);let el=$('#wallMetric');if(el)el.textContent=window.furyWalls+' '+wallWord(window.furyWalls);let total=$('#explosiveWallsTotal');if(total)total.textContent=window.furyWalls+' '+wallWord(window.furyWalls)}
 function stats(){loadExplosives()}
 async function loadExplosives(){
- $('#view').innerHTML='<div claasync function loadExplosives(){
  $('#view').innerHTML='<div class="card"><div class="toolbar"><div><h2>Взрыв</h2><span class="muted">Общий склад отряда. Любой участник может изменить количество.</span></div></div><div id="explosivesBody"><div class="empty">Загрузка…</div></div></div>';
  let b=$('#explosivesBody');if(!sb||!onlineMember){b.innerHTML='<div class="empty">Войди в состав, чтобы видеть склад</div>';return}
  let {data,error}=await sb.from('explosives_inventory').select('item,quantity,updated_at').eq('squad_id',onlineMember.squad_id);
