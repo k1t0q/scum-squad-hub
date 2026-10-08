@@ -2390,3 +2390,30 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  .ref-att-base .ref-presence-buttons .presencechoice{min-width:96px!important}
  .ref-att-base .ref-join-time{margin-top:0!important;white-space:nowrap!important}
 }
+
+/* v7.3: desktop-only denser header and taller homepage middle cards. */
+@media(min-width:901px){
+ .ref-header{
+  height:50px!important;
+  min-height:50px!important;
+  padding:0 0 4px!important;
+  margin-bottom:10px!important;
+ }
+ .ref-header .ref-brand .eyebrow{line-height:17px!important}
+ .ref-header .ref-brand h1{margin-top:1px!important;line-height:14px!important}
+ .ref-home>.ref-middle>.ref-att-base,
+ .ref-home>.ref-middle>.ref-feed{
+  height:470px!important;
+  min-height:470px!important;
+  max-height:470px!important;
+ }
+ .ref-home>.ref-middle>.ref-att-base .ref-members{
+  flex:1 1 auto!important;
+  height:auto!important;
+  max-height:none!important;
+  min-height:0!important;
+ }
+ .ref-home>.ref-middle>.ref-feed #homePlaceBody{
+  height:calc(100% - 42px)!important;
+ }
+}
