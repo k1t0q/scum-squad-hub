@@ -392,7 +392,7 @@ function togglePlacePostMenu(id,e){
  const top=below>=h||below>=above?r.bottom+gap:r.top-gap-h;
  menu.style.setProperty('top',Math.max(viewTop+pad,Math.min(top,viewBottom-h-pad))+'px','important');
 }
-document.addEventListener('click',e=>{if(!e.target.closest('.ref-post-menu')&&!e.target.closest('.fury-post-menu-portal'))furyClosePlacePostMenus()});
+document.addEventListener('click',e=>{if(!e.target.closest('.ref-post-menu')||e.target.closest('.fury-post-menu-portal button'))furyClosePlacePostMenus()});
 document.addEventListener('scroll',()=>{if(furyPostMenuPortal)furyClosePlacePostMenus()},{capture:true,passive:true});
 window.addEventListener('resize',()=>{if(furyPostMenuPortal)furyClosePlacePostMenus()});
 document.addEventListener('click',e=>{if(!e.target.closest('.timefield'))furyCloseTimeMenus();if(!e.target.closest('.fury-select'))furyCloseSelectMenus()});
