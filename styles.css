@@ -1880,3 +1880,33 @@ layero-badge{display:none!important;visibility:hidden!important}
  color:#76e9b9!important;
 }
 #dialog .task-edit-actions>.primary:hover{background:#174432!important;border-color:#45b88b!important}
+
+/* v13.9: balanced raid-plan details actions on phones. */
+@media(max-width:700px){
+ #dialog .raid-detail-actions{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:9px!important;
+  align-items:stretch!important;
+  width:100%!important;
+  margin-top:16px!important;
+ }
+ #dialog .raid-detail-actions>button{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-width:0!important;
+  height:44px!important;
+  min-height:44px!important;
+  margin:0!important;
+  padding:0 7px!important;
+  border-radius:7px!important;
+  font-size:12px!important;
+  line-height:1.2!important;
+  text-align:center!important;
+  white-space:normal!important;
+ }
+ #dialog .raid-detail-actions>.ghost{margin-left:0!important}
+ #dialog .raid-detail-actions>button:only-child{grid-column:1/-1}
+}
