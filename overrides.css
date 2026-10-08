@@ -2539,3 +2539,10 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   min-width:0!important;
  }
 }
+
+/* v8.0: settings actions match squad status colors. */
+.fury-simple-settings .fury-setting-action{font-weight:800!important;border-radius:8px!important;transition:background .15s,border-color .15s!important}
+.fury-simple-settings .fury-setting-action-success{color:#65e7b4!important;background:#09271f!important;border:1px solid #238e6a!important}
+.fury-simple-settings .fury-setting-action-warning{color:#f4c15c!important;background:#2b2110!important;border:1px solid #98671f!important}
+.fury-simple-settings .fury-setting-action-danger{color:#ff707a!important;background:#301419!important;border:1px solid #9a3945!important}
+.fury-simple-settings .fury-setting-action:disabled{opacity:.45!important}
