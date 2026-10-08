@@ -2364,3 +2364,29 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  .ref-att-base .ref-member{grid-template-columns:minmax(0,1fr) 122px 42px!important;column-gap:4px!important}
  .ref-att-base .ref-member-time{width:42px!important;text-align:right!important}
 }
+
+/* v7.2: desktop attendance identity left, actions right, separated by a subtle divider. */
+@media(min-width:901px){
+ .ref-att-base .ref-my-presence{
+  display:grid!important;
+  grid-template-columns:minmax(130px,1fr) auto!important;
+  align-items:center!important;
+  column-gap:18px!important;
+  padding:10px 0 15px!important;
+ }
+ .ref-att-base .ref-me-line{
+  display:flex!important;flex-direction:column!important;
+  align-items:flex-start!important;justify-content:center!important;
+  gap:5px!important;margin:0!important;min-width:0!important;
+ }
+ .ref-att-base .ref-me-line>b{font-size:17px!important;line-height:20px!important}
+ .ref-att-base .ref-me-line>span{font-size:12px!important;line-height:16px!important}
+ .ref-att-base .ref-presence-row{
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;
+  gap:12px!important;min-width:0!important;flex-wrap:wrap!important;
+  border-left:1px solid #2b403d!important;padding-left:18px!important;
+ }
+ .ref-att-base .ref-presence-buttons{display:flex!important;flex-wrap:nowrap!important;gap:8px!important}
+ .ref-att-base .ref-presence-buttons .presencechoice{min-width:96px!important}
+ .ref-att-base .ref-join-time{margin-top:0!important;white-space:nowrap!important}
+}
