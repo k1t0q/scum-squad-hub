@@ -2337,3 +2337,8 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   padding-right:18px!important;
  }
 }
+
+/* v6.9: match homepage explosive stock typography to the inventory tab. */
+.ref-expl-item .ref-expl-bottom>small{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;gap:1px!important;line-height:1.2!important;min-width:0!important}
+.ref-expl-item .ref-expl-stock-label{display:block!important;font-size:11px!important;font-weight:500!important;line-height:14px!important;color:#8d9a9c!important;white-space:nowrap!important}
+.ref-expl-item .ref-expl-bottom>small>b{display:block!important;margin:0!important;font-size:12px!important;line-height:15px!important;font-weight:800!important;color:#f1b83c!important;white-space:nowrap!important}
