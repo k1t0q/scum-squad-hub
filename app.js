@@ -542,10 +542,31 @@ async function loadDiscordDmSettings() {
   if (error) { target.textContent = 'Настройки временно недоступны'; return; }
   const enabled = data?.enabled === true;
   const categories = data?.categories || {};
-  const items = discordNoticeOptions.map(([key,title]) => '<label style="display:block;margin:8px 0"><input type="checkbox" data-discord-category="' + key + '" ' + (categories[key] === true ? 'checked' : '') + '> ' + title + '</label>').join('');
-  target.innerHTML = '<p class="muted">Discord: ' + (data?.linked ? 'привязан' : 'не привязан') + '</p>' +
-    '<label style="display:block;margin:12px 0"><input id="discordDmEnabled" type="checkbox" ' + (enabled ? 'checked' : '') + '> Включить личные уведомления</label>' +
-    items + '<button class="ghost" type="button" onclick="saveDiscordDmSettings()">СОХРАНИТЬ</button>';
+  const items = discordNoticeOptions.map(([key,title]) =>
+    '<label class="settings-row fury-notice-row" style="cursor:pointer;padding:10px 12px;min-height:42px;border-radius:8px"><span><b>' + title + '</b></span><input type="checkbox" data-discord-category="' + key + '" ' + (categories[key] === true ? 'checked' : '') + ' onchange="updateDiscordCategorySummary()"></label>'
+  ).join('');
+  target.innerHTML = '<style>' +
+    '#discordDmSettings .discord-notice-dropdown{position:relative;margin-top:12px;max-width:480px}' +
+    '#discordDmSettings .discord-notice-dropdown>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;border:1px solid var(--line,#303b3c);background:var(--panel,#111d1d);border-radius:9px;padding:12px 14px;font-weight:700;user-select:none}' +
+    '#discordDmSettings .discord-notice-dropdown>summary::-webkit-details-marker{display:none}' +
+    '#discordDmSettings .discord-notice-dropdown>summary:after{content:"⌄";font-size:20px;color:#a6b6b5;line-height:1}' +
+    '#discordDmSettings .discord-notice-dropdown[open]>summary:after{transform:rotate(180deg)}' +
+    '#discordDmSettings .discord-notice-list{border:1px solid var(--line,#303b3c);background:var(--panel,#111d1d);border-radius:9px;margin-top:6px;padding:6px;max-height:330px;overflow-y:auto}' +
+    '#discordDmSettings input[type=checkbox]{accent-color:#23c99c;width:17px;height:17px;cursor:pointer;flex-shrink:0}' +
+    '#discordDmSettings .discord-notice-actions{display:flex;justify-content:flex-end;margin-top:14px}' +
+    '#discordDmSettings .discord-notice-actions button{min-width:150px}' +
+    '</style>' +
+    '<p class="muted" style="margin:6px 0 14px">Discord: ' + (data?.linked ? 'привязан' : 'не привязан') + '</p>' +
+    '<label class="settings-row fury-notice-row" style="cursor:pointer"><span><b>Личные уведомления</b><p class="muted">Получать сообщения от SCUM HUB в Discord</p></span><input id="discordDmEnabled" type="checkbox" ' + (enabled ? 'checked' : '') + '></label>' +
+    '<details class="discord-notice-dropdown"><summary><span id="discordCategorySummary">Категории уведомлений</span></summary><div class="discord-notice-list">' + items + '</div></details>' +
+    '<div class="discord-notice-actions"><button class="primary" type="button" onclick="saveDiscordDmSettings()">СОХРАНИТЬ</button></div>';
+  updateDiscordCategorySummary();
+}
+function updateDiscordCategorySummary() {
+  const summary = document.getElementById('discordCategorySummary');
+  if (!summary) return;
+  const count = document.querySelectorAll('#discordDmSettings [data-discord-category]:checked').length;
+  summary.textContent = 'Категории уведомлений · ' + count + ' из ' + discordNoticeOptions.length;
 }
 async function saveDiscordDmSettings() {
   if (!sb || !onlineMember) return toast('Сначала войди в аккаунт');
