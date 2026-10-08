@@ -2015,3 +2015,7 @@ layero-badge{display:none!important;visibility:hidden!important}
 
 /* v14.4: numeric dropdown matching time selection. */
 .explosiveedit select.explosive-scroll-input,.ref-expl-edit select.explosive-scroll-input{appearance:auto!important;-webkit-appearance:menulist!important;cursor:pointer!important;max-width:115px!important;padding:0 7px!important;color-scheme:dark!important}
+
+/* v14.5: explosive selectors use the same FURY dropdown as time and tasks. */
+.explosiveedit .explosive-number-picker,.ref-expl-edit .explosive-number-picker{width:110px!important;min-width:78px!important;max-width:110px!important}
+.explosiveedit .explosive-number-picker .fury-select-trigger,.ref-expl-edit .explosive-number-picker .fury-select-trigger{height:40px!important;min-height:40px!important;text-align:center!important;justify-content:center!important;padding:0 10px!important;font-size:15px!important;font-weight:800!important}
