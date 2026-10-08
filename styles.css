@@ -1744,3 +1744,19 @@ body>.fury-time-menu.fury-time-portal .fury-time-option.active{background:#17352
  }
  #dialog .task-detail-actions>.ghost{margin-left:0!important}
 }
+
+/* v13.2: portal dropdown for roles and other custom selects, unclipped by mobile modals */
+body>.fury-select-menu.fury-select-portal{
+ display:block!important;
+ position:fixed!important;
+ z-index:2147483647!important;
+ box-sizing:border-box!important;
+ overflow-y:auto!important;
+ overscroll-behavior:contain!important;
+ -webkit-overflow-scrolling:touch!important;
+ background:#09100d!important;
+ border:1px solid #30423b!important;
+ border-radius:8px!important;
+ padding:5px!important;
+ box-shadow:0 16px 36px rgba(0,0,0,.62)!important;
+}
