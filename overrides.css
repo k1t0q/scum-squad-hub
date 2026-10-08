@@ -2240,3 +2240,20 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  text-align:left!important;
  white-space:nowrap!important;
 }
+
+/* v6.5: matching status circles in mobile raid plans and tasks */
+@media(max-width:900px){
+ .ref-home .ref-plan-row .ref-dot,
+ .ref-home .ref-task-row .ref-ring{
+  display:block!important;
+  width:11px!important;
+  height:11px!important;
+  min-width:11px!important;
+  min-height:11px!important;
+  border:2px solid #ff3b43!important;
+  border-radius:50%!important;
+  box-sizing:border-box!important;
+  justify-self:center!important;
+  align-self:center!important;
+ }
+}
