@@ -1837,3 +1837,8 @@ body>.fury-select-menu.fury-select-portal{
 
 /* v13.6: hide the hosting platform's injected footer badge. */
 layero-badge{display:none!important;visibility:hidden!important}
+
+/* v13.7: discreet author credit on squad tasks. */
+.task-author{margin:4px 0 7px;color:#87958e;font-size:11px;line-height:1.35;font-weight:500}
+.task-author b{color:#c4d2ca;font-weight:700}
+.task-author-detail{margin:5px 0 12px;font-size:12px}
