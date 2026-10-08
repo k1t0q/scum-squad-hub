@@ -2358,3 +2358,9 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 .ref-expl-item .ref-expl-bottom .ref-expl-edit .explosive-number-picker>.fury-select-trigger i{
  right:9px!important;border-color:#71847c!important;
 }
+
+/* v7.1: tighten desktop gap between attendance status and join time. */
+@media(min-width:901px){
+ .ref-att-base .ref-member{grid-template-columns:minmax(0,1fr) 122px 42px!important;column-gap:4px!important}
+ .ref-att-base .ref-member-time{width:42px!important;text-align:right!important}
+}
