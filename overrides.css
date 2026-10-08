@@ -2501,3 +2501,21 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 .fury-simple-settings .fury-settings-main-row p{margin:6px 0 0!important;font-size:13px!important}
 .fury-simple-settings .fury-settings-main-row>button{min-width:170px!important;min-height:40px!important;flex:0 0 auto!important}
 @media(max-width:600px){.fury-simple-settings .fury-settings-main-row{flex-wrap:wrap!important}.fury-simple-settings .fury-settings-main-row>button{min-width:0!important;width:100%!important}}
+
+/* v7.8: keep desktop sidebar stationary while the main page scrolls. */
+@media(min-width:901px){
+ .app>aside{
+  position:sticky!important;
+  top:0!important;
+  bottom:auto!important;
+  align-self:start!important;
+  height:100vh!important;
+  min-height:100vh!important;
+  max-height:100vh!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+  scrollbar-width:thin!important;
+  scrollbar-color:#344b45 transparent!important;
+ }
+}
