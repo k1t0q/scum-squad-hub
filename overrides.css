@@ -2220,3 +2220,23 @@ textarea::-webkit-scrollbar{
   text-align:center!important;
  }
 }
+
+/* v6.4: post actions render above the scrolling feed on phones and desktop */
+body>.ref-post-menu-pop.fury-post-menu-portal.open{
+ display:grid!important;
+ position:fixed!important;
+ z-index:2147483000!important;
+ box-sizing:border-box!important;
+ padding:6px!important;
+ background:#0c1413!important;
+ border:1px solid #30403d!important;
+ border-radius:8px!important;
+ box-shadow:0 12px 30px rgba(0,0,0,.65)!important;
+}
+body>.ref-post-menu-pop.fury-post-menu-portal button{
+ min-height:38px!important;
+ padding:9px 11px!important;
+ font-size:13px!important;
+ text-align:left!important;
+ white-space:nowrap!important;
+}
