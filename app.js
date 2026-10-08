@@ -230,7 +230,7 @@ async function loadExplosives(){
  refreshWallMetric();
 }
 function scrollExplosive(e,el){if(e.cancelable)e.preventDefault();let next=Math.max(0,(parseInt(el.value,10)||0)+(e.deltaY<0?1:-1));el.value=next;setExplosive(el.dataset.item,next)}
-function explosiveInputs(item){return [...document.querySelector('.explosiveedit input[data-item="'+CSS.escape(item)+'"], .ref-expl-edit input[data-item="'+CSS.escape(item)+'"]')]}function explosiveInput(item){return explosiveInputs(item).find(el=>document.activeElement===el)||explosiveInputs(item)[0]||null}
+function explosiveInputs(item){return [...document.querySelectorAll('.explosiveedit input[data-item="'+CSS.escape(item)+'"], .ref-expl-edit input[data-item="'+CSS.escape(item)+'"]')]}function explosiveInput(item){return explosiveInputs(item).find(el=>document.activeElement===el)||explosiveInputs(item)[0]||null}
 function explosiveItemLabel(item,q){let key=item==='Граната'?'ГРАНАТА':item==='C4'?'С4':item,per={'С4':3,'РПГ':6,'ГРАНАТА':12,'ДИНАМИТ':6}[key];if(!per)return'';let w=Math.floor(q/per),r=q%per,extra=r?' + '+r+' '+(key==='С4'?'C4':key==='РПГ'?'РПГ':key==='ГРАНАТА'?(r===1?'граната':r>=2&&r<=4?'гранаты':'гранат'):'динамит'):'';return w+' '+wallWord(w).toLowerCase()+extra}
 function updateExplosiveInput(item,q){explosiveInputs(item).forEach(el=>{if(document.activeElement!==el)el.value=Number(q||0);let card=el.closest('.explosiveitem,.ref-expl-item');let label=card?.querySelector('.itemwalls,.ref-expl-bottom>small>b');if(label)label.textContent=explosiveItemLabel(item,Number(q||0))})}
 async function setExplosive(item,value){
