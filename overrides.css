@@ -2300,3 +2300,33 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   color:#f0f5f2!important;
  }
 }
+
+/* v6.7: match desktop arrival-time edit button to mobile */
+@media(min-width:901px){
+ .ref-att-base .ref-time-change{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  height:30px!important;
+  min-height:30px!important;
+  margin:0 0 0 4px!important;
+  padding:0 11px!important;
+  border:1px solid #40504c!important;
+  border-radius:6px!important;
+  background:#101a18!important;
+  color:#bdc9c5!important;
+  font-size:12px!important;
+  font-weight:600!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  box-shadow:none!important;
+ }
+ .ref-att-base .ref-time-change:hover,
+ .ref-att-base .ref-time-change:focus-visible{
+  background:#182722!important;
+  border-color:#688279!important;
+  color:#f0f5f2!important;
+ }
+}
