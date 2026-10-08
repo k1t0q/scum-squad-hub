@@ -2595,3 +2595,17 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 .fury-discord-admin-member{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid #243735;font-size:13px}
 .fury-discord-admin-member span{color:#66d9a9;font-size:12px}
 @media(max-width:900px){.fury-discord-admin{padding:15px}.fury-discord-admin-member{padding:12px 0}}
+
+.fury-discord-admin-member{align-items:center;flex-wrap:wrap}
+.fury-admin-member-name{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:140px}
+.fury-admin-member-name>b{font-size:14px}
+.fury-admin-member-name span{font-size:12px}
+.fury-admin-linked{color:#63dba8!important}
+.fury-admin-unlinked{color:#879895!important}
+.fury-admin-member-actions{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.fury-admin-member-actions button{padding:9px 12px;border-radius:7px;font-size:12px;font-weight:700;min-height:36px}
+@media(max-width:900px){
+ .fury-discord-admin-member{align-items:stretch;flex-direction:column;gap:12px}
+ .fury-admin-member-actions{margin:0;width:100%}
+ .fury-admin-member-actions button{flex:1 1 140px;min-height:42px}
+}
