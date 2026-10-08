@@ -2000,3 +2000,15 @@ layero-badge{display:none!important;visibility:hidden!important}
  #dialog .raid-detail-actions>.ghost,
  #dialog .task-detail-actions>.ghost{margin-left:0!important}
 }
+
+/* v14.3: compact scrollable explosive quantity controls. */
+.explosiveedit,.ref-expl-edit{display:flex!important;align-items:center!important;justify-content:center!important}
+.explosiveedit>.explosive-scroll-input,.ref-expl-edit>.explosive-scroll-input{
+ width:100%!important;min-width:55px!important;max-width:110px!important;
+ height:40px!important;margin:0!important;padding:0 12px!important;
+ text-align:center!important;font-size:16px!important;font-weight:800!important;
+ border:1px solid #354b45!important;border-radius:7px!important;
+ background:#0a1210!important;color:#e6f5ed!important;
+ appearance:textfield!important;-moz-appearance:textfield!important;
+}
+.explosive-scroll-input::-webkit-inner-spin-button,.explosive-scroll-input::-webkit-outer-spin-button{-webkit-appearance:none!important;margin:0!important}
