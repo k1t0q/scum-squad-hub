@@ -2012,3 +2012,6 @@ layero-badge{display:none!important;visibility:hidden!important}
  appearance:textfield!important;-moz-appearance:textfield!important;
 }
 .explosive-scroll-input::-webkit-inner-spin-button,.explosive-scroll-input::-webkit-outer-spin-button{-webkit-appearance:none!important;margin:0!important}
+
+/* v14.4: numeric dropdown matching time selection. */
+.explosiveedit select.explosive-scroll-input,.ref-expl-edit select.explosive-scroll-input{appearance:auto!important;-webkit-appearance:menulist!important;cursor:pointer!important;max-width:115px!important;padding:0 7px!important;color-scheme:dark!important}
