@@ -532,7 +532,7 @@ settingsPage = function () {
 const discordNoticeOptions = [
   ['presence','Моё участие'],['protect','Протект'],['protect_updated','Обновление протекта'],
   ['raids','Рейды'],['tasks','Задачи'],['stash','Схроны'],
-  ['alarm','Нас рейдят'],['posts','Фото и комментарии']
+  ['alarm','Нас рейдят']
 ];
 async function loadDiscordDmSettings() {
   const target = document.getElementById('discordDmSettings');
@@ -540,7 +540,7 @@ async function loadDiscordDmSettings() {
   const { data, error } = await sb.rpc('get_my_discord_settings');
   if (!target.isConnected) return;
   if (error) { target.textContent = 'Настройки временно недоступны'; return; }
-  const enabled = data?.enabled === true && Object.keys(data?.categories || {}).length > 0;
+  const enabled = data?.enabled === true;
   const categories = data?.categories || {};
   const items = discordNoticeOptions.map(([key,title]) => '<label style="display:block;margin:8px 0"><input type="checkbox" data-discord-category="' + key + '" ' + (categories[key] === true ? 'checked' : '') + '> ' + title + '</label>').join('');
   target.innerHTML = '<p class="muted">Discord: ' + (data?.linked ? 'привязан' : 'не привязан') + '</p>' +
