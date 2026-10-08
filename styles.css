@@ -1821,3 +1821,16 @@ body>.fury-select-menu.fury-select-portal{
  #dialog .protect-history-item .protect-history-actions>.ghost:active{background:#1a2a25!important}
  #dialog .protect-history-item .protect-history-actions>.danger:active{background:#3b1b20!important}
 }
+
+/* v13.5: mobile pages end after their content instead of reserving a whole viewport
+   (keeps the Layero-injected badge in its own place below the app). */
+@media(max-width:900px){
+ .app{
+  min-height:0!important;
+  height:auto!important;
+ }
+ .app>main{
+  min-height:0!important;
+  height:auto!important;
+ }
+}
