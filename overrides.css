@@ -2609,3 +2609,28 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  .fury-admin-member-actions{margin:0;width:100%}
  .fury-admin-member-actions button{flex:1 1 140px;min-height:42px}
 }
+
+/* Admin notification management: match SCUM HUB dark red destructive controls */
+.fury-discord-admin .fury-admin-member-actions button,
+.fury-discord-admin .fury-admin-member-actions button.danger{
+ appearance:none!important;-webkit-appearance:none!important;
+ background:#291317!important;color:#ff6a75!important;
+ border:1px solid #913541!important;border-radius:7px!important;
+ box-shadow:none!important;text-shadow:none!important;
+ padding:10px 14px!important;min-height:38px!important;
+ font-family:inherit!important;font-size:12px!important;
+ font-weight:750!important;letter-spacing:.1px!important;
+ line-height:1.25!important;cursor:pointer!important;
+ transition:background .15s,border-color .15s!important;
+}
+.fury-discord-admin .fury-admin-member-actions button:hover{
+ background:#3b1920!important;border-color:#e34a59!important;color:#ff8790!important;
+}
+.fury-discord-admin .fury-admin-member-actions button:focus-visible{
+ outline:2px solid #ff6674!important;outline-offset:2px!important;
+}
+@media(max-width:900px){
+ .fury-discord-admin .fury-admin-member-actions button{
+  min-height:44px!important;font-size:12px!important;
+ }
+}
