@@ -1967,3 +1967,36 @@ layero-badge{display:none!important;visibility:hidden!important}
  }
  #dialog .task-detail-actions>.ghost{margin-left:0!important}
 }
+
+/* v14.2: same desktop action layout for raid plans and tasks. */
+@media(min-width:901px){
+ #dialog .raid-detail-actions,
+ #dialog .task-detail-actions{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:8px!important;
+  align-items:stretch!important;
+  width:100%!important;
+  margin-top:16px!important;
+ }
+ #dialog .raid-detail-actions>button,
+ #dialog .task-detail-actions>button{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  width:100%!important;
+  min-width:0!important;
+  height:40px!important;
+  min-height:40px!important;
+  margin:0!important;
+  padding:0 5px!important;
+  border-radius:6px!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  line-height:1.15!important;
+  text-align:center!important;
+  white-space:normal!important;
+ }
+ #dialog .raid-detail-actions>.ghost,
+ #dialog .task-detail-actions>.ghost{margin-left:0!important}
+}
