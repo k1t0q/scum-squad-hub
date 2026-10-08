@@ -529,6 +529,11 @@ settingsPage = function () {
   container.appendChild(preferences);
   loadDiscordDmSettings();
 };
+const discordNoticeOptions = [
+  ['presence','Моё участие'],['protect','Протект'],['protect_updated','Обновление протекта'],
+  ['raids','Рейды'],['tasks','Задачи'],['stash','Схроны'],
+  ['alarm','Нас рейдят'],['posts','Фото и комментарии']
+];
 async function loadDiscordDmSettings() {
   const target = document.getElementById('discordDmSettings');
   if (!target || !sb) return;
@@ -536,12 +541,18 @@ async function loadDiscordDmSettings() {
   if (!target.isConnected) return;
   if (error) { target.textContent = 'Настройки временно недоступны'; return; }
   const enabled = data?.enabled !== false;
-  target.innerHTML = '<p class="muted">Discord: ' + (data?.linked ? 'привязан' : 'не привязан') + '</p><label><input id="discordDmEnabled" type="checkbox" ' + (enabled ? 'checked' : '') + '> Личные уведомления</label><button class="ghost" type="button" onclick="saveDiscordDmSettings()">СОХРАНИТЬ</button>';
+  const categories = data?.categories || {};
+  const items = discordNoticeOptions.map(([key,title]) => '<label style="display:block;margin:8px 0"><input type="checkbox" data-discord-category="' + key + '" ' + (categories[key] === false ? '' : 'checked') + '> ' + title + '</label>').join('');
+  target.innerHTML = '<p class="muted">Discord: ' + (data?.linked ? 'привязан' : 'не привязан') + '</p>' +
+    '<label style="display:block;margin:12px 0"><input id="discordDmEnabled" type="checkbox" ' + (enabled ? 'checked' : '') + '> Включить личные уведомления</label>' +
+    items + '<button class="ghost" type="button" onclick="saveDiscordDmSettings()">СОХРАНИТЬ</button>';
 }
 async function saveDiscordDmSettings() {
   if (!sb || !onlineMember) return toast('Сначала войди в аккаунт');
   const enabled = !!document.getElementById('discordDmEnabled')?.checked;
-  const { error } = await sb.rpc('set_my_discord_settings', { p_enabled: enabled, p_categories: {} });
+  const categories = {};
+  document.querySelectorAll('[data-discord-category]').forEach(input => { categories[input.dataset.discordCategory] = !!input.checked; });
+  const { error } = await sb.rpc('set_my_discord_settings', { p_enabled: enabled, p_categories: categories });
   toast(error ? 'Не удалось сохранить настройки' : 'Настройки Discord сохранены');
 }
 async function createDiscordLinkCode() {
