@@ -2492,3 +2492,12 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  .app>aside>.logo{gap:5px!important;padding-top:7px!important}
  .app>aside>.logo>div{gap:3px!important}
 }
+
+/* v7.7: two consistent settings controls on desktop and mobile. */
+.fury-simple-settings .fury-settings-main-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;padding:17px 0!important;border-bottom:1px solid #253735!important}
+.fury-simple-settings .fury-settings-main-row:last-child{border-bottom:0!important}
+.fury-simple-settings .fury-settings-main-row>div{min-width:0!important;flex:1!important}
+.fury-simple-settings .fury-settings-main-row b{font-size:15px!important}
+.fury-simple-settings .fury-settings-main-row p{margin:6px 0 0!important;font-size:13px!important}
+.fury-simple-settings .fury-settings-main-row>button{min-width:170px!important;min-height:40px!important;flex:0 0 auto!important}
+@media(max-width:600px){.fury-simple-settings .fury-settings-main-row{flex-wrap:wrap!important}.fury-simple-settings .fury-settings-main-row>button{min-width:0!important;width:100%!important}}
