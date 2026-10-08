@@ -523,7 +523,27 @@ settingsPage = function () {
   section.className = 'settings-row';
   section.innerHTML = '<div><b>Discord · SCUM HUB</b><p class="muted">Однократная безопасная привязка аккаунта. Код действует 10 минут.</p></div><button class="ghost" type="button" onclick="createDiscordLinkCode()">ПРИВЯЗАТЬ DISCORD</button>';
   container.appendChild(section);
+  const preferences = document.createElement('div');
+  preferences.className = 'settings-row';
+  preferences.innerHTML = '<div><b>Личные уведомления Discord</b><p class="muted">Управление уведомлениями SCUM HUB.</p><div id="discordDmSettings">Загрузка…</div></div>';
+  container.appendChild(preferences);
+  loadDiscordDmSettings();
 };
+async function loadDiscordDmSettings() {
+  const target = document.getElementById('discordDmSettings');
+  if (!target || !sb) return;
+  const { data, error } = await sb.rpc('get_my_discord_settings');
+  if (!target.isConnected) return;
+  if (error) { target.textContent = 'Настройки временно недоступны'; return; }
+  const enabled = data?.enabled !== false;
+  target.innerHTML = '<p class="muted">Discord: ' + (data?.linked ? 'привязан' : 'не привязан') + '</p><label><input id="discordDmEnabled" type="checkbox" ' + (enabled ? 'checked' : '') + '> Личные уведомления</label><button class="ghost" type="button" onclick="saveDiscordDmSettings()">СОХРАНИТЬ</button>';
+}
+async function saveDiscordDmSettings() {
+  if (!sb || !onlineMember) return toast('Сначала войди в аккаунт');
+  const enabled = !!document.getElementById('discordDmEnabled')?.checked;
+  const { error } = await sb.rpc('set_my_discord_settings', { p_enabled: enabled, p_categories: {} });
+  toast(error ? 'Не удалось сохранить настройки' : 'Настройки Discord сохранены');
+}
 async function createDiscordLinkCode() {
   if (!sb || !onlineMember) return toast('Сначала войди в аккаунт');
   const { data, error } = await sb.rpc('create_discord_link_code');
