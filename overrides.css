@@ -2634,3 +2634,10 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   min-height:44px!important;font-size:12px!important;
  }
 }
+
+/* v8.7: Mobile pages end at their content instead of leaving an extra viewport of scrollable empty space. */
+@media(max-width:900px){
+ .app{min-height:0!important;height:auto!important}
+ .app>main,main{min-height:0!important;height:auto!important;padding-bottom:12px!important}
+ #view{min-height:0!important;height:auto!important;padding-bottom:0!important}
+}
