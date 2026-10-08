@@ -126,9 +126,71 @@ async function kickMemberByNick(nick){if(db.profile.access!=='admin'||!sb||!onli
 function changeInviteCode(){if(db.profile.access!=='admin')return;modal('<h2>Код вступления</h2><form class="form" onsubmit="saveInviteCode(event)"><span class="muted">Новый код для входа в состав FURY</span><input name="code" required minlength="4" placeholder="Новый код"><div class="dialogfoot"><button type="button" class="ghost" onclick="closeModal()">Отмена</button><button class="primary">Сохранить</button></div></form>')}
 async function saveInviteCode(e){e.preventDefault();let code=new FormData(e.target).get('code').trim();let r=await sb.rpc('admin_change_invite_code',{p_new_code:code});if(r.error){toast('Не удалось сменить код');return}closeModal();toast('Код вступления изменён')}
 function furySelectPicker(name,items,value='',placeholder='Выбрать'){let val=String(value??''),list=items.map(x=>typeof x==='object'?x:{value:String(x),label:String(x)}),cur=list.find(x=>String(x.value)===val),label=cur?cur.label:placeholder,opts=list.map(x=>{let v=String(x.value),l=String(x.label);return '<button type="button" class="fury-select-option'+(v===val?' active':'')+'" data-value="'+esc(v)+'" onclick="furyPickSelect(this)">'+esc(l)+'</button>'}).join('');return '<div class="fury-select"><input type="hidden" name="'+name+'" value="'+esc(val)+'"><button type="button" class="fury-select-trigger" onclick="furyToggleSelect(this,event)"><span>'+esc(label)+'</span><i></i></button><div class="fury-select-menu">'+opts+'</div></div>'}
-function furyCloseSelectMenus(except){document.querySelectorAll('.fury-select.open').forEach(x=>{if(x!==except){x.classList.remove('open');let m=x.querySelector('.fury-select-menu');if(m)m.removeAttribute('style')}})}
-function furyToggleSelect(btn,e){if(e)e.stopPropagation();let box=btn.closest('.fury-select'),willOpen=!box.classList.contains('open');furyCloseSelectMenus(box);furyCloseTimeMenus();box.classList.remove('drop-up');box.classList.toggle('open',willOpen);if(willOpen)setTimeout(()=>{let menu=box.querySelector('.fury-select-menu'),active=menu?.querySelector('.fury-select-option.active'),r=box.getBoundingClientRect(),gap=5,below=window.innerHeight-r.bottom-gap-8,above=r.top-gap-8,space=Math.max(120,Math.min(250,Math.max(below,above)));if(menu){menu.style.setProperty('position','fixed','important');menu.style.setProperty('left',r.left+'px','important');menu.style.setProperty('right','auto','important');menu.style.setProperty('width',r.width+'px','important');menu.style.setProperty('max-height',space+'px','important');if(below>=Math.min(250,menu.scrollHeight)||below>=above){menu.style.setProperty('top',(r.bottom+gap)+'px','important');menu.style.removeProperty('bottom')}else{menu.style.setProperty('top','auto','important');menu.style.setProperty('bottom',(window.innerHeight-r.top+gap)+'px','important')}if(active)menu.scrollTop=Math.max(0,active.offsetTop-(menu.clientHeight-active.offsetHeight)/2)}},0)}
-function furyPickSelect(btn){let box=btn.closest('.fury-select'),v=btn.dataset.value;box.querySelector('input[type="hidden"]').value=v;box.querySelector('.fury-select-trigger span').textContent=btn.textContent;box.querySelectorAll('.fury-select-option').forEach(x=>x.classList.toggle('active',x===btn));box.classList.remove('open');box.querySelector('.fury-select-menu')?.removeAttribute('style')}
+let furySelectPortal=null;
+function furyCloseSelectMenus(except){
+ if(furySelectPortal&&furySelectPortal.box!==except){
+  const p=furySelectPortal;
+  p.box.classList.remove('open','drop-up');
+  p.menu.classList.remove('fury-select-portal');
+  p.menu.removeAttribute('style');
+  if(p.box.isConnected)p.box.appendChild(p.menu);
+  else p.menu.remove();
+  furySelectPortal=null;
+ }
+ document.querySelectorAll('.fury-select.open').forEach(box=>{
+  if(box===except)return;
+  box.classList.remove('open','drop-up');
+  box.querySelector('.fury-select-menu')?.removeAttribute('style');
+ });
+}
+function furyToggleSelect(btn,e){
+ if(e)e.stopPropagation();
+ const box=btn.closest('.fury-select');
+ if(!box)return;
+ const willOpen=!box.classList.contains('open');
+ furyCloseSelectMenus();
+ furyCloseTimeMenus();
+ if(!willOpen)return;
+ const menu=box.querySelector('.fury-select-menu');
+ if(!menu)return;
+ box.classList.add('open');
+ furySelectPortal={box,menu};
+ menu.classList.add('fury-select-portal');
+ document.body.appendChild(menu);
+ const r=btn.getBoundingClientRect(),gap=6,pad=10;
+ const viewTop=window.visualViewport?.offsetTop||0;
+ const viewBottom=viewTop+(window.visualViewport?.height||window.innerHeight);
+ const below=Math.max(0,viewBottom-r.bottom-gap-pad);
+ const above=Math.max(0,r.top-viewTop-gap-pad);
+ const contentHeight=menu.scrollHeight;
+ const openDown=below>=Math.min(contentHeight,220)||below>=above;
+ const available=openDown?below:above;
+ const maxHeight=Math.max(48,Math.min(250,available));
+ const height=Math.min(contentHeight,maxHeight);
+ const top=openDown?r.bottom+gap:r.top-gap-height;
+ const width=Math.min(r.width,window.innerWidth-pad*2);
+ menu.style.setProperty('position','fixed','important');
+ menu.style.setProperty('left',Math.max(pad,Math.min(r.left,window.innerWidth-width-pad))+'px','important');
+ menu.style.setProperty('top',Math.max(viewTop+pad,Math.min(top,viewBottom-height-pad))+'px','important');
+ menu.style.setProperty('right','auto','important');
+ menu.style.setProperty('bottom','auto','important');
+ menu.style.setProperty('width',width+'px','important');
+ menu.style.setProperty('max-height',maxHeight+'px','important');
+ const active=menu.querySelector('.fury-select-option.active');
+ if(active)menu.scrollTop=Math.max(0,active.offsetTop-(menu.clientHeight-active.offsetHeight)/2);
+}
+function furyPickSelect(btn){
+ const box=furySelectPortal?.menu.contains(btn)?furySelectPortal.box:btn.closest('.fury-select');
+ if(!box)return;
+ const v=btn.dataset.value;
+ box.querySelector('input[type="hidden"]').value=v;
+ box.querySelector('.fury-select-trigger span').textContent=btn.textContent;
+ const menu=furySelectPortal?.box===box?furySelectPortal.menu:box.querySelector('.fury-select-menu');
+ menu?.querySelectorAll('.fury-select-option').forEach(x=>x.classList.toggle('active',x===btn));
+ furyCloseSelectMenus();
+}
+document.addEventListener('scroll',e=>{if(furySelectPortal&&!furySelectPortal.menu.contains(e.target))furyCloseSelectMenus()},{capture:true,passive:true});
+window.addEventListener('resize',()=>{if(furySelectPortal)furyCloseSelectMenus()});
 function quantityPicker(name,value=1){let items=Array.from({length:50},(_,i)=>({value:String(i+1),label:String(i+1)}));return furySelectPicker(name,items,value?String(Math.min(50,Math.max(1,Number(value)||1))):'','Количество (необязательно)')}
 function newTask(){modal('<h2>Создать задачу</h2><form class="form" onsubmit="createTask(event)"><input name="title" required placeholder="Например: Собрать металл"><div class="formrow">'+quantityPicker('need')+furySelectPicker('unit',['Стак','Хомяк','Ящик'],'Стак','Единица')+'</div><div class="formrow"><div><small class="muted">Сделать до даты</small><input name="deadline_date" class="datepick" type="date" required onclick="if(this.showPicker)this.showPicker()" onfocus="if(this.showPicker)this.showPicker()"></div><div><small class="muted">До времени</small>'+timePicker('deadline','21:00')+'</div></div><input name="place" placeholder="Куда / место"><textarea name="comment" placeholder="Комментарий"></textarea><div class="dialogfoot"><button type="button" class="ghost" onclick="closeModal()">Отмена</button><button class="primary">Создать</button></div></form>')}
 async function createTask(e){e.preventDefault();let f=new FormData(e.target),need=Number(f.get('need'))||null;if(!sb||!onlineMember)return;let row={squad_id:onlineMember.squad_id,creator_id:onlineMember.id,title:f.get('title'),quantity:need,unit:f.get('unit')||'шт.',place:f.get('place')||null,priority:f.get('priority')||'Обычный',deadline:(f.get('deadline_date')+' '+getPickedTime(f,'deadline')),comment:f.get('comment')||null,status:'В процессе'};let {error}=await sb.from('tasks').insert(row);if(error){toast('Не удалось создать задачу');return}closeModal();await syncOnline();go('Задачи')}
