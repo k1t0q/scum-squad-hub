@@ -2330,3 +2330,10 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   color:#f0f5f2!important;
  }
 }
+
+/* v6.8: keep the mobile roster scrollbar clear of attendance badges. */
+@media(max-width:900px){
+ .ref-att-base .ref-members{
+  padding-right:18px!important;
+ }
+}
