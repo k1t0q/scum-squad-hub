@@ -2546,3 +2546,44 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 .fury-simple-settings .fury-setting-action-warning{color:#f4c15c!important;background:#2b2110!important;border:1px solid #98671f!important}
 .fury-simple-settings .fury-setting-action-danger{color:#ff707a!important;background:#301419!important;border:1px solid #9a3945!important}
 .fury-simple-settings .fury-setting-action:disabled{opacity:.45!important}
+
+/* v8.1: compact, left-aligned mobile settings instead of oversized centered tiles. */
+@media(max-width:900px){
+ #view>.fury-simple-settings{
+  width:100%!important;max-width:none!important;
+  padding:16px!important;border-radius:12px!important;
+ }
+ .fury-simple-settings>.toolbar{margin-bottom:14px!important}
+ .fury-simple-settings .fury-settings-main-row{
+  display:flex!important;flex-direction:column!important;
+  align-items:stretch!important;justify-content:flex-start!important;
+  text-align:left!important;
+  gap:12px!important;
+  padding:15px!important;margin:0 0 12px!important;
+  background:#0c1919!important;
+  border:1px solid #283c3b!important;
+  border-radius:10px!important;
+ }
+ .fury-simple-settings .fury-settings-main-row:last-child{margin-bottom:0!important;border:1px solid #283c3b!important}
+ .fury-simple-settings .fury-settings-main-row>div{
+  width:100%!important;flex:none!important;min-width:0!important;
+  text-align:left!important;
+ }
+ .fury-simple-settings .fury-settings-main-row b{
+  display:block!important;text-align:left!important;
+  font-size:15px!important;line-height:21px!important;
+ }
+ .fury-simple-settings .fury-settings-main-row p{
+  text-align:left!important;margin:5px 0 0!important;
+  font-size:12px!important;line-height:1.5!important;
+ }
+ .fury-simple-settings .fury-settings-main-row .fury-setting-description{color:#a3b1ae!important}
+ .fury-simple-settings .fury-settings-main-row .fury-setting-status{color:#78a99a!important;font-weight:650!important}
+ .fury-simple-settings .fury-settings-main-row>button{
+  display:block!important;width:100%!important;max-width:none!important;
+  min-width:0!important;min-height:42px!important;
+  padding:9px 12px!important;flex:none!important;
+  font-size:12px!important;letter-spacing:.35px!important;
+  text-align:center!important;
+ }
+}
