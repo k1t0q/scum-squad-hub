@@ -511,3 +511,22 @@ async function togglePushPreference(){
 }
 
 $('#pageTitle').textContent=page;nav();render();bootOnline();
+
+
+/* Discord account linking: issue a short-lived code only from an authenticated site session. */
+const originalSettingsPageForDiscord = settingsPage;
+settingsPage = function () {
+  originalSettingsPageForDiscord();
+  const container = document.querySelector('#view .fury-settings');
+  if (!container || !onlineMember) return;
+  const section = document.createElement('div');
+  section.className = 'settings-row';
+  section.innerHTML = '<div><b>Discord · SCUM HUB</b><p class="muted">Однократная безопасная привязка аккаунта. Код действует 10 минут.</p></div><button class="ghost" type="button" onclick="createDiscordLinkCode()">ПРИВЯЗАТЬ DISCORD</button>';
+  container.appendChild(section);
+};
+async function createDiscordLinkCode() {
+  if (!sb || !onlineMember) return toast('Сначала войди в аккаунт');
+  const { data, error } = await sb.rpc('create_discord_link_code');
+  if (error || !data) return toast('Не удалось создать код привязки');
+  modal('<h2>Привязка Discord</h2><p class="muted">В Discord введи /link и вставь одноразовый код. Никому не передавай код.</p><div class="form"><input readonly id="discordLinkCode" value="' + esc(data) + '"><button class="primary" onclick="navigator.clipboard.writeText(document.getElementById(\'discordLinkCode\').value).then(()=>toast(\'Код скопирован\'))">КОПИРОВАТЬ КОД</button><button class="ghost" onclick="closeModal()">ЗАКРЫТЬ</button></div>');
+}
