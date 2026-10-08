@@ -1779,3 +1779,45 @@ body>.fury-select-menu.fury-select-portal{
  background:#85202a!important;
  transform:none!important;
 }
+
+/* v13.4: balanced mobile actions in protect management */
+@media(max-width:700px){
+ #dialog .protect-history-item .protect-history-actions{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  width:100%!important;
+  gap:8px!important;
+  margin-top:14px!important;
+  align-items:stretch!important;
+ }
+ #dialog .protect-history-item .protect-history-actions>button{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:42px!important;
+  height:42px!important;
+  margin:0!important;
+  padding:0 8px!important;
+  border-radius:7px!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  text-align:center!important;
+  box-shadow:none!important;
+ }
+ #dialog .protect-history-item .protect-history-actions>.ghost{
+  background:#101b19!important;
+  border:1px solid #354b45!important;
+  color:#d7e1dd!important;
+ }
+ #dialog .protect-history-item .protect-history-actions>.danger{
+  background:#2a1418!important;
+  border:1px solid #91353d!important;
+  color:#ff777e!important;
+ }
+ #dialog .protect-history-item .protect-history-actions>.ghost:active{background:#1a2a25!important}
+ #dialog .protect-history-item .protect-history-actions>.danger:active{background:#3b1b20!important}
+}
