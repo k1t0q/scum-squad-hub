@@ -1842,3 +1842,41 @@ layero-badge{display:none!important;visibility:hidden!important}
 .task-author{margin:4px 0 7px;color:#87958e;font-size:11px;line-height:1.35;font-weight:500}
 .task-author b{color:#c4d2ca;font-weight:700}
 .task-author-detail{margin:5px 0 12px;font-size:12px}
+
+/* v13.8: two balanced actions in the task editor on phone and desktop. */
+#dialog .task-edit-actions{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+ gap:10px!important;
+ width:100%!important;
+ margin-top:18px!important;
+}
+#dialog .task-edit-actions>button{
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ width:100%!important;
+ min-width:0!important;
+ height:44px!important;
+ min-height:44px!important;
+ margin:0!important;
+ padding:0 12px!important;
+ border-radius:7px!important;
+ font-size:13px!important;
+ font-weight:750!important;
+ line-height:1.2!important;
+ text-transform:none!important;
+ letter-spacing:0!important;
+ white-space:nowrap!important;
+}
+#dialog .task-edit-actions>.ghost{
+ background:#101b19!important;
+ border:1px solid #354b45!important;
+ color:#c8d5d0!important;
+}
+#dialog .task-edit-actions>.primary{
+ background:#103126!important;
+ border:1px solid #328c68!important;
+ color:#76e9b9!important;
+}
+#dialog .task-edit-actions>.primary:hover{background:#174432!important;border-color:#45b88b!important}
