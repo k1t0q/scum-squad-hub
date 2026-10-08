@@ -1760,3 +1760,22 @@ body>.fury-select-menu.fury-select-portal{
  padding:5px!important;
  box-shadow:0 16px 36px rgba(0,0,0,.62)!important;
 }
+
+/* v13.3: clearly red logout button in fighter profile on all screens */
+#dialog .profile-actions button.logoutbtn{
+ background:#9d2530!important;
+ border:1px solid #d44953!important;
+ color:#fff!important;
+ font-weight:800!important;
+ box-shadow:none!important;
+}
+#dialog .profile-actions button.logoutbtn:hover,
+#dialog .profile-actions button.logoutbtn:focus-visible{
+ background:#b92f3b!important;
+ border-color:#f06a72!important;
+ color:#fff!important;
+}
+#dialog .profile-actions button.logoutbtn:active{
+ background:#85202a!important;
+ transform:none!important;
+}
