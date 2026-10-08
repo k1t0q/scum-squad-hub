@@ -1910,3 +1910,31 @@ layero-badge{display:none!important;visibility:hidden!important}
  #dialog .raid-detail-actions>.ghost{margin-left:0!important}
  #dialog .raid-detail-actions>button:only-child{grid-column:1/-1}
 }
+
+/* v14.0: desktop task editor footer matches the clean two-button mobile layout. */
+@media(min-width:901px){
+ #modal.open #dialog form.form>.dialogfoot.task-edit-actions{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  width:100%!important;
+  margin-top:20px!important;
+  justify-content:stretch!important;
+ }
+ #modal.open #dialog form.form>.dialogfoot.task-edit-actions>button{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-width:0!important;
+  height:46px!important;
+  min-height:46px!important;
+  margin:0!important;
+  padding:0 14px!important;
+  border-radius:7px!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  line-height:1!important;
+  text-align:center!important;
+ }
+}
