@@ -486,10 +486,27 @@ async function furySyncSubscription(){
 function settingsPage(){
  const supported=('Notification' in window)&&('serviceWorker' in navigator)&&window.isSecureContext&&('PushManager' in window);
  const granted=supported&&Notification.permission==='granted';
- const installed=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
  const requested=localStorage.getItem('fury_push_requested')==='yes';
- $('#view').innerHTML='<div class="card fury-settings"><div class="toolbar"><div><h2>Настройки</h2><span class="muted">Уведомления и параметры этого устройства.</span></div></div><div class="settings-row"><div><b>Пуш-уведомления</b><p class="muted">Получать сообщения, даже когда сайт закрыт</p></div><button class="ghost" onclick="togglePushPreference()">'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div><div class="muted">Статус: '+(!supported?'не поддерживается браузером':!granted?'нет разрешения':requested?'включены на этом устройстве':'выключены')+'</div><h3 style="margin:24px 0 12px">КАТЕГОРИИ УВЕДОМЛЕНИЙ</h3>'+furyNoticeCategories.map(([key,name,desc])=>'<label class="settings-row fury-notice-row"><span><b>'+name+'</b><p class="muted">'+desc+'</p></span><input type="checkbox" '+(furyNoticeEnabled(key)?'checked':'')+' onchange="furyNoticeToggle(\''+key+'\',this.checked)"></label>').join('')+'</div>';
+ const active=supported&&granted&&requested;
+ $('#view').innerHTML='<div class="card fury-settings fury-simple-settings"><div class="toolbar"><div><h2>Настройки</h2><span class="muted">Уведомления и Discord</span></div></div>'+
+ '<div class="settings-row fury-settings-main-row"><div><b>Уведомления</b><p class="muted">'+(!supported?'Не поддерживаются этим браузером':active?'Уведомления включены':'Уведомления выключены')+'</p></div><button class="ghost" type="button" onclick="togglePushPreference()"'+(!supported?' disabled':'')+'>'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div>'+
+ '<div class="settings-row fury-settings-main-row"><div><b>Discord</b><p class="muted" id="furyDiscordLinkStatus">Проверяем привязку…</p></div><button class="ghost" type="button" id="furyDiscordLinkButton" onclick="createDiscordLinkCode()">ПРИВЯЗАТЬ DISCORD</button></div></div>';
+ loadDiscordLinkStatus();
 }
+async function loadDiscordLinkStatus(){
+ const status=document.getElementById('furyDiscordLinkStatus');
+ const button=document.getElementById('furyDiscordLinkButton');
+ if(!status||!sb||!onlineMember){if(status)status.textContent='Discord не привязан';return}
+ try{
+  const {data,error}=await sb.rpc('get_my_discord_settings');
+  if(!status.isConnected)return;
+  if(error)throw error;
+  const linked=data?.linked===true;
+  status.textContent=linked?'Discord привязан':'Discord не привязан';
+  if(button){button.textContent=linked?'ПРИВЯЗАТЬ ЗАНОВО':'ПРИВЯЗАТЬ DISCORD'}
+ }catch(e){console.error('loadDiscordLinkStatus',e);if(status.isConnected)status.textContent='Не удалось проверить привязку'}
+}
+
 async function togglePushPreference(){
  if(!('Notification' in window)||!('serviceWorker' in navigator)||!('PushManager' in window)||!window.isSecureContext){toast('Откройте установленный сайт на поддерживаемом устройстве');return}
  try{
@@ -513,22 +530,6 @@ async function togglePushPreference(){
 $('#pageTitle').textContent=page;nav();render();bootOnline();
 
 
-/* Discord account linking: issue a short-lived code only from an authenticated site session. */
-const originalSettingsPageForDiscord = settingsPage;
-settingsPage = function () {
-  originalSettingsPageForDiscord();
-  const container = document.querySelector('#view .fury-settings');
-  if (!container || !onlineMember) return;
-  const section = document.createElement('div');
-  section.className = 'settings-row';
-  section.innerHTML = '<div><b>Discord · SCUM HUB</b><p class="muted">Однократная безопасная привязка аккаунта. Код действует 10 минут.</p></div><button class="ghost" type="button" onclick="createDiscordLinkCode()">ПРИВЯЗАТЬ DISCORD</button>';
-  container.appendChild(section);
-  const preferences = document.createElement('div');
-  preferences.className = 'settings-row';
-  preferences.innerHTML = '<div><b>Личные уведомления Discord</b><p class="muted">Управление уведомлениями SCUM HUB.</p><div id="discordDmSettings">Загрузка…</div></div>';
-  container.appendChild(preferences);
-  loadDiscordDmSettings();
-};
 const discordNoticeOptions = [
   ['presence','Моё участие'],['protect','Протект'],['protect_updated','Обновление протекта'],
   ['raids','Рейды'],['tasks','Задачи'],['stash','Схроны'],
