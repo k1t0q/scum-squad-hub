@@ -519,12 +519,13 @@ async function loadDiscordAdminList(){
    '<span class="'+(x.discord_linked?'fury-admin-linked':'fury-admin-unlinked')+'">Discord: '+(x.discord_linked?'привязан':'не привязан')+'</span>'+
    '<span class="'+(x.push_enabled?'fury-admin-linked':'fury-admin-unlinked')+'">Сайт: '+(x.push_enabled?'уведомления включены':'уведомления выключены')+'</span></div>'+
    '<div class="fury-admin-member-actions">'+
-   (x.discord_linked?'<button class="danger" type="button" onclick="adminRevokeMemberChannel(\''+x.member_id+'\',\'discord\',\''+esc(x.nick).replace(/'/g,'&#39;')+'\')">Отвязать Discord</button>':'')+
-   (x.push_enabled?'<button class="danger" type="button" onclick="adminRevokeMemberChannel(\''+x.member_id+'\',\'push\',\''+esc(x.nick).replace(/'/g,'&#39;')+'\')">Отключить уведомления</button>':'')+
+   (x.discord_linked?'<button class="danger" type="button" onclick="adminRevokeMemberChannel(\''+x.member_id+'\',\'discord\',\''+encodeURIComponent(x.nick)+'\')">Отвязать Discord</button>':'')+
+   (x.push_enabled?'<button class="danger" type="button" onclick="adminRevokeMemberChannel(\''+x.member_id+'\',\'push\',\''+encodeURIComponent(x.nick)+'\')">Отключить уведомления</button>':'')+
    '</div></div>').join(''):'В отряде пока нет участников';
  }catch(e){console.error('loadDiscordAdminList',e);if(target.isConnected)target.textContent='Не удалось загрузить список'}
 }
-async function adminRevokeMemberChannel(memberId,channel,nick){
+async function adminRevokeMemberChannel(memberId,channel,encodedNick){
+ const nick=decodeURIComponent(encodedNick);
  if(db.profile.access!=='admin'||!['discord','push'].includes(channel))return;
  const description=channel==='discord'?'отвязать Discord':'отключить уведомления сайта';
  if(!confirm('Вы действительно хотите '+description+' для '+nick+'?'))return;
