@@ -2422,3 +2422,53 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 @media(min-width:901px){
  .ref-header .ref-brand h1{margin-top:5px!important}
 }
+
+/* v7.5: balanced desktop squad identity in the left navigation. */
+@media(min-width:901px){
+ .app>aside>.logo{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:flex-start!important;
+  gap:9px!important;
+  height:auto!important;
+  min-height:98px!important;
+  margin:0 0 18px!important;
+  padding:8px 8px 16px!important;
+  border-bottom:1px solid #243330!important;
+ }
+ .app>aside>.logo>i{
+  display:block!important;
+  width:auto!important;
+  font-family:Impact,"Arial Black",sans-serif!important;
+  font-size:35px!important;
+  line-height:1!important;
+  letter-spacing:-1.5px!important;
+  transform:skew(-8deg)!important;
+  transform-origin:left center!important;
+  margin:0!important;
+  padding:0!important;
+ }
+ .app>aside>.logo>div{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  gap:4px!important;
+  margin:0!important;
+ }
+ .app>aside>.logo>div>b{
+  display:block!important;
+  font-size:10px!important;
+  font-weight:850!important;
+  line-height:13px!important;
+  letter-spacing:1.6px!important;
+  color:#edf3f1!important;
+ }
+ .app>aside>.logo>div>small{
+  display:block!important;
+  font-size:9px!important;
+  line-height:12px!important;
+  letter-spacing:.8px!important;
+  color:#81928e!important;
+ }
+}
