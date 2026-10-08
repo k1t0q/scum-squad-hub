@@ -540,9 +540,9 @@ async function loadDiscordDmSettings() {
   const { data, error } = await sb.rpc('get_my_discord_settings');
   if (!target.isConnected) return;
   if (error) { target.textContent = 'Настройки временно недоступны'; return; }
-  const enabled = data?.enabled !== false;
+  const enabled = data?.enabled === true && Object.keys(data?.categories || {}).length > 0;
   const categories = data?.categories || {};
-  const items = discordNoticeOptions.map(([key,title]) => '<label style="display:block;margin:8px 0"><input type="checkbox" data-discord-category="' + key + '" ' + (categories[key] === false ? '' : 'checked') + '> ' + title + '</label>').join('');
+  const items = discordNoticeOptions.map(([key,title]) => '<label style="display:block;margin:8px 0"><input type="checkbox" data-discord-category="' + key + '" ' + (categories[key] === true ? 'checked' : '') + '> ' + title + '</label>').join('');
   target.innerHTML = '<p class="muted">Discord: ' + (data?.linked ? 'привязан' : 'не привязан') + '</p>' +
     '<label style="display:block;margin:12px 0"><input id="discordDmEnabled" type="checkbox" ' + (enabled ? 'checked' : '') + '> Включить личные уведомления</label>' +
     items + '<button class="ghost" type="button" onclick="saveDiscordDmSettings()">СОХРАНИТЬ</button>';
