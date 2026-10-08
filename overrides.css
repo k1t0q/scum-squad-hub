@@ -2403,9 +2403,9 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  .ref-header .ref-brand h1{margin-top:1px!important;line-height:14px!important}
  .ref-home>.ref-middle>.ref-att-base,
  .ref-home>.ref-middle>.ref-feed{
-  height:470px!important;
-  min-height:470px!important;
-  max-height:470px!important;
+  height:450px!important;
+  min-height:450px!important;
+  max-height:450px!important;
  }
  .ref-home>.ref-middle>.ref-att-base .ref-members{
   flex:1 1 auto!important;
@@ -2416,4 +2416,9 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  .ref-home>.ref-middle>.ref-feed #homePlaceBody{
   height:calc(100% - 42px)!important;
  }
+}
+
+/* v7.4: small separation between desktop header label and page name. */
+@media(min-width:901px){
+ .ref-header .ref-brand h1{margin-top:5px!important}
 }
