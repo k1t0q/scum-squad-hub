@@ -502,9 +502,22 @@ function settingsPage(){
  const active=supported&&granted&&requested;
  $('#view').innerHTML='<div class="card fury-settings fury-simple-settings"><div class="toolbar"><div><h2>Настройки</h2><span class="muted">Уведомления и Discord</span></div></div>'+
  '<div class="settings-row fury-settings-main-row"><div><b>Уведомления</b><p class="muted fury-setting-description">Оповещения о рейдах, задачах, протекте, схронах и событиях отряда.</p><p class="muted fury-setting-status">Статус: '+(!supported?'не поддерживаются этим браузером':active?'включены':'выключены')+'</p></div><button class="ghost fury-setting-action fury-setting-action-'+(requested?'danger':'success')+'" type="button" onclick="togglePushPreference()"'+(!supported?' disabled':'')+'>'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div>'+
- '<div class="settings-row fury-settings-main-row"><div><b>Discord</b><p class="muted fury-setting-description">Привяжите аккаунт, чтобы получать личные сообщения от SCUM HUB в Discord.</p><p class="muted fury-setting-status" id="furyDiscordLinkStatus">Проверяем привязку…</p></div><button class="ghost fury-setting-action fury-setting-action-success" type="button" id="furyDiscordLinkButton" onclick="createDiscordLinkCode()">ПРИВЯЗАТЬ DISCORD</button></div></div>';
+ '<div class="settings-row fury-settings-main-row"><div><b>Discord</b><p class="muted fury-setting-description">Привяжите аккаунт, чтобы получать личные сообщения от SCUM HUB в Discord.</p><p class="muted fury-setting-status" id="furyDiscordLinkStatus">Проверяем привязку…</p></div><button class="ghost fury-setting-action fury-setting-action-success" type="button" id="furyDiscordLinkButton" onclick="createDiscordLinkCode()">ПРИВЯЗАТЬ DISCORD</button></div>'+
+ (db.profile.access==='admin'?'<div class="fury-discord-admin"><b>Привязанные аккаунты Discord</b><p class="muted">Участники отряда, подключившие Discord.</p><div id="furyDiscordAdminList" class="muted">Загрузка списка…</div></div>':'')+'</div>';
  loadDiscordLinkStatus();
+ if(db.profile.access==='admin')loadDiscordAdminList();
 }
+async function loadDiscordAdminList(){
+ const target=document.getElementById('furyDiscordAdminList');
+ if(!target||!sb)return;
+ try{
+  const {data,error}=await sb.rpc('admin_list_discord_links');
+  if(!target.isConnected)return;
+  if(error)throw error;
+  target.innerHTML=data?.length?data.map(x=>'<div class="fury-discord-admin-member"><b>'+esc(x.nick)+'</b><span>Привязан</span></div>').join(''):'Пока никто не привязал Discord';
+ }catch(e){console.error('loadDiscordAdminList',e);if(target.isConnected)target.textContent='Не удалось загрузить список'}
+}
+
 async function loadDiscordLinkStatus(){
  const status=document.getElementById('furyDiscordLinkStatus');
  const button=document.getElementById('furyDiscordLinkButton');
