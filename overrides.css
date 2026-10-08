@@ -2472,3 +2472,23 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   color:#81928e!important;
  }
 }
+
+/* v7.6: restore clean, legible desktop DUBL wordmark. */
+@media(min-width:901px){
+ .app>aside>.logo>i{
+  font-family:Arial,"Arial Black",sans-serif!important;
+  font-style:italic!important;
+  font-size:37px!important;
+  font-weight:1000!important;
+  line-height:1.12!important;
+  letter-spacing:-2.1px!important;
+  transform:none!important;
+  text-shadow:none!important;
+  filter:none!important;
+  white-space:nowrap!important;
+  width:auto!important;
+  max-width:100%!important;
+ }
+ .app>aside>.logo{gap:5px!important;padding-top:7px!important}
+ .app>aside>.logo>div{gap:3px!important}
+}
