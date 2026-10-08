@@ -501,8 +501,8 @@ function settingsPage(){
  const requested=localStorage.getItem('fury_push_requested')==='yes';
  const active=supported&&granted&&requested;
  $('#view').innerHTML='<div class="card fury-settings fury-simple-settings"><div class="toolbar"><div><h2>Настройки</h2><span class="muted">Уведомления и Discord</span></div></div>'+
- '<div class="settings-row fury-settings-main-row"><div><b>Уведомления</b><p class="muted">'+(!supported?'Не поддерживаются этим браузером':active?'Уведомления включены':'Уведомления выключены')+'</p></div><button class="ghost" type="button" onclick="togglePushPreference()"'+(!supported?' disabled':'')+'>'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div>'+
- '<div class="settings-row fury-settings-main-row"><div><b>Discord</b><p class="muted" id="furyDiscordLinkStatus">Проверяем привязку…</p></div><button class="ghost" type="button" id="furyDiscordLinkButton" onclick="createDiscordLinkCode()">ПРИВЯЗАТЬ DISCORD</button></div></div>';
+ '<div class="settings-row fury-settings-main-row"><div><b>Уведомления</b><p class="muted">'+(!supported?'Не поддерживаются этим браузером':active?'Уведомления включены':'Уведомления выключены')+'</p></div><button class="ghost fury-setting-action fury-setting-action-'+(requested?'danger':'success')+'" type="button" onclick="togglePushPreference()"'+(!supported?' disabled':'')+'>'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div>'+
+ '<div class="settings-row fury-settings-main-row"><div><b>Discord</b><p class="muted" id="furyDiscordLinkStatus">Проверяем привязку…</p></div><button class="ghost fury-setting-action fury-setting-action-success" type="button" id="furyDiscordLinkButton" onclick="createDiscordLinkCode()">ПРИВЯЗАТЬ DISCORD</button></div></div>';
  loadDiscordLinkStatus();
 }
 async function loadDiscordLinkStatus(){
@@ -515,7 +515,7 @@ async function loadDiscordLinkStatus(){
   if(error)throw error;
   const linked=data?.linked===true;
   status.textContent=linked?'Discord привязан':'Discord не привязан';
-  if(button){button.textContent=linked?'ПРИВЯЗАТЬ ЗАНОВО':'ПРИВЯЗАТЬ DISCORD'}
+  if(button){button.textContent=linked?'ПРИВЯЗАТЬ ЗАНОВО':'ПРИВЯЗАТЬ DISCORD';button.classList.toggle('fury-setting-action-warning',linked);button.classList.toggle('fury-setting-action-success',!linked)}
  }catch(e){console.error('loadDiscordLinkStatus',e);if(status.isConnected)status.textContent='Не удалось проверить привязку'}
 }
 
