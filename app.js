@@ -355,8 +355,46 @@ async function refreshStash(id,button){
  await placePage('stash');
  }catch(e){console.error('refreshStash',e);toast('Ошибка обновления схрона');if(button){button.disabled=false;button.textContent='Обновить схрон'}}
 }
-function togglePlacePostMenu(id,e){if(e)e.stopPropagation();document.querySelectorAll('.ref-post-menu-pop.open').forEach(x=>{if(x.id!=='placePostMenu'+id)x.classList.remove('open')});document.getElementById('placePostMenu'+id)?.classList.toggle('open')}
-document.addEventListener('click',e=>{if(!e.target.closest('.ref-post-menu'))document.querySelectorAll('.ref-post-menu-pop.open').forEach(x=>x.classList.remove('open'))});
+let furyPostMenuPortal=null;
+function furyClosePlacePostMenus(){
+ const p=furyPostMenuPortal;
+ if(p){
+  p.menu.classList.remove('open','fury-post-menu-portal');
+  p.menu.removeAttribute('style');
+  if(p.parent.isConnected)p.parent.appendChild(p.menu);
+  else p.menu.remove();
+  furyPostMenuPortal=null;
+ }
+ document.querySelectorAll('.ref-post-menu-pop.open').forEach(x=>x.classList.remove('open'));
+}
+function togglePlacePostMenu(id,e){
+ if(e)e.stopPropagation();
+ const current=furyPostMenuPortal?.menu.id==='placePostMenu'+id;
+ furyClosePlacePostMenus();
+ if(current)return;
+ const menu=document.getElementById('placePostMenu'+id);
+ const trigger=menu?.parentElement?.querySelector('.ref-post-dots');
+ if(!menu||!trigger)return;
+ const parent=menu.parentElement,r=trigger.getBoundingClientRect();
+ furyPostMenuPortal={menu,parent};
+ menu.classList.add('open','fury-post-menu-portal');
+ document.body.appendChild(menu);
+ const pad=10,gap=6,width=Math.min(190,window.innerWidth-pad*2);
+ const viewTop=window.visualViewport?.offsetTop||0;
+ const viewBottom=viewTop+(window.visualViewport?.height||window.innerHeight);
+ menu.style.setProperty('position','fixed','important');
+ menu.style.setProperty('width',width+'px','important');
+ menu.style.setProperty('left',Math.max(pad,Math.min(r.right-width,window.innerWidth-width-pad))+'px','important');
+ menu.style.setProperty('right','auto','important');
+ menu.style.setProperty('bottom','auto','important');
+ const h=menu.getBoundingClientRect().height;
+ const below=viewBottom-r.bottom-gap-pad,above=r.top-viewTop-gap-pad;
+ const top=below>=h||below>=above?r.bottom+gap:r.top-gap-h;
+ menu.style.setProperty('top',Math.max(viewTop+pad,Math.min(top,viewBottom-h-pad))+'px','important');
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.ref-post-menu')&&!e.target.closest('.fury-post-menu-portal'))furyClosePlacePostMenus()});
+document.addEventListener('scroll',()=>{if(furyPostMenuPortal)furyClosePlacePostMenus()},{capture:true,passive:true});
+window.addEventListener('resize',()=>{if(furyPostMenuPortal)furyClosePlacePostMenus()});
 document.addEventListener('click',e=>{if(!e.target.closest('.timefield'))furyCloseTimeMenus();if(!e.target.closest('.fury-select'))furyCloseSelectMenus()});
 
 const furyNoticeCategories=[['protect','Протект','За час, за 15 минут и при окончании'],['protect_updated','Обновление протекта','Когда другой участник обновил протект'],['stash','Схрон','Новые записи, фотографии и комментарии'],['base','Базы','Новые записи, фотографии и комментарии'],['tasks','Задачи','Новые задачи'],['raids','Рейды','Новые планы рейдов'],['presence','Моё участие','Каждый день в 15:00 МСК'],['alarm','Экстренная тревога','Уведомление «НАС РЕЙДЯТ»']];
