@@ -503,7 +503,7 @@ function settingsPage(){
  $('#view').innerHTML='<div class="card fury-settings fury-simple-settings"><div class="toolbar"><div><h2>Настройки</h2><span class="muted">Уведомления и Discord</span></div></div>'+
  '<div class="settings-row fury-settings-main-row"><div><b>Уведомления</b><p class="muted fury-setting-description">Оповещения о рейдах, задачах, протекте, схронах и событиях отряда.</p><p class="muted fury-setting-status">Статус: '+(!supported?'не поддерживаются этим браузером':active?'включены':'выключены')+'</p></div><button class="ghost fury-setting-action fury-setting-action-'+(requested?'danger':'success')+'" type="button" onclick="togglePushPreference()"'+(!supported?' disabled':'')+'>'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div>'+
  '<div class="settings-row fury-settings-main-row"><div><b>Discord</b><p class="muted fury-setting-description">Привяжите аккаунт, чтобы получать личные сообщения от SCUM HUB в Discord.</p><p class="muted fury-setting-status" id="furyDiscordLinkStatus">Проверяем привязку…</p></div><button class="ghost fury-setting-action fury-setting-action-success" type="button" id="furyDiscordLinkButton" onclick="createDiscordLinkCode()">ПРИВЯЗАТЬ DISCORD</button></div>'+
- (db.profile.access==='admin'?'<div class="fury-discord-admin"><b>Привязанные аккаунты Discord</b><p class="muted">Участники отряда, подключившие Discord.</p><div id="furyDiscordAdminList" class="muted">Загрузка списка…</div></div>':'')+'</div>';
+ (db.profile.access==='admin'?'<div class="fury-discord-admin"><b>Управление уведомлениями участников</b><p class="muted">Привязки Discord и уведомления сайта для всех участников отряда.</p><div id="furyDiscordAdminList" class="muted">Загрузка списка…</div></div>':'')+'</div>';
  loadDiscordLinkStatus();
  if(db.profile.access==='admin')loadDiscordAdminList();
 }
@@ -511,11 +511,30 @@ async function loadDiscordAdminList(){
  const target=document.getElementById('furyDiscordAdminList');
  if(!target||!sb)return;
  try{
-  const {data,error}=await sb.rpc('admin_list_discord_links');
+  const {data,error}=await sb.rpc('admin_notification_members');
   if(!target.isConnected)return;
   if(error)throw error;
-  target.innerHTML=data?.length?data.map(x=>'<div class="fury-discord-admin-member"><b>'+esc(x.nick)+'</b><span>Привязан</span></div>').join(''):'Пока никто не привязал Discord';
+  target.innerHTML=data?.length?data.map(x=>
+   '<div class="fury-discord-admin-member"><div class="fury-admin-member-name"><b>'+esc(x.nick)+'</b>'+
+   '<span class="'+(x.discord_linked?'fury-admin-linked':'fury-admin-unlinked')+'">Discord: '+(x.discord_linked?'привязан':'не привязан')+'</span>'+
+   '<span class="'+(x.push_enabled?'fury-admin-linked':'fury-admin-unlinked')+'">Сайт: '+(x.push_enabled?'уведомления включены':'уведомления выключены')+'</span></div>'+
+   '<div class="fury-admin-member-actions">'+
+   (x.discord_linked?'<button class="danger" type="button" onclick="adminRevokeMemberChannel(\''+x.member_id+'\',\'discord\',\''+esc(x.nick).replace(/'/g,'&#39;')+'\')">Отвязать Discord</button>':'')+
+   (x.push_enabled?'<button class="danger" type="button" onclick="adminRevokeMemberChannel(\''+x.member_id+'\',\'push\',\''+esc(x.nick).replace(/'/g,'&#39;')+'\')">Отключить уведомления</button>':'')+
+   '</div></div>').join(''):'В отряде пока нет участников';
  }catch(e){console.error('loadDiscordAdminList',e);if(target.isConnected)target.textContent='Не удалось загрузить список'}
+}
+async function adminRevokeMemberChannel(memberId,channel,nick){
+ if(db.profile.access!=='admin'||!['discord','push'].includes(channel))return;
+ const description=channel==='discord'?'отвязать Discord':'отключить уведомления сайта';
+ if(!confirm('Вы действительно хотите '+description+' для '+nick+'?'))return;
+ try{
+  const {error}=await sb.rpc('admin_revoke_member_channel',{target_member:memberId,channel});
+  if(error)throw error;
+  toast(channel==='discord'?'Discord отвязан':'Уведомления отключены');
+  await loadDiscordAdminList();
+  if(nick===db.profile.nick&&channel==='discord')loadDiscordLinkStatus();
+ }catch(e){console.error('adminRevokeMemberChannel',e);toast('Не удалось изменить привязку')}
 }
 
 async function loadDiscordLinkStatus(){
