@@ -502,7 +502,7 @@ function settingsPage(){
  const active=supported&&granted&&requested;
  $('#view').innerHTML='<div class="card fury-settings fury-simple-settings"><div class="toolbar"><div><h2>Настройки</h2><span class="muted">Уведомления и Discord</span></div></div>'+
  '<div class="settings-row fury-settings-main-row"><div><b>Уведомления</b><p class="muted fury-setting-description">Оповещения о рейдах, задачах, протекте, схронах и событиях отряда.</p><p class="muted fury-setting-status">Статус: '+(!supported?'не поддерживаются этим браузером':active?'включены':'выключены')+'</p></div><button class="ghost fury-setting-action fury-setting-action-'+(requested?'danger':'success')+'" type="button" onclick="togglePushPreference()"'+(!supported?' disabled':'')+'>'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div>'+
- '<div class="settings-row fury-settings-main-row"><div><b>Discord</b><p class="muted fury-setting-description">Привяжите аккаунт, чтобы получать личные сообщения от SCUM HUB в Discord.</p><p class="muted fury-setting-status" id="furyDiscordLinkStatus">Проверяем привязку…</p></div><button class="ghost fury-setting-action fury-setting-action-success" type="button" id="furyDiscordLinkButton" onclick="createDiscordLinkCode()">ПРИВЯЗАТЬ DISCORD</button></div>'+
+ '<div class="settings-row fury-settings-main-row"><div><b>Discord</b><p class="muted fury-setting-description">Привяжите аккаунт, чтобы получать личные сообщения от SCUM HUB в Discord.</p><p class="muted fury-setting-status" id="furyDiscordLinkStatus">Проверяем привязку…</p></div><button class="ghost fury-setting-action fury-setting-action-success" type="button" id="furyDiscordLinkButton" onclick="createDiscordLinkCode()" disabled style="visibility:hidden">ПРОВЕРЯЕМ…</button></div>'+
  (db.profile.access==='admin'?'<div class="fury-discord-admin"><b>Управление уведомлениями участников</b><p class="muted">Привязки Discord и уведомления сайта для всех участников отряда.</p><div id="furyDiscordAdminList" class="muted">Загрузка списка…</div></div>':'')+'</div>';
  loadDiscordLinkStatus();
  if(db.profile.access==='admin')loadDiscordAdminList();
@@ -541,14 +541,14 @@ async function adminRevokeMemberChannel(memberId,channel,encodedNick){
 async function loadDiscordLinkStatus(){
  const status=document.getElementById('furyDiscordLinkStatus');
  const button=document.getElementById('furyDiscordLinkButton');
- if(!status||!sb||!onlineMember){if(status)status.textContent='Discord не привязан';return}
+ if(!status||!sb||!onlineMember){if(status)status.textContent='Не удалось проверить привязку';return}
  try{
   const {data,error}=await sb.rpc('get_my_discord_settings');
   if(!status.isConnected)return;
   if(error)throw error;
   const linked=data?.linked===true;
   status.textContent=linked?'Discord привязан':'Discord не привязан';
-  if(button){button.textContent=linked?'ПРИВЯЗАТЬ ЗАНОВО':'ПРИВЯЗАТЬ DISCORD';button.classList.toggle('fury-setting-action-warning',linked);button.classList.toggle('fury-setting-action-success',!linked)}
+  if(button){button.textContent=linked?'ПРИВЯЗАТЬ ЗАНОВО':'ПРИВЯЗАТЬ DISCORD';button.classList.toggle('fury-setting-action-warning',linked);button.classList.toggle('fury-setting-action-success',!linked);button.disabled=false;button.style.visibility='visible'}
  }catch(e){console.error('loadDiscordLinkStatus',e);if(status.isConnected)status.textContent='Не удалось проверить привязку'}
 }
 
