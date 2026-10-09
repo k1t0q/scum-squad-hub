@@ -553,7 +553,10 @@ async function loadDiscordLinkStatus(){
 }
 
 async function togglePushPreference(){
+ const button=document.querySelector('.fury-settings-main-row .fury-setting-action');
+ const status=document.querySelector('.fury-settings-main-row .fury-setting-status');
  if(!('Notification' in window)||!('serviceWorker' in navigator)||!('PushManager' in window)||!window.isSecureContext){toast('Откройте установленный сайт на поддерживаемом устройстве');return}
+ if(button){button.disabled=true;button.setAttribute('aria-busy','true')}
  try{
   const reg=await navigator.serviceWorker.register('./sw.js');
   if(localStorage.getItem('fury_push_requested')==='yes'){
@@ -562,14 +565,24 @@ async function togglePushPreference(){
    localStorage.setItem('fury_push_requested','no');toast('Уведомления выключены');
   }else{
    const permission=await Notification.requestPermission();
-   if(permission!=='granted'){toast('Разрешение не предоставлено');settingsPage();return}
+   if(permission!=='granted'){toast('Разрешение не предоставлено');return}
    let sub=await reg.pushManager.getSubscription();
    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:furyPushKey(FURY_VAPID_PUBLIC)});
    await furyPushRequest({action:'subscribe',subscription:sub.toJSON(),preferences:Object.fromEntries(furyNoticeCategories.map(([k])=>[k,furyNoticeEnabled(k)]))});
    localStorage.setItem('fury_push_requested','yes');toast('Уведомления включены');
   }
  }catch(e){console.error(e);toast('Не удалось подключить: '+String(e.message||e).slice(0,70))}
- settingsPage();
+ finally{
+  const requested=localStorage.getItem('fury_push_requested')==='yes';
+  const active=requested&&Notification.permission==='granted';
+  if(status)status.textContent='Статус: '+(active?'включены':'выключены');
+  if(button){
+   button.textContent=requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ';
+   button.classList.toggle('fury-setting-action-danger',requested);
+   button.classList.toggle('fury-setting-action-success',!requested);
+   button.disabled=false;button.removeAttribute('aria-busy');
+  }
+ }
 }
 
 $('#pageTitle').textContent=page;nav();render();bootOnline();
