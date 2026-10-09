@@ -538,6 +538,21 @@ async function adminRevokeMemberChannel(memberId,channel,encodedNick){
  }catch(e){console.error('adminRevokeMemberChannel',e);toast('Не удалось изменить привязку')}
 }
 
+async function unlinkMyDiscord(){
+ if(!sb||!onlineMember)return toast('Сначала войди в аккаунт');
+ if(!confirm('Отвязать Discord от SCUM HUB? Уведомления в личные сообщения перестанут приходить.'))return;
+ const button=document.getElementById('furyDiscordLinkButton');
+ if(button)button.disabled=true;
+ try{
+  const {error}=await sb.rpc('unlink_my_discord');
+  if(error)throw error;
+  toast('Discord отвязан');
+  await loadDiscordLinkStatus();
+  if(db.profile.access==='admin')loadDiscordAdminList();
+ }catch(e){console.error('unlinkMyDiscord',e);toast('Не удалось отвязать Discord')}
+ finally{if(button&&button.isConnected)button.disabled=false}
+}
+
 async function loadDiscordLinkStatus(){
  const status=document.getElementById('furyDiscordLinkStatus');
  const button=document.getElementById('furyDiscordLinkButton');
@@ -548,7 +563,7 @@ async function loadDiscordLinkStatus(){
   if(error)throw error;
   const linked=data?.linked===true;
   status.textContent=linked?'Discord привязан':'Discord не привязан';
-  if(button){button.textContent=linked?'ПРИВЯЗАТЬ ЗАНОВО':'ПРИВЯЗАТЬ DISCORD';button.classList.toggle('fury-setting-action-warning',linked);button.classList.toggle('fury-setting-action-success',!linked);button.disabled=false;button.style.visibility='visible'}
+  if(button){button.textContent=linked?'ОТВЯЗАТЬ DISCORD':'ПРИВЯЗАТЬ DISCORD';button.setAttribute('onclick',linked?'unlinkMyDiscord()':'createDiscordLinkCode()');button.classList.toggle('fury-setting-action-danger',linked);button.classList.toggle('fury-setting-action-success',!linked);button.classList.remove('fury-setting-action-warning');button.disabled=false;button.style.visibility='visible'}
  }catch(e){console.error('loadDiscordLinkStatus',e);if(status.isConnected)status.textContent='Не удалось проверить привязку'}
 }
 
