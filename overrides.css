@@ -2641,3 +2641,33 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  .app>main,main{min-height:0!important;height:auto!important;padding-bottom:12px!important}
  #view{min-height:0!important;height:auto!important;padding-bottom:0!important}
 }
+
+/* v8.8: balanced mobile explosives number selectors and centered numeric dropdown. */
+@media(max-width:900px){
+ .explosiveedit .explosive-number-picker,
+ .ref-expl-edit .explosive-number-picker{
+  width:88px!important;min-width:88px!important;max-width:88px!important;
+  flex:0 0 88px!important;
+ }
+ .explosiveedit .explosive-number-picker .fury-select-trigger,
+ .ref-expl-edit .explosive-number-picker .fury-select-trigger{
+  width:88px!important;min-width:88px!important;max-width:88px!important;
+  padding:0 24px 0 8px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  text-align:center!important;box-sizing:border-box!important;
+ }
+ .explosiveedit .explosive-number-picker .fury-select-trigger span,
+ .ref-expl-edit .explosive-number-picker .fury-select-trigger span{
+  flex:1!important;text-align:center!important;
+ }
+ .explosiveedit .explosive-number-picker .fury-select-trigger i,
+ .ref-expl-edit .explosive-number-picker .fury-select-trigger i{right:10px!important}
+ .explosive-number-picker .fury-select-menu,
+ .explosive-number-picker .fury-select-option{text-align:center!important}
+ body>.fury-select-menu.fury-select-portal:has(.fury-select-option){
+  text-align:center!important;
+ }
+ body>.fury-select-menu.fury-select-portal .fury-select-option{
+  text-align:center!important;padding-left:6px!important;padding-right:6px!important;
+ }
+}
