@@ -61,6 +61,10 @@ function squadMapPage(){
   mapSharedRefreshTimer=setInterval(()=>{if(page==='Карта')refreshSharedMapMarkers();else{clearInterval(mapSharedRefreshTimer);mapSharedRefreshTimer=null}},5000);
   $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261013stashlinked" style="display:block;width:100%;height:calc(100dvh - 220px);min-height:540px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen id="squadMapFrame" onload="initMapFrame()"></iframe></div>';
 }
+function stashMapTitle(p){
+ const first=String(p.comment||'').split(/\r?\n/).map(x=>x.trim()).find(Boolean);
+ return (first||'Схрон '+(p.author_nick||'отряда')).slice(0,70);
+}
 let pendingStashMap=null;
 function stashMapOpen(id,pick=false){pendingStashMap={id:String(id),pick};go('Карта')}
 let mapHelloTimer=null;
@@ -94,7 +98,7 @@ async function refreshSharedMapMarkers(){
    const p=byId.get(String(m.id).slice(11));
    const checked=new Date(p.stash_checked_at||p.created_at).getTime();
    const left=Math.max(0,Math.ceil((checked+14*86400000-Date.now())/86400000));
-   return {...m,name:'Схрон #'+p.id,stashOwner:p.author_nick||'Участник',stashDays:left,stashCheckedBy:p.stash_checked_by_nick||p.author_nick||'Участник',color:left===0?'#888888':left<=1?'#e05252':left<=5?'#e5aa30':'#34a853'};
+   return {...m,name:stashMapTitle(p),stashOwner:p.author_nick||'Участник',stashDays:left,stashCheckedBy:p.stash_checked_by_nick||p.author_nick||'Участник',color:left===0?'#888888':left<=1?'#e05252':left<=5?'#e5aa30':'#34a853'};
   });
   frame.contentWindow?.postMessage({kind:'scumMapSharedMarkers',markers},'https://k1t0q.github.io');
  }catch(e){console.error('Shared markers fetch',e)}
@@ -116,7 +120,7 @@ window.addEventListener('message',async e=>{
    if(pe)throw pe;
    const p=(posts||[]).find(p=>String(p.id)===id);
    if(!p)throw Error('Схрон не найден');
-   const marker={id:'stash-post-'+id,x,y,type:'stash',icon:'📦',color:'#45bf73',size:30,showLabel:true,name:'Схрон #'+id,note:'',stashPostId:id,updatedAt:Date.now()};
+   const marker={id:'stash-post-'+id,x,y,type:'stash',icon:'📦',color:'#45bf73',size:30,showLabel:true,name:stashMapTitle(p),note:'',stashPostId:id,updatedAt:Date.now()};
    const {error}=await sb.rpc('squad_map_sync',{p_action:'save',p_marker:marker});
    if(error)throw error;
    toast('Положение схрона сохранено');
