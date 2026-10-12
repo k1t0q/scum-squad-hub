@@ -57,9 +57,53 @@ function render(){if(page==='Сегодня')page='Главная'; headerProtec
 
 // SCUM MAP embedded as a section of the authenticated SCUM HUB interface.
 function squadMapPage(){
-  $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261012tedaspost" style="display:block;width:100%;height:calc(100dvh - 220px);min-height:540px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen id="squadMapFrame" onload="syncMapBasePublications()"></iframe></div>';
+  $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261012sharedmarkers" style="display:block;width:100%;height:calc(100dvh - 220px);min-height:540px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen id="squadMapFrame" onload="syncMapBasePublications()"></iframe></div>';
 }
+let mapSharedRefreshTimer=null;
+let mapSharedBusy=false;
+let mapSharedReady=false;
+async function refreshSharedMapMarkers(){
+ const frame=document.getElementById('squadMapFrame');
+ if(!frame||!sb||!onlineMember||mapSharedBusy)return;
+ mapSharedBusy=true;
+ try{
+  const {data,error}=await sb.rpc('squad_map_sync',{p_action:'list'});
+  if(error)throw error;
+  frame.contentWindow?.postMessage({kind:'scumMapSharedMarkers',markers:data||[]},'https://k1t0q.github.io');
+ }catch(e){console.error('Shared markers fetch',e)}
+ finally{mapSharedBusy=false}
+}
+window.addEventListener('message',async e=>{
+ if(e.origin!=='https://k1t0q.github.io'||e.source!==document.getElementById('squadMapFrame')?.contentWindow)return;
+ const msg=e.data||{};
+ if(msg.kind==='scumMapReady'){
+  mapSharedReady=true;
+  await refreshSharedMapMarkers();
+  // Import any previously saved local markers only once per marker ID.
+  if(Array.isArray(msg.localMarkers)&&msg.localMarkers.length){
+   try{
+    const {data,error}=await sb.rpc('squad_map_sync',{p_action:'list'});
+    if(error)throw error;
+    const existing=new Set((data||[]).map(m=>m.id));
+    for(const marker of msg.localMarkers){
+     if(!marker?.id||existing.has(marker.id))continue;
+     const result=await sb.rpc('squad_map_sync',{p_action:'save',p_marker:marker});
+     if(!result.error)existing.add(marker.id);
+    }
+    await refreshSharedMapMarkers();
+   }catch(err){console.error('Map import',err)}
+  }
+ }else if(msg.kind==='scumMapMarkerAction'&&onlineMember&&sb){
+  try{
+   const params=msg.action==='save'?{p_action:'save',p_marker:msg.marker}:{p_action:'delete',p_id:msg.id};
+   const {error}=await sb.rpc('squad_map_sync',params);
+   if(error)throw error;
+   await refreshSharedMapMarkers();
+  }catch(err){console.error('Marker sync',err);toast('Не удалось сохранить метку на сервере');await refreshSharedMapMarkers()}
+ }
+});
 async function syncMapBasePublications(){
+ refreshSharedMapMarkers();
  const frame=document.getElementById('squadMapFrame');
  if(!frame||!sb||!onlineMember)return;
  try{
