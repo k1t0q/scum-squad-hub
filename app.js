@@ -61,6 +61,8 @@ function squadMapPage(){
   mapSharedRefreshTimer=setInterval(()=>{if(page==='Карта')refreshSharedMapMarkers();else{clearInterval(mapSharedRefreshTimer);mapSharedRefreshTimer=null}},5000);
   $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261012htmlrepaired" style="display:block;width:100%;height:calc(100dvh - 220px);min-height:540px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen id="squadMapFrame" onload="initMapFrame()"></iframe></div>';
 }
+let pendingStashMap=null;
+function stashMapOpen(id,pick=false){pendingStashMap={id:String(id),pick};go('Карта')}
 let mapHelloTimer=null;
 function initMapFrame(){
  mapSharedReady=false;
@@ -84,13 +86,41 @@ async function refreshSharedMapMarkers(){
  try{
   const {data,error}=await sb.rpc('squad_map_sync',{p_action:'list'});
   if(error)throw error;
-  frame.contentWindow?.postMessage({kind:'scumMapSharedMarkers',markers:Array.isArray(data)?data:[]},'https://k1t0q.github.io');
+  const {data:posts,error:postError}=await sb.rpc('get_squad_place_posts',{p_kind:'stash'});
+  if(postError)throw postError;
+  const byId=new Map((posts||[]).map(p=>[String(p.id),p]));
+  const markers=(Array.isArray(data)?data:[]).filter(m=>!String(m.id).startsWith('stash-post-')||byId.has(String(m.id).slice(11))).map(m=>{
+   if(!String(m.id).startsWith('stash-post-'))return m;
+   const p=byId.get(String(m.id).slice(11));
+   const checked=new Date(p.stash_checked_at||p.created_at).getTime();
+   const left=Math.max(0,Math.ceil((checked+14*86400000-Date.now())/86400000));
+   return {...m,name:'Схрон #'+p.id,stashOwner:p.author_nick||'Участник',stashDays:left,stashCheckedBy:p.stash_checked_by_nick||p.author_nick||'Участник',color:left===0?'#888888':left<=1?'#e05252':left<=5?'#e5aa30':'#34a853'};
+  });
+  frame.contentWindow?.postMessage({kind:'scumMapSharedMarkers',markers},'https://k1t0q.github.io');
  }catch(e){console.error('Shared markers fetch',e)}
  finally{mapSharedBusy=false}
 }
 window.addEventListener('message',async e=>{
  if(e.origin!=='https://k1t0q.github.io'||e.source!==document.getElementById('squadMapFrame')?.contentWindow)return;
  const msg=e.data||{};
+ if(msg.kind==='scumStashPicked'&&onlineMember&&sb){
+  try{
+   const id=String(msg.id||'');
+   const x=Number(msg.x),y=Number(msg.y);
+   if(!/^\\d+$/.test(id)||!Number.isFinite(x)||!Number.isFinite(y)||x<0||x>1||y<0||y>1)throw Error('Некорректная точка');
+   const {data:posts,error:pe}=await sb.rpc('get_squad_place_posts',{p_kind:'stash'});
+   if(pe)throw pe;
+   const p=(posts||[]).find(p=>String(p.id)===id);
+   if(!p)throw Error('Схрон не найден');
+   const marker={id:'stash-post-'+id,x,y,type:'stash',icon:'📦',color:'#45bf73',size:30,showLabel:true,name:'Схрон #'+id,note:'',stashPostId:id,updatedAt:Date.now()};
+   const {error}=await sb.rpc('squad_map_sync',{p_action:'save',p_marker:marker});
+   if(error)throw error;
+   toast('Положение схрона сохранено');
+   await refreshSharedMapMarkers();
+   e.source?.postMessage({kind:'scumStashFocus',id},e.origin);
+  }catch(err){console.error('Stash position',err);toast('Не удалось сохранить точку схрона')}
+  return;
+ }
  if(msg.kind==='scumMapCreatePost'){
   let ok=false,errorText='';
   try{
@@ -120,6 +150,7 @@ window.addEventListener('message',async e=>{
   if(mapHelloTimer){clearInterval(mapHelloTimer);mapHelloTimer=null;}
   syncMapBasePublications();
   await refreshSharedMapMarkers();
+  if(pendingStashMap){e.source.postMessage({kind:pendingStashMap.pick?'scumStashPick':'scumStashFocus',id:pendingStashMap.id},e.origin);pendingStashMap=null;}
   // Import any previously saved local markers only once per marker ID.
   if(Array.isArray(msg.localMarkers)&&msg.localMarkers.length){
    try{
@@ -385,7 +416,7 @@ async function placePage(kind){
  try{let r=await Promise.race([sb.rpc('get_squad_place_posts',{p_kind:kind}),new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),8000))]);data=r.data;error=r.error}catch(e){error=e}
  if(error){console.error('placePage',kind,error);if(body)body.innerHTML='<div class="empty">Ошибка загрузки: '+esc(error.message||String(error))+'<br><button class="ghost" style="margin-top:12px" onclick="placePage(\''+kind+'\')">Повторить</button></div>';return}
  let d=placeDraft[kind]||{images:[],comment:''};
- $('#placeBody').innerHTML='<div class="place-compose"><div class="raidphotos placephotos">'+d.images.map((u,i)=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"><button class="place-photo-remove" onclick="removeDraftPlacePhoto(\''+kind+'\','+i+')">×</button></div>').join('')+'</div><div class="ref-feed-compose-row"><textarea id="placeComment" class="place-comment" placeholder="Напишите...">'+esc(d.comment||'')+'</textarea><button class="primary ref-feed-send" onclick="publishPlacePost(\''+kind+'\')">Отправить</button></div><div class="ref-feed-attach-row"><label class="ref-feed-attach"><span class="attach-full">Прикрепить фото</span><span class="attach-mobile">Прикрепить</span><input id="placePhotoFile" type="file" accept="image/*" multiple></label><span class="muted">Ctrl+V — вставить скриншот из буфера · либо выбрать файлы. Максимум 5 фото.</span></div></div><div class="list ref-feed-list place-feed-list">'+((data||[]).length?(data||[]).map(p=>'<div class="item ref-feed-post"><div class="itemtop"><div><b>'+esc(p.author_nick||'Участник')+'</b><span class="ref-feed-date">'+new Date(p.created_at).toLocaleString('ru-RU',{timeZone:'Europe/Moscow'})+'</span></div>'+((p.created_by===onlineMember.id||onlineMember.access_role==='admin'||db.profile?.access==='admin')?'<div class="ref-post-menu"><button class="ref-post-dots" onclick="togglePlacePostMenu('+p.id+',event)">•••</button><div class="ref-post-menu-pop" id="placePostMenu'+p.id+'"><button onclick="editPlacePost('+p.id+',\''+kind+'\')">Редактировать</button><button class="danger" onclick="deletePlacePost('+p.id+',\''+kind+'\')">Удалить публикацию</button></div></div>':'')+'</div>'+(p.comment?'<div class="ref-feed-comment">'+esc(p.comment)+'</div>':'')+'<div class="raidphotos placephotos">'+(p.images||[]).map(u=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"></div>').join('')+'</div>'+(kind==='stash'?stashLifeHtml(p):'')+'</div>').join(''):'<div class="empty">Публикаций пока нет</div>')+'</div>';
+ $('#placeBody').innerHTML='<div class="place-compose"><div class="raidphotos placephotos">'+d.images.map((u,i)=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"><button class="place-photo-remove" onclick="removeDraftPlacePhoto(\''+kind+'\','+i+')">×</button></div>').join('')+'</div><div class="ref-feed-compose-row"><textarea id="placeComment" class="place-comment" placeholder="Напишите...">'+esc(d.comment||'')+'</textarea><button class="primary ref-feed-send" onclick="publishPlacePost(\''+kind+'\')">Отправить</button></div><div class="ref-feed-attach-row"><label class="ref-feed-attach"><span class="attach-full">Прикрепить фото</span><span class="attach-mobile">Прикрепить</span><input id="placePhotoFile" type="file" accept="image/*" multiple></label><span class="muted">Ctrl+V — вставить скриншот из буфера · либо выбрать файлы. Максимум 5 фото.</span></div></div><div class="list ref-feed-list place-feed-list">'+((data||[]).length?(data||[]).map(p=>'<div class="item ref-feed-post"><div class="itemtop"><div><b>'+esc(p.author_nick||'Участник')+'</b><span class="ref-feed-date">'+new Date(p.created_at).toLocaleString('ru-RU',{timeZone:'Europe/Moscow'})+'</span></div>'+((p.created_by===onlineMember.id||onlineMember.access_role==='admin'||db.profile?.access==='admin')?'<div class="ref-post-menu"><button class="ref-post-dots" onclick="togglePlacePostMenu('+p.id+',event)">•••</button><div class="ref-post-menu-pop" id="placePostMenu'+p.id+'"><button onclick="editPlacePost('+p.id+',\''+kind+'\')">Редактировать</button><button class="danger" onclick="deletePlacePost('+p.id+',\''+kind+'\')">Удалить публикацию</button></div></div>':'')+'</div>'+(p.comment?'<div class="ref-feed-comment">'+esc(p.comment)+'</div>':'')+'<div class="raidphotos placephotos">'+(p.images||[]).map(u=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"></div>').join('')+'</div>'+(kind==='stash'?stashLifeHtml(p)+'<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="stashMapOpen('+p.id+',false)">Показать на карте</button><button class="ghost" onclick="stashMapOpen('+p.id+',true)">Указать на карте</button></div>':'')+'</div>').join(''):'<div class="empty">Публикаций пока нет</div>')+'</div>';
  $('#placePhotoFile')?.addEventListener('change',e=>uploadPlaceFiles(kind,[...e.target.files]));
  $('#placeComment')?.addEventListener('input',e=>{placeDraft[kind]=placeDraft[kind]||{images:[],comment:''};placeDraft[kind].comment=e.target.value});
 }
@@ -398,7 +429,7 @@ function openPlaceEditModal(){let p=placeEdit;if(!p)return;modal('<h2>Редак
 function removePlaceEditPhoto(i){if(!placeEdit)return;placeEdit.comment=$('#placeEditComment')?.value??placeEdit.comment;placeEdit.images.splice(i,1);openPlaceEditModal()}
 async function uploadPlaceEditFiles(files){if(!placeEdit)return;placeEdit.comment=$('#placeEditComment')?.value??placeEdit.comment;files=[...(files||[])].filter(f=>f?.type?.startsWith('image/')).slice(0,5-placeEdit.images.length);for(let file of files){if(file.size>10*1024*1024){toast('Фото больше 10 МБ пропущено');continue}let ext=(file.name?.split('.').pop()||file.type.split('/')[1]||'png').replace(/[^a-zA-Z0-9]/g,'').toLowerCase(),path=onlineMember.squad_id+'/'+placeEdit.kind+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;let up=await sb.storage.from('squad-photos').upload(path,file,{contentType:file.type,upsert:false});if(up.error){toast('Не удалось загрузить фото');continue}placeEdit.images.push(sb.storage.from('squad-photos').getPublicUrl(path).data.publicUrl)}openPlaceEditModal()}
 async function savePlaceEdit(){if(!placeEdit)return;placeEdit.comment=$('#placeEditComment')?.value.trim()||'';let {error}=await sb.from('squad_place_posts').update({images:placeEdit.images.slice(0,5),comment:placeEdit.comment}).eq('id',placeEdit.id);if(error){toast('Не удалось сохранить');return}let kind=placeEdit.kind;placeEdit=null;closeModal();toast('Публикация обновлена');refreshPlaceKind(kind)}
-async function deletePlacePost(id,kind){if(!confirm('Удалить публикацию?'))return;let {error}=await sb.from('squad_place_posts').delete().eq('id',id);if(error){toast('Не удалось удалить');return}refreshPlaceKind(kind)}
+async function deletePlacePost(id,kind){if(!confirm('Удалить публикацию?'))return;let {error}=await sb.from('squad_place_posts').delete().eq('id',id);if(error){toast('Не удалось удалить');return}if(kind==='stash'){const r=await sb.rpc('squad_map_sync',{p_action:'delete',p_id:'stash-post-'+id});if(r.error)console.warn('Stash map cleanup',r.error)}refreshPlaceKind(kind)}
 function authScreen(){modal('<h2>Вход в FURY</h2><div id="authForm"></div>','fury-role-dialog');showMemberLogin()}
 function showMemberLogin(){let a=$('#authForm');if(!a)return;a.innerHTML='<form class="form" onsubmit="doJoin(event)"><input name="code" required placeholder="Код состава"><input name="nick" required value="" autocomplete="off" placeholder="Ник">'+furySelectPicker('role',['Rifler','Bomber','Locker','Builder','Helper','Sniper'],'','Выбрать роль')+'<button class="primary">ВОЙТИ В СОСТАВ</button></form>'}
 function showAdminLogin(){let a=$('#authForm');if(!a)return;$('#adminTab')?.classList.add('on');$('#memberTab')?.classList.remove('on');a.innerHTML='<form class="form" onsubmit="adminLogin(event)"><input name="email" type="email" required autocomplete="username" placeholder="E-mail"><input name="password" type="password" required minlength="6" autocomplete="current-password" placeholder="Пароль"><button class="primary">ВОЙТИ КАК АДМИН</button><button type="button" class="ghost" onclick="adminSignup(event)">ПЕРВЫЙ ВХОД / СОЗДАТЬ ПАРОЛЬ</button><div id="adminAuthStatus" class="muted" style="min-height:18px"></div></form><small class="muted">При первом входе создай пароль. После этого используй обычный вход администратора.</small>'}
