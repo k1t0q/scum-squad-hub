@@ -103,11 +103,15 @@ async function refreshSharedMapMarkers(){
 window.addEventListener('message',async e=>{
  if(e.origin!=='https://k1t0q.github.io'||e.source!==document.getElementById('squadMapFrame')?.contentWindow)return;
  const msg=e.data||{};
+ if(msg.kind==='scumStashOpen'&&onlineMember){
+   go('Схрон');
+   return;
+ }
  if(msg.kind==='scumStashPicked'&&onlineMember&&sb){
   try{
    const id=String(msg.id||'');
    const x=Number(msg.x),y=Number(msg.y);
-   if(!/^\\d+$/.test(id)||!Number.isFinite(x)||!Number.isFinite(y)||x<0||x>1||y<0||y>1)throw Error('Некорректная точка');
+   if(!/^\d+$/.test(id)||!Number.isFinite(x)||!Number.isFinite(y)||x<0||x>1||y<0||y>1)throw Error('Некорректная точка');
    const {data:posts,error:pe}=await sb.rpc('get_squad_place_posts',{p_kind:'stash'});
    if(pe)throw pe;
    const p=(posts||[]).find(p=>String(p.id)===id);
