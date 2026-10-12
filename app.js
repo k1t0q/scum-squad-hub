@@ -59,11 +59,20 @@ function render(){if(page==='Сегодня')page='Главная'; headerProtec
 function squadMapPage(){
   if(mapSharedRefreshTimer)clearInterval(mapSharedRefreshTimer);
   mapSharedRefreshTimer=setInterval(()=>{if(page==='Карта')refreshSharedMapMarkers();else{clearInterval(mapSharedRefreshTimer);mapSharedRefreshTimer=null}},5000);
-  $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261012layerosync" style="display:block;width:100%;height:calc(100dvh - 220px);min-height:540px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen id="squadMapFrame" onload="initMapFrame()"></iframe></div>';
+  $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261012layeroretry" style="display:block;width:100%;height:calc(100dvh - 220px);min-height:540px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen id="squadMapFrame" onload="initMapFrame()"></iframe></div>';
 }
+let mapHelloTimer=null;
 function initMapFrame(){
- const frame=document.getElementById('squadMapFrame');
- frame?.contentWindow?.postMessage({kind:'scumMapParentHello'},'https://k1t0q.github.io');
+ mapSharedReady=false;
+ if(mapHelloTimer)clearInterval(mapHelloTimer);
+ let attempts=0;
+ const hello=()=>{
+  const frame=document.getElementById('squadMapFrame');
+  if(!frame||page!=='Карта'||mapSharedReady||attempts++>=25){clearInterval(mapHelloTimer);mapHelloTimer=null;return}
+  frame.contentWindow?.postMessage({kind:'scumMapParentHello'},'https://k1t0q.github.io');
+ };
+ hello();
+ mapHelloTimer=setInterval(hello,800);
 }
 let mapSharedRefreshTimer=null;
 let mapSharedBusy=false;
@@ -108,6 +117,7 @@ window.addEventListener('message',async e=>{
  }
  if(msg.kind==='scumMapReady'){
   mapSharedReady=true;
+  if(mapHelloTimer){clearInterval(mapHelloTimer);mapHelloTimer=null;}
   syncMapBasePublications();
   await refreshSharedMapMarkers();
   // Import any previously saved local markers only once per marker ID.
