@@ -59,7 +59,7 @@ function render(){if(page==='Сегодня')page='Главная'; headerProtec
 function squadMapPage(){
   if(mapSharedRefreshTimer)clearInterval(mapSharedRefreshTimer);
   mapSharedRefreshTimer=setInterval(()=>{if(page==='Карта')refreshSharedMapMarkers();else{clearInterval(mapSharedRefreshTimer);mapSharedRefreshTimer=null}},5000);
-  $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261012narrowpanel" style="display:block;width:100%;height:calc(100dvh - 220px);min-height:540px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen id="squadMapFrame" onload="syncMapBasePublications()"></iframe></div>';
+  $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261012simplifycontrols" style="display:block;width:100%;height:calc(100dvh - 220px);min-height:540px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen id="squadMapFrame" onload="syncMapBasePublications()"></iframe></div>';
 }
 let mapSharedRefreshTimer=null;
 let mapSharedBusy=false;
