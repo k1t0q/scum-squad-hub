@@ -65,6 +65,18 @@ function stashMapTitle(p){
  const first=String(p.comment||'').split(/\r?\n/).map(x=>x.trim()).find(Boolean);
  return (first||'Схрон '+(p.author_nick||'отряда')).slice(0,70);
 }
+const STASH_XL=619646.8573,STASH_XR=-905369.0266,STASH_YT=619659.7258,STASH_YB=-904357.527;
+function stashCoords(text){
+ const t=String(text||'').replace(/,/g,'.');
+ const x=t.match(/\bX\s*[:=]\s*(-?\d+(?:\.\d+)?)/i),y=t.match(/\bY\s*[:=]\s*(-?\d+(?:\.\d+)?)/i);
+ if(!x||!y)return null;
+ const nx=(STASH_XL-Number(x[1]))/(STASH_XL-STASH_XR),ny=(STASH_YT-Number(y[1]))/(STASH_YT-STASH_YB);
+ return Number.isFinite(nx)&&Number.isFinite(ny)&&nx>=0&&nx<=1&&ny>=0&&ny<=1?{x:nx,y:ny}:null;
+}
+function stashCommentWithCoords(comment,coords){
+ const cleaned=String(comment||'').replace(/\n?Координаты:\s*X\s*[:=][^\n]*/gi,'').trim();
+ return coords?.trim()?cleaned+'\nКоординаты: '+coords.trim():cleaned;
+}
 let pendingStashMap=null;
 function stashMapOpen(id,pick=false){pendingStashMap={id:String(id),pick};go('Карта')}
 let mapHelloTimer=null;
@@ -93,12 +105,19 @@ async function refreshSharedMapMarkers(){
   const {data:posts,error:postError}=await sb.rpc('get_squad_place_posts',{p_kind:'stash'});
   if(postError)throw postError;
   const byId=new Map((posts||[]).map(p=>[String(p.id),p]));
-  const markers=(Array.isArray(data)?data:[]).filter(m=>!String(m.id).startsWith('stash-post-')||byId.has(String(m.id).slice(11))).map(m=>{
+  const rawMarkers=(Array.isArray(data)?data:[]).filter(m=>!String(m.id).startsWith('stash-post-')||byId.has(String(m.id).slice(11)));
+  for(const p of posts||[]){
+   const id='stash-post-'+p.id;
+   if(rawMarkers.some(m=>String(m.id)===id))continue;
+   const pos=stashCoords(p.comment);
+   if(pos)rawMarkers.push({id,...pos,type:'stash',icon:'📦',size:30,showLabel:true});
+  }
+  const markers=rawMarkers.map(m=>{
    if(!String(m.id).startsWith('stash-post-'))return m;
    const p=byId.get(String(m.id).slice(11));
    const checked=new Date(p.stash_checked_at||p.created_at).getTime();
    const left=Math.max(0,Math.ceil((checked+14*86400000-Date.now())/86400000));
-   return {...m,name:stashMapTitle(p),stashOwner:p.author_nick||'Участник',stashDays:left,stashCheckedBy:p.stash_checked_by_nick||p.author_nick||'Участник',color:left===0?'#888888':left<=1?'#e05252':left<=5?'#e5aa30':'#34a853'};
+   return {...m,name:stashMapTitle(p),stashOwner:p.author_nick||'Участник',stashDays:left,stashCheckedBy:p.stash_checked_by_nick||p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:left===0?'#888888':left<=1?'#e05252':left<=5?'#e5aa30':'#34a853'};
   });
   frame.contentWindow?.postMessage({kind:'scumMapSharedMarkers',markers},'https://k1t0q.github.io');
  }catch(e){console.error('Shared markers fetch',e)}
@@ -424,13 +443,23 @@ async function placePage(kind){
  try{let r=await Promise.race([sb.rpc('get_squad_place_posts',{p_kind:kind}),new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),8000))]);data=r.data;error=r.error}catch(e){error=e}
  if(error){console.error('placePage',kind,error);if(body)body.innerHTML='<div class="empty">Ошибка загрузки: '+esc(error.message||String(error))+'<br><button class="ghost" style="margin-top:12px" onclick="placePage(\''+kind+'\')">Повторить</button></div>';return}
  let d=placeDraft[kind]||{images:[],comment:''};
- $('#placeBody').innerHTML='<div class="place-compose"><div class="raidphotos placephotos">'+d.images.map((u,i)=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"><button class="place-photo-remove" onclick="removeDraftPlacePhoto(\''+kind+'\','+i+')">×</button></div>').join('')+'</div><div class="ref-feed-compose-row"><textarea id="placeComment" class="place-comment" placeholder="Напишите...">'+esc(d.comment||'')+'</textarea><button class="primary ref-feed-send" onclick="publishPlacePost(\''+kind+'\')">Отправить</button></div><div class="ref-feed-attach-row"><label class="ref-feed-attach"><span class="attach-full">Прикрепить фото</span><span class="attach-mobile">Прикрепить</span><input id="placePhotoFile" type="file" accept="image/*" multiple></label><span class="muted">Ctrl+V — вставить скриншот из буфера · либо выбрать файлы. Максимум 5 фото.</span></div></div><div class="list ref-feed-list place-feed-list">'+((data||[]).length?(data||[]).map(p=>'<div class="item ref-feed-post"><div class="itemtop"><div><b>'+esc(p.author_nick||'Участник')+'</b><span class="ref-feed-date">'+new Date(p.created_at).toLocaleString('ru-RU',{timeZone:'Europe/Moscow'})+'</span></div>'+((p.created_by===onlineMember.id||onlineMember.access_role==='admin'||db.profile?.access==='admin')?'<div class="ref-post-menu"><button class="ref-post-dots" onclick="togglePlacePostMenu('+p.id+',event)">•••</button><div class="ref-post-menu-pop" id="placePostMenu'+p.id+'"><button onclick="editPlacePost('+p.id+',\''+kind+'\')">Редактировать</button><button class="danger" onclick="deletePlacePost('+p.id+',\''+kind+'\')">Удалить публикацию</button></div></div>':'')+'</div>'+(p.comment?'<div class="ref-feed-comment">'+esc(p.comment)+'</div>':'')+'<div class="raidphotos placephotos">'+(p.images||[]).map(u=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"></div>').join('')+'</div>'+(kind==='stash'?stashLifeHtml(p)+'<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="stashMapOpen('+p.id+',false)">Показать на карте</button><button class="ghost" onclick="stashMapOpen('+p.id+',true)">Указать на карте</button></div>':'')+'</div>').join(''):'<div class="empty">Публикаций пока нет</div>')+'</div>';
+ $('#placeBody').innerHTML='<div class="place-compose"><div class="raidphotos placephotos">'+d.images.map((u,i)=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"><button class="place-photo-remove" onclick="removeDraftPlacePhoto(\''+kind+'\','+i+')">×</button></div>').join('')+'</div><div class="ref-feed-compose-row"><textarea id="placeComment" class="place-comment" placeholder="Напишите...">'+esc(d.comment||'')+'</textarea><button class="primary ref-feed-send" onclick="publishPlacePost(\''+kind+'\')">Отправить</button></div>+(kind==='stash'?'<input id="stashCoordsInput" placeholder="Координаты: X=123456 Y=-234567 Z=0" value="'+esc(d.coords||'')+'" style="width:100%;margin:8px 0 0;padding:10px;border:1px solid #35453f;border-radius:7px;background:#0b1512;color:#fff">':'')+<div class="ref-feed-attach-row"><label class="ref-feed-attach"><span class="attach-full">Прикрепить фото</span><span class="attach-mobile">Прикрепить</span><input id="placePhotoFile" type="file" accept="image/*" multiple></label><span class="muted">Ctrl+V — вставить скриншот из буфера · либо выбрать файлы. Максимум 5 фото.</span></div></div><div class="list ref-feed-list place-feed-list">'+((data||[]).length?(data||[]).map(p=>'<div class="item ref-feed-post"><div class="itemtop"><div><b>'+esc(p.author_nick||'Участник')+'</b><span class="ref-feed-date">'+new Date(p.created_at).toLocaleString('ru-RU',{timeZone:'Europe/Moscow'})+'</span></div>'+((p.created_by===onlineMember.id||onlineMember.access_role==='admin'||db.profile?.access==='admin')?'<div class="ref-post-menu"><button class="ref-post-dots" onclick="togglePlacePostMenu('+p.id+',event)">•••</button><div class="ref-post-menu-pop" id="placePostMenu'+p.id+'"><button onclick="editPlacePost('+p.id+',\''+kind+'\')">Редактировать</button><button class="danger" onclick="deletePlacePost('+p.id+',\''+kind+'\')">Удалить публикацию</button></div></div>':'')+'</div>'+(p.comment?'<div class="ref-feed-comment">'+esc(p.comment)+'</div>':'')+'<div class="raidphotos placephotos">'+(p.images||[]).map(u=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"></div>').join('')+'</div>'+(kind==='stash'?stashLifeHtml(p)+'<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="stashMapOpen('+p.id+',false)">Показать на карте</button><button class="ghost" onclick="stashMapOpen('+p.id+',true)">Указать на карте</button></div>':'')+'</div>').join(''):'<div class="empty">Публикаций пока нет</div>')+'</div>';
  $('#placePhotoFile')?.addEventListener('change',e=>uploadPlaceFiles(kind,[...e.target.files]));
+ $('#stashCoordsInput')?.addEventListener('input',e=>{placeDraft.stash.coords=e.target.value});
  $('#placeComment')?.addEventListener('input',e=>{placeDraft[kind]=placeDraft[kind]||{images:[],comment:''};placeDraft[kind].comment=e.target.value});
 }
 async function uploadPlaceFiles(kind,files){let commentEl=$('#placeComment');if(commentEl){placeDraft[kind]=placeDraft[kind]||{images:[],comment:''};placeDraft[kind].comment=commentEl.value}files=[...(files||[])].filter(f=>f&&f.type&&f.type.startsWith('image/'));if(!files.length){toast('В буфере нет изображения');return}let d=placeDraft[kind]||{images:[],comment:''},slots=5-d.images.length;if(slots<=0){toast('Максимум 5 фото');return}for(let file of files.slice(0,slots)){if(file.size>10*1024*1024){toast('Фото больше 10 МБ пропущено');continue}let ext=(file.name?.split('.').pop()||file.type.split('/')[1]||'png').replace(/[^a-zA-Z0-9]/g,'').toLowerCase(),path=onlineMember.squad_id+'/'+kind+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;let up=await sb.storage.from('squad-photos').upload(path,file,{contentType:file.type,upsert:false});if(up.error){toast('Не удалось загрузить фото');continue}d.images.push(sb.storage.from('squad-photos').getPublicUrl(path).data.publicUrl)}placeDraft[kind]=d;refreshPlaceKind(kind)}
 function removeDraftPlacePhoto(kind,i){let commentEl=$('#placeComment');if(commentEl){placeDraft[kind]=placeDraft[kind]||{images:[],comment:''};placeDraft[kind].comment=commentEl.value}let d=placeDraft[kind];if(!d)return;d.images.splice(i,1);refreshPlaceKind(kind)}
-async function publishPlacePost(kind){let d=placeDraft[kind]||{images:[]},comment=$('#placeComment')?.value.trim()||'';if(!d.images.length&&!comment){toast('Добавь фото или комментарий');return}let {error}=await sb.from('squad_place_posts').insert({squad_id:onlineMember.squad_id,kind,images:d.images.slice(0,5),comment,created_by:onlineMember.id});if(error){toast('Не удалось опубликовать');return}placeDraft[kind]={images:[],comment:''};toast('Опубликовано');refreshPlaceKind(kind)}
+async function publishPlacePost(kind){
+ let d=placeDraft[kind]||{images:[]},comment=$('#placeComment')?.value.trim()||'';
+ const coords=kind==='stash'?String($('#stashCoordsInput')?.value||'').trim():'';
+ if(coords&&!stashCoords(coords)){toast('Неверные координаты: укажи X=... Y=... в пределах карты');return}
+ if(kind==='stash'&&coords)comment=stashCommentWithCoords(comment,coords);
+ if(!d.images.length&&!comment){toast('Добавь фото или комментарий');return}
+ const {error}=await sb.from('squad_place_posts').insert({squad_id:onlineMember.squad_id,kind,images:d.images.slice(0,5),comment,created_by:onlineMember.id});
+ if(error){toast('Не удалось опубликовать');return}
+ placeDraft[kind]={images:[],comment:'',coords:''};toast('Опубликовано');refreshPlaceKind(kind);
+}
 async function editPlacePost(id,kind){document.querySelectorAll('.ref-post-menu-pop.open').forEach(x=>x.classList.remove('open'));let {data:p,error}=await sb.from('squad_place_posts').select('*').eq('id',id).single();if(error||!p){toast('Редактирование недоступно');return}placeEdit={id:p.id,kind,images:[...(p.images||[])],comment:p.comment||''};openPlaceEditModal()}
 function cancelPlaceEdit(){placeEdit=null;closeModal()}
 function openPlaceEditModal(){let p=placeEdit;if(!p)return;modal('<h2>Редактировать публикацию</h2><div class="raidphotos placephotos">'+p.images.map((u,i)=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"><button class="place-photo-remove" onclick="removePlaceEditPhoto('+i+')">×</button></div>').join('')+'</div><input id="placeEditFiles" type="file" accept="image/*" multiple><div class="muted" style="margin:8px 0 14px">Можно добавить фото. Максимум 5.</div><textarea id="placeEditComment" class="place-comment" placeholder="Комментарий">'+esc(p.comment)+'</textarea><div class="dialogfoot"><button class="ghost" onclick="cancelPlaceEdit()">Отмена</button><button class="primary" onclick="savePlaceEdit()">Сохранить</button></div>');$('#placeEditFiles')?.addEventListener('change',e=>uploadPlaceEditFiles([...e.target.files]))}
