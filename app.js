@@ -71,7 +71,7 @@ async function refreshSharedMapMarkers(){
  try{
   const {data,error}=await sb.rpc('squad_map_sync',{p_action:'list'});
   if(error)throw error;
-  frame.contentWindow?.postMessage({kind:'scumMapSharedMarkers',markers:data||[]},'https://k1t0q.github.io');
+  frame.contentWindow?.postMessage({kind:'scumMapSharedMarkers',markers:Array.isArray(data)?data:[]},'https://k1t0q.github.io');
  }catch(e){console.error('Shared markers fetch',e)}
  finally{mapSharedBusy=false}
 }
@@ -90,7 +90,7 @@ window.addEventListener('message',async e=>{
     for(const marker of msg.localMarkers){
      if(!marker?.id||existing.has(marker.id))continue;
      const result=await sb.rpc('squad_map_sync',{p_action:'save',p_marker:marker});
-     if(!result.error)existing.add(marker.id);
+     if(!result.error)existing.add(marker.id);else console.error('Map marker import',result.error);
     }
     await refreshSharedMapMarkers();
    }catch(err){console.error('Map import',err)}
@@ -101,7 +101,7 @@ window.addEventListener('message',async e=>{
    const {error}=await sb.rpc('squad_map_sync',params);
    if(error)throw error;
    await refreshSharedMapMarkers();
-  }catch(err){console.error('Marker sync',err);toast('Не удалось сохранить метку на сервере');await refreshSharedMapMarkers()}
+  }catch(err){console.error('Marker sync',err);toast('Ошибка сохранения метки — локальная копия сохранена');}
  }
 });
 async function syncMapBasePublications(){
