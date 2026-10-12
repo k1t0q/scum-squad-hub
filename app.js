@@ -78,6 +78,30 @@ async function refreshSharedMapMarkers(){
 window.addEventListener('message',async e=>{
  if(e.origin!=='https://k1t0q.github.io'||e.source!==document.getElementById('squadMapFrame')?.contentWindow)return;
  const msg=e.data||{};
+ if(msg.kind==='scumMapCreatePost'){
+  let ok=false,errorText='';
+  try{
+   if(!onlineMember||!sb)throw new Error('Нет авторизации');
+   const files=Array.isArray(msg.files)?msg.files.slice(0,5):[];
+   const comment=String(msg.comment||'').slice(0,5000);
+   if(!files.length&&!comment.trim())throw new Error('Пустая публикация');
+   const images=[];
+   for(const file of files){
+    if(!file?.type?.startsWith('image/')||file.size>10*1024*1024)throw new Error('Фото должно быть до 10 МБ');
+    const ext=(file.name?.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,'').toLowerCase();
+    const path=onlineMember.squad_id+'/base/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
+    const up=await sb.storage.from('squad-photos').upload(path,file,{contentType:file.type,upsert:false});
+    if(up.error)throw up.error;
+    images.push(sb.storage.from('squad-photos').getPublicUrl(path).data.publicUrl);
+   }
+   const {error}=await sb.from('squad_place_posts').insert({squad_id:onlineMember.squad_id,kind:'base',images,comment,created_by:onlineMember.id,map_marker_name:String(msg.marker||'').slice(0,200)});
+   if(error)throw error;
+   ok=true;
+  }catch(err){console.error('Map post failed',err);errorText=String(err.message||err).slice(0,120)}
+  e.source?.postMessage({kind:'scumMapPostResult',ok,error:errorText},e.origin);
+  if(ok)syncMapBasePublications();
+  return;
+ }
  if(msg.kind==='scumMapReady'){
   mapSharedReady=true;
   await refreshSharedMapMarkers();
@@ -111,7 +135,7 @@ async function syncMapBasePublications(){
  try{
   const {data,error}=await sb.rpc('get_squad_place_posts',{p_kind:'base'});
   if(error)throw error;
-  const posts=(data||[]).filter(p=>p.id===19).map(p=>({id:p.id,marker:'Тедас',comment:p.comment||'',images:Array.isArray(p.images)?p.images:[],author:p.author_nick||'Участник',date:p.created_at}));
+  const posts=(data||[]).filter(p=>p.map_marker_name||p.id===19).map(p=>({id:p.id,marker:p.map_marker_name||'Тедас',comment:p.comment||'',images:Array.isArray(p.images)?p.images:[],author:p.author_nick||'Участник',date:p.created_at}));
   frame.contentWindow?.postMessage({kind:'scumHubMarkerPosts',posts},'https://k1t0q.github.io');
  }catch(e){console.error('Map publications',e)}
 }
