@@ -57,7 +57,17 @@ function render(){if(page==='Сегодня')page='Главная'; headerProtec
 
 // SCUM MAP embedded as a section of the authenticated SCUM HUB interface.
 function squadMapPage(){
-  $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261012gap38" style="display:block;width:100%;height:calc(100dvh - 220px);min-height:540px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen></iframe></div>';
+  $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261012gap38" style="display:block;width:100%;height:calc(100dvh - 220px);min-height:540px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen id="squadMapFrame" onload="syncMapBasePublications()"></iframe></div>';
+}
+async function syncMapBasePublications(){
+ const frame=document.getElementById('squadMapFrame');
+ if(!frame||!sb||!onlineMember)return;
+ try{
+  const {data,error}=await sb.rpc('get_squad_place_posts',{p_kind:'base'});
+  if(error)throw error;
+  const posts=(data||[]).filter(p=>p.id===19).map(p=>({id:p.id,marker:'Тедас',comment:p.comment||'',images:Array.isArray(p.images)?p.images:[],author:p.author_nick||'Участник',date:p.created_at}));
+  frame.contentWindow?.postMessage({kind:'scumHubMarkerPosts',posts},'https://k1t0q.github.io');
+ }catch(e){console.error('Map publications',e)}
 }
 async function raiseRaidAlarm(){
  if(!sb||!onlineMember){toast('Сначала войдите в отряд');return}
