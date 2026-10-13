@@ -2855,3 +2855,14 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   background-size:cover,100% auto!important;
  }
 }
+
+/* FURYHUB 3: full-bleed header photo across the complete header rectangle. */
+@media(min-width:901px){
+ .ref-header.fury-has-photo{
+  padding:0 14px!important;
+  background-size:cover,100% 100%!important;
+  background-position:center center,center center!important;
+  background-origin:border-box!important;
+  background-clip:border-box!important;
+ }
+}
