@@ -2687,3 +2687,9 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 }
 .place-compose .fury-marker-type-select:focus-visible{outline:2px solid #e05262!important;outline-offset:2px!important}
 .place-compose .fury-marker-type-select option{background:#151b1b;color:#fff}
+
+/* Marker type uses the same Fury dropdown component as numeric selectors. */
+.place-compose .fury-select:has(input[name="placeKindSelect"]){width:116px!important;min-width:116px!important;max-width:116px!important;flex:0 0 116px!important}
+.place-compose .fury-select:has(input[name="placeKindSelect"]) .fury-select-trigger{width:116px!important;min-width:116px!important;height:34px!important;min-height:34px!important;padding:0 26px 0 10px!important;font-size:12px!important;font-weight:750!important}
+.place-compose .fury-select:has(input[name="placeKindSelect"]) .fury-select-trigger span{text-align:center!important;flex:1!important}
+.place-compose .fury-select:has(input[name="placeKindSelect"]) .fury-select-trigger i{right:9px!important}
