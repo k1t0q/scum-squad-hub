@@ -2866,3 +2866,18 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   background-clip:border-box!important;
  }
 }
+
+/* FURYHUB 3: remove inset/gap around desktop photo header. */
+@media(min-width:901px){
+ .app>main .ref-header.fury-has-photo{
+  width:calc(100% + 32px)!important;
+  max-width:none!important;
+  margin-left:-16px!important;
+  margin-right:-16px!important;
+  margin-top:0!important;
+  padding:0 16px!important;
+  border-radius:0!important;
+  background-size:cover,100% 100%!important;
+  background-position:center center,center center!important;
+ }
+}
