@@ -2813,20 +2813,31 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 .fury-appearance-actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px;margin-top:2px}
 @media(max-width:700px){#furyAppearanceEditor{grid-template-columns:1fr}.fury-appearance-preview-sidebar{max-width:100%}}
 
-/* Keep the desktop sidebar permanently visible while only page content scrolls. */
+
+/* Restore the original 250px grid: sticky sidebar without overlap. */
 @media(min-width:901px){
+ .app{grid-template-columns:250px minmax(0,1fr)!important;align-items:start!important}
  .app>aside{
-  position:fixed!important;
-  top:0!important;left:0!important;bottom:0!important;
-  height:100dvh!important;
-  width:240px!important;
-  overflow:hidden!important;
-  overscroll-behavior:none!important;
-  z-index:100!important;
+  position:sticky!important;top:0!important;left:auto!important;bottom:auto!important;
+  width:auto!important;min-width:0!important;height:100vh!important;
+  overflow:hidden!important;z-index:10!important;
  }
- .app>main{grid-column:2!important;min-width:0!important}
- .app>aside.fury-has-photo::before{
-  background-position:center,var(--fury-photo-x,50%) var(--fury-photo-y,50%)!important;
-  background-size:cover,cover!important;
- }
+ .app>main{grid-column:auto!important;min-width:0!important}
 }
+/* Photo backgrounds are painted directly on the actual sidebar/header,
+   avoiding pseudo-element stacking and dark overlay conflicts. */
+.app>aside.fury-has-photo{
+ background-color:#0c1213!important;
+ background-image:linear-gradient(rgba(0,0,0,var(--fury-photo-dark,.65)),rgba(0,0,0,var(--fury-photo-dark,.65))),var(--fury-photo-url)!important;
+ background-position:center,var(--fury-photo-x,50%) var(--fury-photo-y,50%)!important;
+ background-size:cover,cover!important;
+ background-repeat:no-repeat!important;
+}
+.app>aside.fury-has-photo::before{display:none!important}
+.ref-header.fury-has-photo{
+ background-image:linear-gradient(rgba(0,0,0,var(--fury-photo-dark,.55)),rgba(0,0,0,var(--fury-photo-dark,.55))),var(--fury-photo-url)!important;
+ background-position:center,var(--fury-photo-x,50%) var(--fury-photo-y,50%)!important;
+ background-size:cover,100% auto!important;
+ background-repeat:no-repeat!important;
+}
+.ref-header.fury-has-photo::before{display:none!important}
