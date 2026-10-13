@@ -854,96 +854,6 @@ async function togglePushPreference(){
  }
 }
 
-$('#pageTitle').textContent=page;nav();render();bootOnline();
-
-
-const discordNoticeOptions = [
-  ['presence','Моё участие'],['protect','Протект'],['protect_updated','Обновление протекта'],
-  ['raids','Рейды'],['tasks','Задачи'],['stash','Схроны'],
-  ['alarm','Нас рейдят']
-];
-async function loadDiscordDmSettings() {
-  const target = document.getElementById('discordDmSettings');
-  if (!target || !sb) return;
-  const { data, error } = await sb.rpc('get_my_discord_settings');
-  if (!target.isConnected) return;
-  if (error) { target.textContent = 'Настройки временно недоступны'; return; }
-  const enabled = data?.enabled === true;
-  const categories = data?.categories || {};
-  const items = discordNoticeOptions.map(([key,title]) =>
-    '<label class="settings-row fury-notice-row" style="cursor:pointer;padding:10px 12px;min-height:42px;border-radius:8px"><span><b>' + title + '</b></span><input type="checkbox" data-discord-category="' + key + '" ' + (categories[key] === true ? 'checked' : '') + ' onchange="updateDiscordCategorySummary()"></label>'
-  ).join('');
-  target.innerHTML = '<style>' +
-    '#discordDmSettings .discord-notice-dropdown{position:relative;margin-top:12px;max-width:480px}' +
-    '#discordDmSettings .discord-notice-dropdown>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;border:1px solid var(--line,#303b3c);background:var(--panel,#111d1d);border-radius:9px;padding:12px 14px;font-weight:700;user-select:none}' +
-    '#discordDmSettings .discord-notice-dropdown>summary::-webkit-details-marker{display:none}' +
-    '#discordDmSettings .discord-notice-dropdown>summary:after{content:"⌄";font-size:20px;color:#a6b6b5;line-height:1}' +
-    '#discordDmSettings .discord-notice-dropdown[open]>summary:after{transform:rotate(180deg)}' +
-    '#discordDmSettings .discord-notice-list{border:1px solid var(--line,#303b3c);background:var(--panel,#111d1d);border-radius:9px;margin-top:6px;padding:6px;max-height:330px;overflow-y:auto}' +
-    '#discordDmSettings input[type=checkbox]{accent-color:#23c99c;width:17px;height:17px;cursor:pointer;flex-shrink:0}' +
-    '#discordDmSettings .discord-notice-actions{display:flex;justify-content:flex-end;margin-top:14px}' +
-    '#discordDmSettings .discord-notice-actions button{min-width:150px}' +
-    '</style>' +
-    '<p class="muted" style="margin:6px 0 14px">Discord: ' + (data?.linked ? 'привязан' : 'не привязан') + '</p>' +
-    '<label class="settings-row fury-notice-row" style="cursor:pointer"><span><b>Личные уведомления</b><p class="muted">Получать сообщения от SCUM HUB в Discord</p></span><input id="discordDmEnabled" type="checkbox" ' + (enabled ? 'checked' : '') + '></label>' +
-    '<details class="discord-notice-dropdown"><summary><span id="discordCategorySummary">Категории уведомлений</span></summary><div class="discord-notice-list">' + items + '</div></details>' +
-    '<div class="discord-notice-actions"><button class="primary" type="button" onclick="saveDiscordDmSettings()">СОХРАНИТЬ</button></div>';
-  updateDiscordCategorySummary();
-}
-function updateDiscordCategorySummary() {
-  const summary = document.getElementById('discordCategorySummary');
-  if (!summary) return;
-  const count = document.querySelectorAll('#discordDmSettings [data-discord-category]:checked').length;
-  summary.textContent = 'Категории уведомлений · ' + count + ' из ' + discordNoticeOptions.length;
-}
-async function saveDiscordDmSettings() {
-  if (!sb || !onlineMember) return toast('Сначала войди в аккаунт');
-  const enabled = !!document.getElementById('discordDmEnabled')?.checked;
-  const categories = {};
-  document.querySelectorAll('[data-discord-category]').forEach(input => { categories[input.dataset.discordCategory] = !!input.checked; });
-  const { error } = await sb.rpc('set_my_discord_settings', { p_enabled: enabled, p_categories: categories });
-  toast(error ? 'Не удалось сохранить настройки' : 'Настройки Discord сохранены');
-}
-async function createDiscordLinkCode() {
-  if (!sb || !onlineMember) return toast('Сначала войди в аккаунт');
-  const { data, error } = await sb.rpc('create_discord_link_code');
-  if (error || !data) return toast('Не удалось создать код привязки');
-  modal('<h2>Привязка Discord</h2><p class="muted">В Discord введи /link и вставь одноразовый код. Никому не передавай код.</p><div class="form"><input readonly id="discordLinkCode" value="' + esc(data) + '"><button class="primary" onclick="navigator.clipboard.writeText(document.getElementById(\'discordLinkCode\').value).then(()=>toast(\'Код скопирован\'))">КОПИРОВАТЬ КОД</button><button class="ghost" onclick="closeModal()">ЗАКРЫТЬ</button></div>');
-}
-
-
-/* Subtle directional hover glow: top/left/right/bottom follow mouse position. */
-(function initFuryCardGlow(){
- if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches)return;
- let active=null,frame=0,lastEvent=null;
- const clear=()=>{
-  if(active){active.classList.remove('fury-glow-active');active=null}
- };
- document.addEventListener('pointermove',e=>{
-  if(e.pointerType!=='mouse')return;
-  const card=e.target instanceof Element?e.target.closest('.ref-card,.card'):null;
-  if(card!==active){clear();active=card;if(active)active.classList.add('fury-glow-active')}
-  if(!card)return;
-  lastEvent={x:e.clientX,y:e.clientY,card};
-  if(frame)return;
-  frame=requestAnimationFrame(()=>{
-   frame=0;
-   if(!lastEvent||lastEvent.card!==active)return;
-   const rect=active.getBoundingClientRect();
-   if(!rect.width||!rect.height)return;
-   const x=Math.max(0,Math.min(1,(lastEvent.x-rect.left)/rect.width));
-   const y=Math.max(0,Math.min(1,(lastEvent.y-rect.top)/rect.height));
-   active.style.setProperty('--fury-glow-x',(x*100).toFixed(1)+'%');
-   active.style.setProperty('--fury-glow-y',(y*100).toFixed(1)+'%');
-   active.style.setProperty('--fury-glow-shift-x',((x-.5)*20).toFixed(1)+'px');
-   active.style.setProperty('--fury-glow-shift-y',((y-.5)*20).toFixed(1)+'px');
-  });
- },{passive:true});
- document.addEventListener('pointerleave',clear,{passive:true});
- window.addEventListener('blur',clear);
-})();
-
-
 /* Shared squad appearance: only an admin can upload and save images. */
 let furyAppearance={header:{url:'',x:50,y:50,zoom:100,dark:55},sidebar:{url:'',x:50,y:50,zoom:100,dark:65}};
 const furyAppearanceDefaults=JSON.parse(JSON.stringify(furyAppearance));
@@ -1043,3 +953,94 @@ async function furyCancelAppearance(){
  renderAppearanceEditor();
 }
 setInterval(()=>{if(onlineMember&&sb&&db.profile.access!=='admin')furyLoadAppearance()},90000);
+
+$('#pageTitle').textContent=page;nav();render();bootOnline();
+
+
+const discordNoticeOptions = [
+  ['presence','Моё участие'],['protect','Протект'],['protect_updated','Обновление протекта'],
+  ['raids','Рейды'],['tasks','Задачи'],['stash','Схроны'],
+  ['alarm','Нас рейдят']
+];
+async function loadDiscordDmSettings() {
+  const target = document.getElementById('discordDmSettings');
+  if (!target || !sb) return;
+  const { data, error } = await sb.rpc('get_my_discord_settings');
+  if (!target.isConnected) return;
+  if (error) { target.textContent = 'Настройки временно недоступны'; return; }
+  const enabled = data?.enabled === true;
+  const categories = data?.categories || {};
+  const items = discordNoticeOptions.map(([key,title]) =>
+    '<label class="settings-row fury-notice-row" style="cursor:pointer;padding:10px 12px;min-height:42px;border-radius:8px"><span><b>' + title + '</b></span><input type="checkbox" data-discord-category="' + key + '" ' + (categories[key] === true ? 'checked' : '') + ' onchange="updateDiscordCategorySummary()"></label>'
+  ).join('');
+  target.innerHTML = '<style>' +
+    '#discordDmSettings .discord-notice-dropdown{position:relative;margin-top:12px;max-width:480px}' +
+    '#discordDmSettings .discord-notice-dropdown>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;border:1px solid var(--line,#303b3c);background:var(--panel,#111d1d);border-radius:9px;padding:12px 14px;font-weight:700;user-select:none}' +
+    '#discordDmSettings .discord-notice-dropdown>summary::-webkit-details-marker{display:none}' +
+    '#discordDmSettings .discord-notice-dropdown>summary:after{content:"⌄";font-size:20px;color:#a6b6b5;line-height:1}' +
+    '#discordDmSettings .discord-notice-dropdown[open]>summary:after{transform:rotate(180deg)}' +
+    '#discordDmSettings .discord-notice-list{border:1px solid var(--line,#303b3c);background:var(--panel,#111d1d);border-radius:9px;margin-top:6px;padding:6px;max-height:330px;overflow-y:auto}' +
+    '#discordDmSettings input[type=checkbox]{accent-color:#23c99c;width:17px;height:17px;cursor:pointer;flex-shrink:0}' +
+    '#discordDmSettings .discord-notice-actions{display:flex;justify-content:flex-end;margin-top:14px}' +
+    '#discordDmSettings .discord-notice-actions button{min-width:150px}' +
+    '</style>' +
+    '<p class="muted" style="margin:6px 0 14px">Discord: ' + (data?.linked ? 'привязан' : 'не привязан') + '</p>' +
+    '<label class="settings-row fury-notice-row" style="cursor:pointer"><span><b>Личные уведомления</b><p class="muted">Получать сообщения от SCUM HUB в Discord</p></span><input id="discordDmEnabled" type="checkbox" ' + (enabled ? 'checked' : '') + '></label>' +
+    '<details class="discord-notice-dropdown"><summary><span id="discordCategorySummary">Категории уведомлений</span></summary><div class="discord-notice-list">' + items + '</div></details>' +
+    '<div class="discord-notice-actions"><button class="primary" type="button" onclick="saveDiscordDmSettings()">СОХРАНИТЬ</button></div>';
+  updateDiscordCategorySummary();
+}
+function updateDiscordCategorySummary() {
+  const summary = document.getElementById('discordCategorySummary');
+  if (!summary) return;
+  const count = document.querySelectorAll('#discordDmSettings [data-discord-category]:checked').length;
+  summary.textContent = 'Категории уведомлений · ' + count + ' из ' + discordNoticeOptions.length;
+}
+async function saveDiscordDmSettings() {
+  if (!sb || !onlineMember) return toast('Сначала войди в аккаунт');
+  const enabled = !!document.getElementById('discordDmEnabled')?.checked;
+  const categories = {};
+  document.querySelectorAll('[data-discord-category]').forEach(input => { categories[input.dataset.discordCategory] = !!input.checked; });
+  const { error } = await sb.rpc('set_my_discord_settings', { p_enabled: enabled, p_categories: categories });
+  toast(error ? 'Не удалось сохранить настройки' : 'Настройки Discord сохранены');
+}
+async function createDiscordLinkCode() {
+  if (!sb || !onlineMember) return toast('Сначала войди в аккаунт');
+  const { data, error } = await sb.rpc('create_discord_link_code');
+  if (error || !data) return toast('Не удалось создать код привязки');
+  modal('<h2>Привязка Discord</h2><p class="muted">В Discord введи /link и вставь одноразовый код. Никому не передавай код.</p><div class="form"><input readonly id="discordLinkCode" value="' + esc(data) + '"><button class="primary" onclick="navigator.clipboard.writeText(document.getElementById(\'discordLinkCode\').value).then(()=>toast(\'Код скопирован\'))">КОПИРОВАТЬ КОД</button><button class="ghost" onclick="closeModal()">ЗАКРЫТЬ</button></div>');
+}
+
+
+/* Subtle directional hover glow: top/left/right/bottom follow mouse position. */
+(function initFuryCardGlow(){
+ if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches)return;
+ let active=null,frame=0,lastEvent=null;
+ const clear=()=>{
+  if(active){active.classList.remove('fury-glow-active');active=null}
+ };
+ document.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse')return;
+  const card=e.target instanceof Element?e.target.closest('.ref-card,.card'):null;
+  if(card!==active){clear();active=card;if(active)active.classList.add('fury-glow-active')}
+  if(!card)return;
+  lastEvent={x:e.clientX,y:e.clientY,card};
+  if(frame)return;
+  frame=requestAnimationFrame(()=>{
+   frame=0;
+   if(!lastEvent||lastEvent.card!==active)return;
+   const rect=active.getBoundingClientRect();
+   if(!rect.width||!rect.height)return;
+   const x=Math.max(0,Math.min(1,(lastEvent.x-rect.left)/rect.width));
+   const y=Math.max(0,Math.min(1,(lastEvent.y-rect.top)/rect.height));
+   active.style.setProperty('--fury-glow-x',(x*100).toFixed(1)+'%');
+   active.style.setProperty('--fury-glow-y',(y*100).toFixed(1)+'%');
+   active.style.setProperty('--fury-glow-shift-x',((x-.5)*20).toFixed(1)+'px');
+   active.style.setProperty('--fury-glow-shift-y',((y-.5)*20).toFixed(1)+'px');
+  });
+ },{passive:true});
+ document.addEventListener('pointerleave',clear,{passive:true});
+ window.addEventListener('blur',clear);
+})();
+
+
