@@ -974,6 +974,7 @@ async function furyLoadAppearance(){
  if(error){console.warn('Appearance load',error);return}
  furyAppearance=furySafeAppearance(data);
  furyApplyAppearance(furyAppearance);
+ if(document.getElementById('furyAppearanceEditor'))renderAppearanceEditor();
 }
 function renderAppearanceEditor(){
  const box=document.getElementById('furyAppearanceEditor');
