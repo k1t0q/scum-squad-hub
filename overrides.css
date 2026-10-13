@@ -2751,7 +2751,7 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   inset:0;
   border-radius:inherit;
   padding:1px;
-  background:radial-gradient(ellipse 220px 155px at var(--fury-glow-x) var(--fury-glow-y),rgba(255,72,86,.7) 0%,rgba(214,42,55,.32) 35%,transparent 90%);
+  background:radial-gradient(ellipse 220px 155px at var(--fury-glow-x) var(--fury-glow-y),rgba(255,91,103,.94) 0%,rgba(235,52,67,.52) 38%,transparent 90%);
   -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
   -webkit-mask-composite:xor;
   mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
@@ -2762,10 +2762,21 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   z-index:2;
  }
  .ref-card.fury-glow-active,.card.fury-glow-active{
-  box-shadow:var(--fury-glow-shift-x) var(--fury-glow-shift-y) 26px -9px rgba(236,43,59,.34),0 0 1px rgba(255,76,86,.18)!important;
+  box-shadow:var(--fury-glow-shift-x) var(--fury-glow-shift-y) 32px -6px rgba(236,43,59,.54),0 0 12px rgba(255,76,86,.16)!important;
  }
  .ref-card.fury-glow-active::after,.card.fury-glow-active::after{opacity:1}
 }
 @media (prefers-reduced-motion:reduce){
  .ref-card,.card,.ref-card::after,.card::after{transition:none!important}
 }
+
+/* Category colors for squad activity; intentionally distinct from the red card glow. */
+.ref-events .ref-event-icon-tasks{color:#48df98!important;border-color:#247b56!important;background:#112b20!important}
+.ref-events .ref-event-icon-protect,.ref-events .ref-event-icon-protect_updated{color:#51d8b0!important;border-color:#26705e!important;background:#102b24!important}
+.ref-events .ref-event-icon-stash{color:#ffc66d!important;border-color:#8b6234!important;background:#2e2415!important}
+.ref-events .ref-event-icon-base{color:#ff7784!important;border-color:#903b4a!important;background:#30171f!important}
+.ref-events .ref-event-icon-other{color:#ac9aff!important;border-color:#66549b!important;background:#211b32!important}
+.ref-events .ref-event-icon-raids{color:#ffad62!important;border-color:#995a30!important;background:#302014!important}
+.ref-events .ref-event-icon-explosives{color:#ff9e58!important;border-color:#92502e!important;background:#301c14!important}
+.ref-events .ref-event-icon-alarm{color:#ff5b6c!important;border-color:#b83d4c!important;background:#35131c!important}
+.ref-events .ref-event-icon-misc{color:#76c8ed!important;border-color:#367d9e!important;background:#142934!important}
