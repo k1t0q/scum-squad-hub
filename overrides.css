@@ -2671,3 +2671,19 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   text-align:center!important;padding-left:6px!important;padding-right:6px!important;
  }
 }
+
+/* Compact marker-type dropdown matching SCUM HUB dark/red controls. */
+.place-compose .fury-marker-type-select{
+ appearance:none!important;-webkit-appearance:none!important;
+ width:116px!important;min-width:116px!important;max-width:116px!important;
+ height:34px!important;min-height:34px!important;
+ padding:0 27px 0 12px!important;
+ border:1px solid #633038!important;border-radius:7px!important;
+ background-color:#1b1013!important;color:#f1e9e9!important;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23e65a68' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")!important;
+ background-repeat:no-repeat!important;background-position:right 10px center!important;
+ font:700 12px inherit!important;font-size:12px!important;font-weight:700!important;
+ box-shadow:none!important;cursor:pointer!important;
+}
+.place-compose .fury-marker-type-select:focus-visible{outline:2px solid #e05262!important;outline-offset:2px!important}
+.place-compose .fury-marker-type-select option{background:#151b1b;color:#fff}
