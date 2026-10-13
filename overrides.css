@@ -2881,3 +2881,16 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
   background-position:center center,center center!important;
  }
 }
+
+/* FURYHUB 3: desktop sidebar must never scroll with the page. */
+@media(min-width:901px){
+ .app>aside{
+  position:fixed!important;
+  top:0!important;left:0!important;bottom:0!important;
+  width:250px!important;height:100dvh!important;
+  max-height:100dvh!important;
+  overflow:hidden!important;
+  z-index:100!important;
+ }
+ .app>main{grid-column:2!important;min-width:0!important}
+}
