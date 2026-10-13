@@ -2894,3 +2894,10 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  }
  .app>main{grid-column:2!important;min-width:0!important}
 }
+
+/* FURYHUB 3: restore original narrow sidebar width while keeping it fixed. */
+@media(min-width:901px){
+ .app{grid-template-columns:225px minmax(0,1fr)!important}
+ .app>aside{width:225px!important;min-width:225px!important;max-width:225px!important}
+ .app>main{grid-column:2!important}
+}
