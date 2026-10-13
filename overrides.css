@@ -2845,3 +2845,13 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 @media(min-width:901px){
  .app>aside.fury-has-photo{position:sticky!important;top:0!important;height:100vh!important}
 }
+
+/* Slightly taller photo header without changing the existing grid/sidebar. */
+@media(min-width:901px){
+ .ref-header.fury-has-photo{
+  height:82px!important;
+  min-height:82px!important;
+  padding:8px 0!important;
+  background-size:cover,100% auto!important;
+ }
+}
