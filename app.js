@@ -1034,7 +1034,7 @@ function furyResetAppearance(part){
 async function furySaveAppearance(){
  if(db.profile.access!=='admin'||!sb)return;
  const {data,error}=await sb.rpc('set_squad_appearance',{p_appearance:furyAppearance});
- if(error){console.error('Appearance save',error);toast('Не удалось сохранить оформление');return}
+ if(error){console.error('Appearance save',error);toast('Ошибка сохранения: '+String(error.message||error.details||error.code||'неизвестная ошибка').slice(0,180));return}
  furyAppearance=furySafeAppearance(data);furyApplyAppearance(furyAppearance);
  toast('Оформление сохранено для всего отряда');
 }
