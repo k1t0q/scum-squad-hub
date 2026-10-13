@@ -498,6 +498,8 @@ async function renderHomeEvents(){
    '<time class="ref-event-date">'+esc(when)+'</time></div>';
  }).join('')+'</div>';
 }
+// Refresh recent events while the home screen is open, without reloading the page.
+setInterval(()=>{if((page==='Главная'||page==='Сегодня')&&document.getElementById('homeEventsBody')&&onlineMember)renderHomeEvents()},60000);
 async function renderHomePlace(){
  const body=$('#homePlaceBody');if(!body||!sb||!onlineMember)return;
  let r;try{r=await sb.rpc('get_squad_place_posts',{p_kind:'home'})}catch(e){r={error:e}}
