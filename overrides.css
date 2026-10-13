@@ -2841,3 +2841,7 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  background-repeat:no-repeat!important;
 }
 .ref-header.fury-has-photo::before{display:none!important}
+
+@media(min-width:901px){
+ .app>aside.fury-has-photo{position:sticky!important;top:0!important;height:100vh!important}
+}
