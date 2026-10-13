@@ -104,15 +104,28 @@ async function refreshSharedMapMarkers(){
   if(error)throw error;
   const {data:posts,error:postError}=await sb.rpc('get_squad_place_posts',{p_kind:'stash'});
   if(postError)throw postError;
+  const {data:basePosts,error:baseError}=await sb.rpc('get_squad_place_posts',{p_kind:'base'});
+  if(baseError)throw baseError;
   const byId=new Map((posts||[]).map(p=>[String(p.id),p]));
-  const rawMarkers=(Array.isArray(data)?data:[]).filter(m=>!String(m.id).startsWith('stash-post-')||byId.has(String(m.id).slice(11)));
+  const basesById=new Map((basePosts||[]).map(p=>[String(p.id),p]));
+  const rawMarkers=(Array.isArray(data)?data:[]).filter(m=>(!String(m.id).startsWith('stash-post-')||byId.has(String(m.id).slice(11)))&&(!String(m.id).startsWith('base-post-')||basesById.has(String(m.id).slice(10))));
   for(const p of posts||[]){
    const id='stash-post-'+p.id;
    if(rawMarkers.some(m=>String(m.id)===id))continue;
    const pos=stashCoords(p.comment);
    if(pos)rawMarkers.push({id,...pos,type:'stash',icon:'📦',size:30,showLabel:true});
   }
+  for(const p of basePosts||[]){
+   const id='base-post-'+p.id;
+   if(rawMarkers.some(m=>String(m.id)===id))continue;
+   const pos=stashCoords(p.comment);
+   if(pos)rawMarkers.push({id,...pos,type:'base',icon:'🏠',size:30,showLabel:true});
+  }
   const markers=rawMarkers.map(m=>{
+   if(String(m.id).startsWith('base-post-')){
+    const p=basesById.get(String(m.id).slice(10));
+    return {...m,type:'base',icon:'🏠',name:stashMapTitle(p).replace(/^Схрон /,'База '),stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:'#e05252'};
+   }
    if(!String(m.id).startsWith('stash-post-'))return m;
    const p=byId.get(String(m.id).slice(11));
    const checked=new Date(p.stash_checked_at||p.created_at).getTime();
