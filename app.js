@@ -607,6 +607,7 @@ function stashLifeHtml(p){
 }
 async function refreshStash(id,button){
  if(!sb||!onlineMember)return;
+ if(!confirm('Обновить срок хранения схрона на 14 дней?\nПодтвердите, что вы действительно проверили схрон.'))return;
  if(button){button.disabled=true;button.textContent='Обновление…'}
  try{
  const {error}=await sb.rpc('refresh_stash',{p_post_id:id});
