@@ -2733,3 +2733,39 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  .ref-event-icon{width:28px;height:28px;flex-basis:28px}
  .ref-event-date{font-size:9px}
 }
+
+/* Directional red edge glow follows the pointer on SCUM HUB panels. */
+@media (hover:hover) and (pointer:fine){
+ .ref-card,.card{
+  --fury-glow-x:50%;
+  --fury-glow-y:50%;
+  --fury-glow-shift-x:0px;
+  --fury-glow-shift-y:0px;
+  position:relative;
+  isolation:isolate;
+  transition:box-shadow .22s ease,border-color .22s ease;
+ }
+ .ref-card::after,.card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  padding:1px;
+  background:radial-gradient(ellipse 220px 155px at var(--fury-glow-x) var(--fury-glow-y),rgba(255,72,86,.7) 0%,rgba(214,42,55,.32) 35%,transparent 90%);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask-composite:exclude;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .2s ease;
+  z-index:2;
+ }
+ .ref-card.fury-glow-active,.card.fury-glow-active{
+  box-shadow:var(--fury-glow-shift-x) var(--fury-glow-shift-y) 26px -9px rgba(236,43,59,.34),0 0 1px rgba(255,76,86,.18)!important;
+ }
+ .ref-card.fury-glow-active::after,.card.fury-glow-active::after{opacity:1}
+}
+@media (prefers-reduced-motion:reduce){
+ .ref-card,.card,.ref-card::after,.card::after{transition:none!important}
+}
