@@ -2901,3 +2901,12 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  .app>aside{width:225px!important;min-width:225px!important;max-width:225px!important}
  .app>main{grid-column:2!important}
 }
+
+/* SCUM map page: disable outer page scroll, preserve map iframe interactions. */
+@media(min-width:901px){
+ html.fury-map-page,body.fury-map-page{height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important}
+ body.fury-map-page .app{height:100dvh!important;max-height:100dvh!important;overflow:hidden!important}
+ body.fury-map-page .app>main{height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;min-height:0!important}
+ body.fury-map-page #view{overflow:hidden!important;min-height:0!important}
+ body.fury-map-page #squadMapFrame{overscroll-behavior:contain}
+}
