@@ -211,6 +211,8 @@ window.addEventListener('message',async e=>{
     if(error)throw error;
     const existing=new Set((data||[]).map(m=>m.id));
     for(const marker of msg.localMarkers){
+     // Publications own these marker IDs; never resurrect deleted posts from iframe cache.
+     if(/^(stash|base|other)-post-\d+$/.test(String(marker?.id||'')))continue;
      if(!marker?.id||existing.has(marker.id))continue;
      const result=await sb.rpc('squad_map_sync',{p_action:'save',p_marker:marker});
      if(!result.error)existing.add(marker.id);else console.error('Map marker import',result.error);
