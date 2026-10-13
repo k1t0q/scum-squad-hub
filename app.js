@@ -265,10 +265,10 @@ function today(){
  '</div>'+
  '<div class="ref-middle">'+
   '<section class="ref-card ref-att ref-att-base"><div class="ref-title"><h2>МОЁ УЧАСТИЕ</h2></div><div class="ref-my-presence"><div class="ref-me-line"><b>'+esc(db.profile.nick)+'</b><span>'+esc(db.profile.role)+'</span></div><div class="ref-presence-row"><div class="ref-presence-buttons">'+choices+'</div>'+(db.presence.status==='Буду'?'<div class="ref-join-time">Время захода: <b>'+esc(db.presence.time||'20:00')+'</b><button class="ref-time-change" onclick="setTime()">Изменить</button></div>':'')+'</div>'+'</div><div class="ref-att-divider"></div><div class="ref-att-head"><h3>КТО СЕГОДНЯ БУДЕТ?</h3><b>'+playing+' / '+db.members.length+'</b></div><div class="ref-members">'+db.members.map(m=>'<div class="ref-member"><div class="ref-member-info"><b>'+esc(m[0])+'</b><small>'+esc(m[1])+'</small></div><div class="ref-statuses"><span class="ref-status '+(m[3]==='Буду'?'yes':m[3]==='Под вопросом'?'maybe':'no')+'">'+esc(m[3])+'</span></div><span class="ref-member-time">'+(m[3]==='Буду'?esc(m[2]||'20:00'):'—')+'</span></div>').join('')+'</div></section>'+
-  '<section class="ref-card ref-feed"><div class="ref-title"><h2>ФОТО И КОММЕНТАРИИ</h2></div><div id="homePlaceBody"><div class="empty">Загрузка…</div></div></section>'+
+  '<section class="ref-card ref-feed ref-events"><div class="ref-title"><h2>ПОСЛЕДНИЕ СОБЫТИЯ ОТРЯДА</h2></div><div id="homeEventsBody"><div class="empty">Загрузка событий…</div></div></section>'+
  '</div>'+
  '<section class="ref-card ref-expl"><div class="ref-title"><h2 class="ref-expl-title-link" onclick="go(\'Взрыв\')">ВЗРЫВ</h2><small>Общий склад отряда. Любой участник может изменить количество.</small></div><div id="refExplosiveStrip"><div class="empty">Загрузка склада…</div></div></section>'+
- '</div>'; renderHomePlace(); renderRefExplosives();
+ '</div>'; renderHomeEvents(); renderRefExplosives();
 }
 function updateHomePresenceUI(){if(page!=='Главная'&&page!=='Сегодня')return;let card=document.querySelector('.ref-att-base');if(!card)return;let playing=db.members.filter(x=>x[3]==='Буду').length;card.querySelectorAll('.presencechoice').forEach(b=>b.classList.toggle('active',b.textContent.trim()===db.presence.status));let row=card.querySelector('.ref-presence-row');if(row){let oldTime=row.querySelector('.ref-join-time');if(db.presence.status==='Буду'){if(!oldTime){oldTime=document.createElement('div');oldTime.className='ref-join-time';row.appendChild(oldTime)}oldTime.innerHTML='Время захода: <b>'+esc(db.presence.time||'20:00')+'</b><button class="ref-time-change" onclick="setTime()">Изменить</button>'}else oldTime?.remove()}let headCount=card.querySelector('.ref-att-head>b');if(headCount)headCount.textContent=playing+' / '+db.members.length;let members=card.querySelector('.ref-members');if(members)members.innerHTML=db.members.map(m=>'<div class="ref-member"><div class="ref-member-info"><b>'+esc(m[0])+'</b><small>'+esc(m[1])+'</small></div><div class="ref-statuses"><span class="ref-status '+(m[3]==='Буду'?'yes':m[3]==='Под вопросом'?'maybe':'no')+'">'+esc(m[3])+'</span></div><span class="ref-member-time">'+(m[3]==='Буду'?esc(m[2]||'20:00'):'—')+'</span></div>').join('')}
 async function renderRefExplosives(){let host=document.getElementById('refExplosiveStrip');if(!host||!sb||!onlineMember)return;let {data,error}=await sb.from('explosives_inventory').select('item,quantity').eq('squad_id',onlineMember.squad_id);if(!host||error)return;let names=['С4','РПГ','ГРАНАТА','ДИНАМИТ','ПАЙПА','40'],getQ=n=>Number((data||[]).find(x=>(x.item==='Граната'?'ГРАНАТА':x.item==='C4'?'С4':x.item)===n)?.quantity||0),per={'С4':3,'РПГ':6,'ГРАНАТА':12,'ДИНАМИТ':6};let cards=names.map(n=>{let q=getQ(n),pw=per[n],w=pw?Math.floor(q/pw):0,r=pw?q%pw:0,item=n==='ГРАНАТА'?'Граната':n;return '<div class="ref-expl-item"><div class="ref-expl-main"><b>'+n+'</b></div><div class="ref-expl-bottom"><small><span class="ref-expl-stock-label">В наличии</span><b>'+w+' '+wallWord(w).toLowerCase()+(r?' + '+r+' '+n:'')+'</b></small><div class="ref-expl-edit">'+explosivePicker(item,q)+'</div></div></div>'}).join('');host.innerHTML='<div class="ref-expl-items">'+cards+'</div><div class="ref-wall-total"><small>МОЖНО ВЗОРВАТЬ</small><b>'+Number(window.furyWalls||0)+' '+wallWord(window.furyWalls)+'</b></div>';await refreshWallMetric()}
@@ -446,6 +446,58 @@ async function changeExplosive(item,delta){
  let el=explosiveInput(item),current=Math.max(0,parseInt(el?.value,10)||0),next=Math.max(0,current+delta);if(el)el.value=next;await setExplosive(item,next)
 }
 
+// Read-only activity feed. Uses the squad's existing notification events.
+async function renderHomeEvents(){
+ const body=$('#homeEventsBody');
+ if(!body)return;
+ if(!sb||!onlineMember){
+  body.innerHTML='<div class="empty">Подключаем журнал отряда…</div>';
+  return;
+ }
+ let result;
+ try{
+  result=await Promise.race([
+   sb.rpc('get_squad_recent_events',{p_limit:9}),
+   new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),9000))
+  ]);
+ }catch(err){result={error:err}}
+ if(!document.contains(body))return;
+ if(result.error){
+  body.innerHTML='<div class="empty">Не удалось загрузить события <button class="ref-event-retry" onclick="renderHomeEvents()">Повторить</button></div>';
+  return;
+ }
+ const events=Array.isArray(result.data)?result.data:[];
+ if(!events.length){
+  body.innerHTML='<div class="empty">Пока нет событий отряда</div>';
+  return;
+ }
+ const types={
+  tasks:{icon:'☑',label:'Задачи',page:'Задачи'},
+  raids:{icon:'⚑',label:'Рейды',page:'План на рейд'},
+  stash:{icon:'▣',label:'Схроны',page:'Метка'},
+  base:{icon:'⌖',label:'Метки',page:'Метка'},
+  other:{icon:'⌖',label:'Метки',page:'Метка'},
+  protect:{icon:'◈',label:'Протект',page:''},
+  protect_updated:{icon:'◈',label:'Протект',page:''},
+  alarm:{icon:'!',label:'Тревога',page:'Главная'},
+  explosives:{icon:'✳',label:'Взрыв',page:'Взрыв'}
+ };
+ const fmt=new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+ body.innerHTML='<div class="ref-events-list">'+events.map(e=>{
+  const t=types[e.category]||{icon:'•',label:'Событие',page:''};
+  const when=e.created_at?fmt.format(new Date(e.created_at)):'';
+  const actor=e.actor_nick?' · '+esc(e.actor_nick):'';
+  const detail=String(e.body||'').trim();
+  const title=String(e.title||t.label).trim();
+  const onclick=t.page?' onclick="go(\''+t.page+'\')"':'';
+  return '<div class="ref-event-row'+(t.page?' ref-event-clickable':'')+'"'+onclick+'>'+
+   '<span class="ref-event-icon" aria-hidden="true">'+t.icon+'</span>'+
+   '<div class="ref-event-info"><b>'+esc(title)+'</b>'+
+   (detail?'<span>'+esc(detail)+'</span>':'')+
+   '<small>'+esc(t.label)+actor+'</small></div>'+
+   '<time class="ref-event-date">'+esc(when)+'</time></div>';
+ }).join('')+'</div>';
+}
 async function renderHomePlace(){
  const body=$('#homePlaceBody');if(!body||!sb||!onlineMember)return;
  let r;try{r=await sb.rpc('get_squad_place_posts',{p_kind:'home'})}catch(e){r={error:e}}
