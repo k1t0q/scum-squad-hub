@@ -472,13 +472,13 @@ async function renderHomeEvents(){
   return;
  }
  const types={
-  tasks:{icon:'☑',label:'Задачи',page:'Задачи'},
+  tasks:{icon:'✓',label:'Задачи',page:'Задачи'},
   raids:{icon:'⚑',label:'Рейды',page:'План на рейд'},
   stash:{icon:'▣',label:'Схроны',page:'Метка'},
   base:{icon:'⌖',label:'Метки',page:'Метка'},
-  other:{icon:'⌖',label:'Метки',page:'Метка'},
-  protect:{icon:'◈',label:'Протект',page:''},
-  protect_updated:{icon:'◈',label:'Протект',page:''},
+  other:{icon:'✦',label:'Метки',page:'Метка'},
+  protect:{icon:'⬡',label:'Протект',page:''},
+  protect_updated:{icon:'⬡',label:'Протект',page:''},
   alarm:{icon:'!',label:'Тревога',page:'Главная'},
   explosives:{icon:'✳',label:'Взрыв',page:'Взрыв'}
  };
@@ -491,7 +491,7 @@ async function renderHomeEvents(){
   const title=String(e.title||t.label).trim();
   const onclick=t.page?' onclick="go(\''+t.page+'\')"':'';
   return '<div class="ref-event-row'+(t.page?' ref-event-clickable':'')+'"'+onclick+'>'+
-   '<span class="ref-event-icon" aria-hidden="true">'+t.icon+'</span>'+
+   '<span class="ref-event-icon ref-event-icon-'+(Object.hasOwn(types,e.category)?e.category:'misc')+'" aria-hidden="true">'+t.icon+'</span>'+
    '<div class="ref-event-info"><b>'+esc(title)+'</b>'+
    (detail?'<span>'+esc(detail)+'</span>':'')+
    '<small>'+esc(t.label)+actor+'</small></div>'+
