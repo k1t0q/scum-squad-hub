@@ -153,7 +153,9 @@ async function refreshSharedMapMarkers(){
    const p=byId.get(String(m.id).slice(11));
    const checked=new Date(p.stash_checked_at||p.created_at).getTime();
    const left=Math.max(0,Math.ceil((checked+14*86400000-Date.now())/86400000));
-   return {...m,name:m.name||stashMapTitle(p),icon:m.icon||'📦',stashOwner:p.author_nick||'Участник',stashDays:left,stashCheckedBy:p.stash_checked_by_nick||p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||(left===0?'#888888':left<=1?'#e05252':left<=5?'#e5aa30':'#34a853')};
+   const oldTitle=String(m.name||'').trim();
+   const title=(!oldTitle||/^Схрон\s*#\s*\d+$/i.test(oldTitle))?stashMapTitle(p):oldTitle;
+   return {...m,name:title,icon:m.icon||'📦',stashOwner:p.author_nick||'Участник',stashDays:left,stashCheckedBy:p.stash_checked_by_nick||p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||(left===0?'#888888':left<=1?'#e05252':left<=5?'#e5aa30':'#34a853')};
   });
   frame.contentWindow?.postMessage({kind:'scumMapSharedMarkers',markers},'https://k1t0q.github.io');
  }catch(e){console.error('Shared markers fetch',e)}
