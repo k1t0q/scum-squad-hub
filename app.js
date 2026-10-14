@@ -173,17 +173,23 @@ window.addEventListener('message',async e=>{
    const id=String(msg.id||''),kind=['stash','base','other'].includes(msg.postKind)?msg.postKind:'stash';
    const x=Number(msg.x),y=Number(msg.y);
    if(!/^\d+$/.test(id)||!Number.isFinite(x)||!Number.isFinite(y)||x<0||x>1||y<0||y>1)throw Error('Некорректная точка');
-   const {data:posts,error:pe}=await sb.rpc('get_squad_place_posts',{p_kind:kind});
-   if(pe)throw pe;
-   const p=(posts||[]).find(p=>String(p.id)===id);
-   if(!p)throw Error('Публикация не найдена');
-   const marker={id:kind+'-post-'+id,x,y,type:kind==='stash'?'stash':'base',icon:kind==='stash'?'📦':kind==='base'?'🏠':'📍',color:kind==='stash'?'#45bf73':'#e5a74b',size:30,showLabel:true,name:stashMapTitle(p),note:'',stashPostId:id,updatedAt:Date.now()};
+   // Resolve the actual publication type even if an older cached map iframe omits postKind.
+   let actualKind=kind,p=null;
+   for(const candidate of [kind,...['stash','base','other'].filter(k=>k!==kind)]){
+    const {data:posts,error:pe}=await sb.rpc('get_squad_place_posts',{p_kind:candidate});
+    if(pe)throw pe;
+    p=(posts||[]).find(item=>String(item.id)===id);
+    if(p){actualKind=candidate;break}
+   }
+   if(!p)throw Error('Публикация не найдена: '+id);
+   const markerKind=actualKind;
+   const marker={id:markerKind+'-post-'+id,x,y,type:markerKind==='stash'?'stash':'base',icon:markerKind==='stash'?'📦':markerKind==='base'?'🏠':'📍',color:markerKind==='stash'?'#45bf73':'#e5a74b',size:30,showLabel:true,name:stashMapTitle(p),note:'',stashPostId:id,updatedAt:Date.now()};
    const {error}=await sb.rpc('squad_map_sync',{p_action:'save',p_marker:marker});
    if(error)throw error;
    toast('Положение метки сохранено');
    await refreshSharedMapMarkers();
-   e.source?.postMessage({kind:'scumStashFocus',id,postKind:kind},e.origin);
-  }catch(err){console.error('Marker position',err);toast('Не удалось сохранить точку')}
+   e.source?.postMessage({kind:'scumStashFocus',id,postKind:markerKind},e.origin);
+  }catch(err){console.error('Marker position',err);toast('Не удалось сохранить точку: '+(err?.message||String(err)))}
   return;
  }
  if(msg.kind==='scumMapDeletePostPhoto'){
