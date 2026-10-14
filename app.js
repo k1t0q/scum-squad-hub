@@ -78,7 +78,7 @@ function stashCommentWithCoords(comment,coords){
  return coords?.trim()?cleaned+'\nКоординаты: '+coords.trim():cleaned;
 }
 let pendingStashMap=null;
-function stashMapOpen(id,pick=false){pendingStashMap={id:String(id),pick};go('Карта')}
+function stashMapOpen(id,pick=false,kind='stash'){pendingStashMap={id:String(id),pick,kind};go('Карта')}
 let mapHelloTimer=null;
 function initMapFrame(){
  mapSharedReady=false;
@@ -170,20 +170,20 @@ window.addEventListener('message',async e=>{
  }
  if(msg.kind==='scumStashPicked'&&onlineMember&&sb){
   try{
-   const id=String(msg.id||'');
+   const id=String(msg.id||''),kind=['stash','base','other'].includes(msg.postKind)?msg.postKind:'stash';
    const x=Number(msg.x),y=Number(msg.y);
    if(!/^\d+$/.test(id)||!Number.isFinite(x)||!Number.isFinite(y)||x<0||x>1||y<0||y>1)throw Error('Некорректная точка');
-   const {data:posts,error:pe}=await sb.rpc('get_squad_place_posts',{p_kind:'stash'});
+   const {data:posts,error:pe}=await sb.rpc('get_squad_place_posts',{p_kind:kind});
    if(pe)throw pe;
    const p=(posts||[]).find(p=>String(p.id)===id);
-   if(!p)throw Error('Схрон не найден');
-   const marker={id:'stash-post-'+id,x,y,type:'stash',icon:'📦',color:'#45bf73',size:30,showLabel:true,name:stashMapTitle(p),note:'',stashPostId:id,updatedAt:Date.now()};
+   if(!p)throw Error('Публикация не найдена');
+   const marker={id:kind+'-post-'+id,x,y,type:kind==='stash'?'stash':'base',icon:kind==='stash'?'📦':kind==='base'?'🏠':'📍',color:kind==='stash'?'#45bf73':'#e5a74b',size:30,showLabel:true,name:stashMapTitle(p),note:'',stashPostId:id,updatedAt:Date.now()};
    const {error}=await sb.rpc('squad_map_sync',{p_action:'save',p_marker:marker});
    if(error)throw error;
-   toast('Положение схрона сохранено');
+   toast('Положение метки сохранено');
    await refreshSharedMapMarkers();
-   e.source?.postMessage({kind:'scumStashFocus',id},e.origin);
-  }catch(err){console.error('Stash position',err);toast('Не удалось сохранить точку схрона')}
+   e.source?.postMessage({kind:'scumStashFocus',id,postKind:kind},e.origin);
+  }catch(err){console.error('Marker position',err);toast('Не удалось сохранить точку')}
   return;
  }
  if(msg.kind==='scumMapDeletePostPhoto'){
@@ -234,7 +234,7 @@ window.addEventListener('message',async e=>{
   if(mapHelloTimer){clearInterval(mapHelloTimer);mapHelloTimer=null;}
   syncMapBasePublications();
   await refreshSharedMapMarkers();
-  if(pendingStashMap){e.source.postMessage({kind:pendingStashMap.pick?'scumStashPick':'scumStashFocus',id:pendingStashMap.id},e.origin);pendingStashMap=null;}
+  if(pendingStashMap){e.source.postMessage({kind:pendingStashMap.pick?'scumStashPick':'scumStashFocus',id:pendingStashMap.id,postKind:pendingStashMap.kind||'stash'},e.origin);pendingStashMap=null;}
   // Import any previously saved local markers only once per marker ID.
   if(Array.isArray(msg.localMarkers)&&msg.localMarkers.length){
    try{
@@ -567,7 +567,7 @@ async function placePage(kind){
  if(page!==placeTitle(kind))return;
  if(error){console.error('placePage',kind,error);if(body)body.innerHTML='<div class="empty">Ошибка загрузки: '+esc(error.message||String(error))+'<br><button class="ghost" style="margin-top:12px" onclick="placePage(\''+kind+'\')">Повторить</button></div>';return}
  let d=placeDraft[kind]||{images:[],comment:''};
- $('#placeBody').innerHTML='<div class="place-compose"><div class="raidphotos placephotos">'+d.images.map((u,i)=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"><button class="place-photo-remove" onclick="removeDraftPlacePhoto(\''+kind+'\','+i+')">×</button></div>').join('')+'</div>'+(kind==='stash'?'<div style="display:flex;align-items:center;gap:12px;margin:0 0 10px"><label for="placeKindSelect" style="font-weight:700">Тип метки</label>'+furySelectPicker('placeKindSelect',[{value:'stash',label:'Схрон'},{value:'base',label:'База'},{value:'other',label:'Прочее'}],d.postKind||'stash','Схрон')+'</div>':'')+'<div class="ref-feed-compose-row"><textarea id="placeComment" class="place-comment" placeholder="Напишите...">'+esc(d.comment||'')+'</textarea><button class="primary ref-feed-send" onclick="publishPlacePost(\''+kind+'\')">Отправить</button></div>'+(kind==='stash'?'<input id="stashCoordsInput" placeholder="Координаты: X=123456 Y=-234567 Z=0" value="'+esc(d.coords||'')+'" style="width:100%;margin:8px 0 0;padding:10px;border:1px solid #35453f;border-radius:7px;background:#0b1512;color:#fff">':'')+'<div class="ref-feed-attach-row"><label class="ref-feed-attach"><span class="attach-full">Прикрепить фото</span><span class="attach-mobile">Прикрепить</span><input id="placePhotoFile" type="file" accept="image/*" multiple></label><span class="muted">Ctrl+V — вставить скриншот из буфера · либо выбрать файлы. Максимум 5 фото.</span></div></div><div class="list ref-feed-list place-feed-list">'+((data||[]).length?(data||[]).map(p=>'<div class="item ref-feed-post"><div class="itemtop"><div><b>'+esc(p.author_nick||'Участник')+'</b><span class="ref-feed-date">'+new Date(p.created_at).toLocaleString('ru-RU',{timeZone:'Europe/Moscow'})+'</span></div>'+((p.created_by===onlineMember.id||onlineMember.access_role==='admin'||db.profile?.access==='admin')?'<div class="ref-post-menu"><button class="ref-post-dots" onclick="togglePlacePostMenu('+p.id+',event)">•••</button><div class="ref-post-menu-pop" id="placePostMenu'+p.id+'"><button onclick="editPlacePost('+p.id+',\''+(p.kind||kind)+'\')">Редактировать</button><button class="danger" onclick="deletePlacePost('+p.id+',\''+(p.kind||kind)+'\')">Удалить публикацию</button></div></div>':'')+'</div>'+(p.comment?'<div class="ref-feed-comment">'+esc(p.comment)+'</div>':'')+'<div class="raidphotos placephotos">'+(p.images||[]).map(u=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"></div>').join('')+'</div>'+(kind==='stash'?(p.kind==='base'||p.kind==='other'?'':stashLifeHtml(p))+(p.kind==='base'||p.kind==='other'?'':'<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="stashMapOpen('+p.id+',false)">Показать на карте</button><button class="ghost" onclick="stashMapOpen('+p.id+',true)">Указать на карте</button></div>'):'')+'</div>').join(''):'<div class="empty">Публикаций пока нет</div>')+'</div>';
+ $('#placeBody').innerHTML='<div class="place-compose"><div class="raidphotos placephotos">'+d.images.map((u,i)=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"><button class="place-photo-remove" onclick="removeDraftPlacePhoto(\''+kind+'\','+i+')">×</button></div>').join('')+'</div>'+(kind==='stash'?'<div style="display:flex;align-items:center;gap:12px;margin:0 0 10px"><label for="placeKindSelect" style="font-weight:700">Тип метки</label>'+furySelectPicker('placeKindSelect',[{value:'stash',label:'Схрон'},{value:'base',label:'База'},{value:'other',label:'Прочее'}],d.postKind||'stash','Схрон')+'</div>':'')+'<div class="ref-feed-compose-row"><textarea id="placeComment" class="place-comment" placeholder="Напишите...">'+esc(d.comment||'')+'</textarea><button class="primary ref-feed-send" onclick="publishPlacePost(\''+kind+'\')">Отправить</button></div>'+(kind==='stash'?'<input id="stashCoordsInput" placeholder="Координаты: X=123456 Y=-234567 Z=0" value="'+esc(d.coords||'')+'" style="width:100%;margin:8px 0 0;padding:10px;border:1px solid #35453f;border-radius:7px;background:#0b1512;color:#fff">':'')+'<div class="ref-feed-attach-row"><label class="ref-feed-attach"><span class="attach-full">Прикрепить фото</span><span class="attach-mobile">Прикрепить</span><input id="placePhotoFile" type="file" accept="image/*" multiple></label><span class="muted">Ctrl+V — вставить скриншот из буфера · либо выбрать файлы. Максимум 5 фото.</span></div></div><div class="list ref-feed-list place-feed-list">'+((data||[]).length?(data||[]).map(p=>'<div class="item ref-feed-post"><div class="itemtop"><div><b>'+esc(p.author_nick||'Участник')+'</b><span class="ref-feed-date">'+new Date(p.created_at).toLocaleString('ru-RU',{timeZone:'Europe/Moscow'})+'</span></div>'+((p.created_by===onlineMember.id||onlineMember.access_role==='admin'||db.profile?.access==='admin')?'<div class="ref-post-menu"><button class="ref-post-dots" onclick="togglePlacePostMenu('+p.id+',event)">•••</button><div class="ref-post-menu-pop" id="placePostMenu'+p.id+'"><button onclick="editPlacePost('+p.id+',\''+(p.kind||kind)+'\')">Редактировать</button><button class="danger" onclick="deletePlacePost('+p.id+',\''+(p.kind||kind)+'\')">Удалить публикацию</button></div></div>':'')+'</div>'+(p.comment?'<div class="ref-feed-comment">'+esc(p.comment)+'</div>':'')+'<div class="raidphotos placephotos">'+(p.images||[]).map(u=>'<div class="placephoto"><img src="'+esc(u)+'" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in"></div>').join('')+'</div>'+(kind==='stash'?(p.kind==='base'||p.kind==='other'?'':stashLifeHtml(p))+'<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="stashMapOpen('+p.id+',false,\''+(p.kind||kind)+'\')">Показать на карте</button><button class="ghost" onclick="stashMapOpen('+p.id+',true,\''+(p.kind||kind)+'\')">Указать на карте</button></div>':'')+'</div>').join(''):'<div class="empty">Публикаций пока нет</div>')+'</div>';
  $('#placePhotoFile')?.addEventListener('change',e=>uploadPlaceFiles(kind,[...e.target.files]));
  $('#stashCoordsInput')?.addEventListener('input',e=>{placeDraft.stash.coords=e.target.value});
  $('#placeComment')?.addEventListener('input',e=>{placeDraft[kind]=placeDraft[kind]||{images:[],comment:''};placeDraft[kind].comment=e.target.value});
