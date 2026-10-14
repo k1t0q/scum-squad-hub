@@ -143,7 +143,7 @@ async function refreshSharedMapMarkers(){
     const rawNote=typeof m.note==='string'?m.note.trim():'';
     const cleanNote=['undefined','null'].includes(rawNote.toLowerCase())?'':rawNote;
     const desc=String(p?.comment||'').split(/\r?\n/).map(t=>t.trim()).filter(t=>t&&!['undefined','null'].includes(t.toLowerCase())&&!/^(Координаты:|Источник:)/i.test(t)).join('\n');
-    return {...m,type:m.type||'base',icon:m.icon||'📍',name:m.name||stashMapTitle(p).replace(/^Схрон /,'Метка '),note:cleanNote||(desc==='Маркер'?'':desc),stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e5aa30'};
+    return {...m,type:m.type||'base',icon:m.icon||'📍',name:m.name||stashMapTitle(p).replace(/^Схрон /,'Метка '),note:cleanNote,stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e5aa30'};
    }
    if(String(m.id).startsWith('base-post-')){
     const p=basesById.get(String(m.id).slice(10));
