@@ -705,7 +705,7 @@ sb.from('protect_updates').select('*').eq('squad_id',onlineMember.squad_id).orde
 async function bootOnline(){try{sb=supabase.createClient(SUPA_URL,SUPA_KEY);await joinOnline()}catch(e){console.error(e);toast('Supabase недоступен')}}
 
 
-document.addEventListener('paste',async e=>{if(page!=='Главная'&&page!=='Сегодня'&&page!=='Схрон'&&page!=='Базы')return;let files=[...(e.clipboardData?.items||[])].filter(x=>x.kind==='file'&&x.type.startsWith('image/')).map(x=>x.getAsFile()).filter(Boolean);if(!files.length)return;e.preventDefault();if(placeEdit){await uploadPlaceEditFiles(files)}else{await uploadPlaceFiles((page==='Главная'||page==='Сегодня')?'home':page==='Схрон'?'stash':'base',files)}});
+document.addEventListener('paste',async e=>{if(page!=='Главная'&&page!=='Сегодня'&&page!=='Метка'&&page!=='Схрон'&&page!=='Базы')return;let files=[...(e.clipboardData?.items||[])].filter(x=>x.kind==='file'&&x.type.startsWith('image/')).map(x=>x.getAsFile()).filter(Boolean);if(!files.length)return;e.preventDefault();if(placeEdit){await uploadPlaceEditFiles(files)}else{await uploadPlaceFiles((page==='Главная'||page==='Сегодня')?'home':(page==='Схрон'||page==='Метка')?'stash':'base',files)}});
 
 function stashLifeHtml(p){
  const checked=p.stash_checked_at||p.created_at;
