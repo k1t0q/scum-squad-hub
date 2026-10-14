@@ -133,7 +133,7 @@ async function refreshSharedMapMarkers(){
   const markers=rawMarkers.map(m=>{
    if(String(m.id).startsWith('other-post-')){
     const p=othersById.get(String(m.id).slice(11));
-    return {...m,type:'base',icon:'📍',name:stashMapTitle(p).replace(/^Схрон /,'Метка '),stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:'#e5aa30'};
+    return {...m,type:'base',icon:String(m.icon||'📍'),name:String(m.name||stashMapTitle(p).replace(/^Схрон /,'Метка ')),stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e5aa30'};
    }
    if(String(m.id).startsWith('base-post-')){
     const p=basesById.get(String(m.id).slice(10));
