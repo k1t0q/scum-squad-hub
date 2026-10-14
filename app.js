@@ -186,6 +186,25 @@ window.addEventListener('message',async e=>{
   }catch(err){console.error('Stash position',err);toast('Не удалось сохранить точку схрона')}
   return;
  }
+ if(msg.kind==='scumMapDeletePostPhoto'){
+  let ok=false,errorText='';
+  const postId=Number(msg.postId),url=String(msg.url||'');
+  try{
+   if(!onlineMember||!sb)throw new Error('Нет авторизации');
+   if(!Number.isSafeInteger(postId)||postId<=0||!url.startsWith('https://'))throw new Error('Неверные данные фото');
+   const {data:post,error:readError}=await sb.from('squad_place_posts').select('id,images,squad_id').eq('id',postId).eq('squad_id',onlineMember.squad_id).single();
+   if(readError||!post)throw new Error('Публикация недоступна');
+   const images=Array.isArray(post.images)?post.images:[];
+   if(!images.includes(url))throw new Error('Фото уже отсутствует');
+   const {data:updated,error:updateError}=await sb.from('squad_place_posts').update({images:images.filter(x=>x!==url)}).eq('id',postId).eq('squad_id',onlineMember.squad_id).select('id');
+   if(updateError)throw updateError;
+   if(!updated?.length)throw new Error('Нет разрешения на удаление');
+   ok=true;
+  }catch(err){console.error('Map photo delete',err);errorText=String(err.message||err).slice(0,160)}
+  e.source?.postMessage({kind:'scumMapDeletePostPhotoResult',postId,url,ok,error:errorText},e.origin);
+  if(ok)syncMapBasePublications();
+  return;
+ }
  if(msg.kind==='scumMapCreatePost'){
   let ok=false,errorText='';
   try{
