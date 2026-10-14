@@ -94,6 +94,7 @@ function initMapFrame(){
 }
 let mapSharedRefreshTimer=null;
 let mapSharedBusy=false;
+const mapPendingSaves=new Map();
 let mapSharedReady=false;
 async function refreshSharedMapMarkers(){
  const frame=document.getElementById('squadMapFrame');
@@ -129,6 +130,12 @@ async function refreshSharedMapMarkers(){
    if(rawMarkers.some(m=>String(m.id)===id))continue;
    const pos=stashCoords(p.comment);
    if(pos)rawMarkers.push({id,...pos,type:'base',icon:'📍',size:30,showLabel:true});
+  }
+  // Keep local edits visible until their server save finishes. Background refreshes must not roll them back.
+  for(const [id,item] of mapPendingSaves){
+   const ix=rawMarkers.findIndex(m=>String(m.id)===id);
+   if(ix>=0)rawMarkers[ix]={...rawMarkers[ix],...item};
+   else rawMarkers.push({...item});
   }
   const markers=rawMarkers.map(m=>{
    if(String(m.id).startsWith('other-post-')){
@@ -221,12 +228,21 @@ window.addEventListener('message',async e=>{
    }catch(err){console.error('Map import',err)}
   }
  }else if(msg.kind==='scumMapMarkerAction'&&onlineMember&&sb){
+  const id=msg.action==='save'?String(msg.marker?.id||''):String(msg.id||'');
+  if(msg.action==='save'&&id)mapPendingSaves.set(id,{...msg.marker});
   try{
    const params=msg.action==='save'?{p_action:'save',p_marker:msg.marker}:{p_action:'delete',p_id:msg.id};
    const {error}=await sb.rpc('squad_map_sync',params);
    if(error)throw error;
+   mapPendingSaves.delete(id);
    await refreshSharedMapMarkers();
-  }catch(err){console.error('Marker sync',err);toast('Ошибка сохранения метки — локальная копия сохранена');}
+   if(msg.action==='save')toast('Изменения метки сохранены');
+  }catch(err){
+   console.error('Marker sync',err);
+   mapPendingSaves.delete(id);
+   toast('Ошибка сохранения метки — проверь доступ');
+   await refreshSharedMapMarkers();
+  }
  }
 });
 async function syncMapBasePublications(){
