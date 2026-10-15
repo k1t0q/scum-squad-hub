@@ -334,32 +334,53 @@ function openRaidPhoto(url){
  img.style.cssText='position:absolute;left:50%;top:50%;display:block;width:auto;height:auto;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);object-fit:contain;transform:translate(-50%,-50%) translate(0px,0px) scale(1);transform-origin:center center;user-select:none;-webkit-user-drag:none;touch-action:none;cursor:zoom-in';
  d.appendChild(img);document.body.appendChild(d);
  let scale=1,startScale=1,startDist=0,moved=false,tx=0,ty=0,startTx=0,startTy=0,startMidX=0,startMidY=0,downX=0,downY=0;
- const apply=()=>{img.style.transform='translate(-50%,-50%) translate('+tx+'px,'+ty+'px) scale('+scale+')'};
+ const apply=()=>{img.style.transform='translate(-50%,-50%) translate('+tx+'px,'+ty+'px) scale('+scale+')';if(img.complete&&img.naturalWidth)resizeCanvas()};
  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
  const mid=t=>({x:(t[0].clientX+t[1].clientX)/2,y:(t[0].clientY+t[1].clientY)/2});
  const toggleZoom=()=>{if(scale>1.01){scale=1;tx=0;ty=0}else{scale=2.5;tx=0;ty=0}apply();img.style.cursor=scale>1?'zoom-out':'zoom-in'};
  const toolbar=document.createElement('div');toolbar.id='photoDrawToolbar';
  toolbar.style.cssText='position:absolute;z-index:5;top:12px;left:12px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;max-width:calc(100vw - 80px);padding:7px;background:#101819ee;border:1px solid #405052;border-radius:9px;box-shadow:0 8px 30px #000a;touch-action:manipulation';
- const tools=[['pen','✎','Карандаш'],['arrow','➚','Стрелка'],['rect','▭','Прямоугольник'],['text','T','Текст'],['eraser','⌫','Ластик'],['undo','↶','Отменить'],['save','💾','Сохранить PNG']];
+ const tools=[['pen','✎','Карандаш'],['arrow','➚','Стрелка'],['rect','▭','Прямоугольник'],['text','T','Текст'],['eraser','⌫','Ластик'],['undo','↶','Отменить'],['save','💾','Сохранить на сайте'],['reset','↺','Сбросить рисунки']];
  for(const [id,symbol,label] of tools){let b=document.createElement('button');b.type='button';b.textContent=symbol;b.title=label;b.dataset.tool=id;b.style.cssText='border:1px solid #344547;border-radius:5px;background:#1b292b;color:#f1f5f4;min-width:34px;height:34px;font-size:19px;cursor:pointer';toolbar.appendChild(b)}
  const color=document.createElement('input');color.type='color';color.value='#ff273c';color.title='Цвет';color.style.cssText='width:34px;height:34px;border:0;background:transparent;cursor:pointer';toolbar.insertBefore(color,toolbar.querySelector('[data-tool=undo]'));
  const close=document.createElement('button');close.textContent='×';close.title='Закрыть фото';close.style.cssText='position:absolute;right:12px;top:12px;z-index:6;background:#202629;color:white;border:1px solid #59666a;border-radius:7px;font-size:26px;width:38px;height:38px;cursor:pointer';close.onclick=closeRaidPhoto;d.append(toolbar,close);
- const canvas=document.createElement('canvas');canvas.style.cssText='position:absolute;z-index:3;touch-action:none;display:none;cursor:crosshair';d.appendChild(canvas);
- const ctx=canvas.getContext('2d');let tool='',strokes=[],active=null,pointer=null;
+ const canvas=document.createElement('canvas');canvas.style.cssText='position:absolute;z-index:3;touch-action:none;display:block;pointer-events:none;cursor:crosshair';d.appendChild(canvas);
+ const ctx=canvas.getContext('2d');let tool='',strokes=[],active=null,pointer=null,loadingDrawings=true;
  const bounds=()=>img.getBoundingClientRect();
  function resizeCanvas(){if(!img.naturalWidth)return;const b=bounds();canvas.style.left=b.left+'px';canvas.style.top=b.top+'px';canvas.style.width=b.width+'px';canvas.style.height=b.height+'px';canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;draw()}
  function point(e){let b=canvas.getBoundingClientRect();return {x:(e.clientX-b.left)*canvas.width/b.width,y:(e.clientY-b.top)*canvas.height/b.height}}
  function paint(s){if(!s)return;ctx.save();ctx.strokeStyle=s.color;ctx.fillStyle=s.color;ctx.lineWidth=Math.max(3,canvas.width/400);ctx.lineCap='round';ctx.lineJoin='round';if(s.type==='eraser')ctx.globalCompositeOperation='destination-out';if(s.type==='pen'||s.type==='eraser'){ctx.beginPath();s.points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));if(s.points.length===1){ctx.lineTo(s.points[0].x+.01,s.points[0].y+.01)}ctx.stroke()}else if(s.type==='rect'){ctx.strokeRect(s.from.x,s.from.y,s.to.x-s.from.x,s.to.y-s.from.y)}else if(s.type==='arrow'){let a=s.from,b=s.to,angle=Math.atan2(b.y-a.y,b.x-a.x),size=Math.max(15,canvas.width/45);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.moveTo(b.x-size*Math.cos(angle-.55),b.y-size*Math.sin(angle-.55));ctx.lineTo(b.x,b.y);ctx.lineTo(b.x-size*Math.cos(angle+.55),b.y-size*Math.sin(angle+.55));ctx.stroke()}else if(s.type==='text'){ctx.font='bold '+Math.max(22,Math.round(canvas.width/35))+'px Arial';ctx.fillText(s.value,s.from.x,s.from.y)}ctx.restore()}
  function draw(){if(!canvas.width)return;ctx.clearRect(0,0,canvas.width,canvas.height);strokes.forEach(paint);paint(active)}
- function setTool(t){tool=t;canvas.style.display=t?'block':'none';img.style.cursor=t?'default':'zoom-in';for(let b of toolbar.querySelectorAll('[data-tool]'))b.style.borderColor=b.dataset.tool===t?'#ff4b5c':'#344547';if(t){scale=1;tx=0;ty=0;apply();resizeCanvas()}}
- toolbar.addEventListener('click',async e=>{const b=e.target.closest('[data-tool]');if(!b)return;e.stopPropagation();const t=b.dataset.tool;if(t==='undo'){strokes.pop();draw();return}if(t==='save'){await savePhotoDrawing();return}setTool(tool===t?'':t)});
+ function setTool(t){tool=t;canvas.style.pointerEvents=t?'auto':'none';img.style.cursor=t?'default':'zoom-in';for(let b of toolbar.querySelectorAll('[data-tool]'))b.style.borderColor=b.dataset.tool===t?'#ff4b5c':'#344547';if(t){scale=1;tx=0;ty=0;apply();resizeCanvas()}}
+ toolbar.addEventListener('click',async e=>{const b=e.target.closest('[data-tool]');if(!b)return;e.stopPropagation();const t=b.dataset.tool;if(t==='undo'){strokes.pop();draw();return}if(t==='save'){await savePhotoDrawing();return}if(t==='reset'){await resetPhotoDrawing();return}setTool(tool===t?'':t)});
  canvas.addEventListener('pointerdown',e=>{if(!tool)return;e.preventDefault();e.stopPropagation();if(tool==='text'){const value=prompt('Введите текст');if(value){strokes.push({type:'text',from:point(e),value,color:color.value});draw()}return}pointer=e.pointerId;canvas.setPointerCapture(pointer);const p=point(e);active={type:tool,from:p,to:p,points:[p],color:color.value};draw()});
  canvas.addEventListener('pointermove',e=>{if(e.pointerId!==pointer||!active)return;e.preventDefault();let p=point(e);active.to=p;if(active.type==='pen'||active.type==='eraser')active.points.push(p);draw()});
  function finish(e){if(e.pointerId!==pointer)return;pointer=null;if(active){strokes.push(active);active=null;draw()}}
  canvas.addEventListener('pointerup',finish);canvas.addEventListener('pointercancel',finish);
- async function savePhotoDrawing(){if(!img.complete||!img.naturalWidth){toast('Фото ещё загружается');return}let output=document.createElement('canvas');output.width=img.naturalWidth;output.height=img.naturalHeight;let out=output.getContext('2d');try{out.drawImage(img,0,0);out.drawImage(canvas,0,0);output.toBlob(blob=>{if(!blob){toast('Не удалось сохранить PNG');return}let u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='scum-hub-photo-'+Date.now()+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)},'image/png')}catch(err){console.error(err);toast('Сохранение недоступно: источник фото запрещает экспорт')} }
+ async function savePhotoDrawing(){
+  if(loadingDrawings){toast('Подожди загрузки рисунков');return}
+  if(!sb||!onlineMember){toast('Нужна авторизация');return}
+  const {error}=await sb.rpc('squad_photo_drawings',{p_url:url,p_strokes:strokes,p_save:true});
+  if(error){console.error('Photo drawing save',error);toast('Не удалось сохранить рисунки');return}
+  toast('Рисунки сохранены для всего отряда');
+ }
+ async function resetPhotoDrawing(){
+  if(!confirm('Сбросить все рисунки на этой фотографии для всего отряда?'))return;
+  if(!sb||!onlineMember){toast('Нужна авторизация');return}
+  const {error}=await sb.rpc('squad_photo_drawings',{p_url:url,p_strokes:[],p_save:true});
+  if(error){console.error('Photo drawing reset',error);toast('Не удалось сбросить рисунки');return}
+  strokes=[];active=null;draw();toast('Рисунки сброшены для всего отряда');
+ }
+ async function loadPhotoDrawing(){
+  if(!sb||!onlineMember){loadingDrawings=false;return}
+  const {data,error}=await sb.rpc('squad_photo_drawings',{p_url:url});
+  if(!d.isConnected)return;
+  loadingDrawings=false;
+  if(error){console.error('Photo drawing load',error);toast('Не удалось загрузить рисунки');return}
+  strokes=Array.isArray(data)?data:[];draw();
+ }
  img.crossOrigin='anonymous';img.src=url;
- img.addEventListener('load',()=>{if(tool)resizeCanvas()});
+ img.addEventListener('load',()=>resizeCanvas());loadPhotoDrawing();
  d.addEventListener('touchstart',e=>{if(tool||e.target.closest('#photoDrawToolbar')||e.target===close)return;if(e.touches.length===2){e.preventDefault();startDist=dist(e.touches);startScale=scale;startTx=tx;startTy=ty;let m=mid(e.touches);startMidX=m.x;startMidY=m.y;moved=true}else if(e.touches.length===1){downX=e.touches[0].clientX;downY=e.touches[0].clientY;startTx=tx;startTy=ty;moved=false}},{passive:false});
  d.addEventListener('touchmove',e=>{if(tool||e.target.closest('#photoDrawToolbar'))return;if(e.touches.length===2&&startDist){e.preventDefault();let m=mid(e.touches),ns=Math.max(1,Math.min(5,startScale*dist(e.touches)/startDist)),ratio=ns/startScale;tx=m.x-innerWidth/2-(startMidX-innerWidth/2-startTx)*ratio;ty=m.y-innerHeight/2-(startMidY-innerHeight/2-startTy)*ratio;scale=ns;if(scale<=1.001){scale=1;tx=0;ty=0}apply();moved=true}else if(e.touches.length===1&&scale>1){e.preventDefault();let dx=e.touches[0].clientX-downX,dy=e.touches[0].clientY-downY;if(Math.abs(dx)>3||Math.abs(dy)>3)moved=true;tx=startTx+dx;ty=startTy+dy;apply()}},{passive:false});
  d.addEventListener('touchend',e=>{if(tool||e.target.closest('#photoDrawToolbar'))return;if(!e.touches.length&&!moved&&e.changedTouches.length===1){if(e.target===img)toggleZoom();else if(e.target===d)closeRaidPhoto()}if(!e.touches.length){startDist=0;if(scale<=1.01){scale=1;tx=0;ty=0;apply()}}},{passive:false});
