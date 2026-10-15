@@ -793,11 +793,10 @@ function settingsPage(){
  $('#view').innerHTML='<div class="card fury-settings fury-simple-settings"><div class="toolbar"><div><h2>Настройки</h2><span class="muted">Уведомления и Discord</span></div></div>'+
  '<div class="settings-row fury-settings-main-row"><div><b>Уведомления</b><p class="muted fury-setting-description">Оповещения о рейдах, задачах, протекте, схронах и событиях отряда.</p><p class="muted fury-setting-status">Статус: '+(!supported?'не поддерживаются этим браузером':active?'включены':'выключены')+'</p></div><button class="ghost fury-setting-action fury-setting-action-'+(requested?'danger':'success')+'" type="button" onclick="togglePushPreference()"'+(!supported?' disabled':'')+'>'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div>'+
  '<div class="settings-row fury-settings-main-row"><div><b>Discord</b><p class="muted fury-setting-description">Привяжите аккаунт, чтобы получать личные сообщения от SCUM HUB в Discord.</p><p class="muted fury-setting-status" id="furyDiscordLinkStatus">Проверяем привязку…</p></div><button class="ghost fury-setting-action fury-setting-action-success" type="button" id="furyDiscordLinkButton" onclick="createDiscordLinkCode()" disabled style="visibility:hidden">ПРОВЕРЯЕМ…</button></div>'+
- (db.profile.access==='admin'?'<div class="fury-appearance-settings"><div class="toolbar"><div><h2>ОФОРМЛЕНИЕ САЙТА</h2><span class="muted">Фоны шапки и боковой панели · видны всему отряду</span></div></div><div id="furyAppearanceEditor">Загрузка оформления…</div></div>':'')+
+
  (db.profile.access==='admin'?'<div class="fury-discord-admin"><b>Управление уведомлениями участников</b><p class="muted">Привязки Discord и уведомления сайта для всех участников отряда.</p><div id="furyDiscordAdminList" class="muted">Загрузка списка…</div></div>':'')+'</div>';
  loadDiscordLinkStatus();
  if(db.profile.access==='admin')loadDiscordAdminList();
- if(db.profile.access==='admin')renderAppearanceEditor();
 }
 async function loadDiscordAdminList(){
  const target=document.getElementById('furyDiscordAdminList');
@@ -891,106 +890,6 @@ async function togglePushPreference(){
   }
  }
 }
-
-/* Shared squad appearance: only an admin can upload and save images. */
-let furyAppearance={header:{url:'',x:50,y:50,zoom:100,dark:55},sidebar:{url:'',x:50,y:50,zoom:100,dark:65}};
-const furyAppearanceDefaults=JSON.parse(JSON.stringify(furyAppearance));
-function furySafeAppearance(obj){
- const out={};
- for(const part of ['header','sidebar']){
-  const raw=obj?.[part]||{},fallback=furyAppearanceDefaults[part];
-  out[part]={url:typeof raw.url==='string'?raw.url:'',x:Number(raw.x??fallback.x),y:Number(raw.y??fallback.y),zoom:Number(raw.zoom??fallback.zoom),dark:Number(raw.dark??fallback.dark)};
- }
- return out;
-}
-function furyApplyAppearance(obj){
- for(const part of ['header','sidebar']){
-  const data=obj[part]||{},target=document.querySelector(part==='header'?'.ref-header':'.app>aside');
-  if(!target)continue;
-  const url=String(data.url||'');
-  target.classList.toggle('fury-has-photo',!!url);
-  target.style.setProperty('--fury-photo-url',url?'url("'+url.replace(/["\\]/g,'')+'")':'none');
-  target.style.setProperty('--fury-photo-x',Math.max(0,Math.min(100,Number(data.x)||0))+'%');
-  target.style.setProperty('--fury-photo-y',Math.max(0,Math.min(100,Number(data.y)||0))+'%');
-  target.style.setProperty('--fury-photo-zoom',String(Math.max(1,Math.min(2.5,(Number(data.zoom)||100)/100))));
-  target.style.setProperty('--fury-photo-dark',String(Math.max(0,Math.min(1,(Number(data.dark)||0)/100))));
- }
-}
-async function furyLoadAppearance(){
- if(!sb||!onlineMember)return;
- const {data,error}=await sb.rpc('get_squad_appearance');
- if(error){console.warn('Appearance load',error);return}
- furyAppearance=furySafeAppearance(data);
- furyApplyAppearance(furyAppearance);
- if(document.getElementById('furyAppearanceEditor'))renderAppearanceEditor();
-}
-function renderAppearanceEditor(){
- const box=document.getElementById('furyAppearanceEditor');
- if(!box||db.profile.access!=='admin')return;
- box.innerHTML=['header','sidebar'].map(part=>{
-  const name=part==='header'?'ШАПКА САЙТА':'ЛЕВАЯ ПАНЕЛЬ',d=furyAppearance[part];
-  return '<div class="fury-appearance-part"><h3>'+name+'</h3>'+
-  '<div class="fury-appearance-preview fury-appearance-preview-'+part+'" id="furyAppearancePreview-'+part+'"><span>'+name+'</span></div>'+
-  '<label class="fury-appearance-upload">Загрузить изображение <input type="file" accept="image/png,image/jpeg,image/webp" onchange="furyUploadAppearance(this,\''+part+'\')"></label>'+
-  '<button class="ghost fury-appearance-reset" onclick="furyResetAppearance(\''+part+'\')">УБРАТЬ ФОТО</button>'+
-  [['x','По горизонтали',0,100],['y','По вертикали',0,100],['zoom','Масштаб',100,250],['dark','Затемнение',0,100]].map(([key,label,min,max])=>
-   '<label class="fury-appearance-control"><span>'+label+' <b id="furyAppearanceValue-'+part+'-'+key+'">'+d[key]+'%</b></span><input type="range" min="'+min+'" max="'+max+'" value="'+d[key]+'" oninput="furyChangeAppearance(\''+part+'\',\''+key+'\',this.value)"></label>'
-  ).join('')+'</div>';
- }).join('')+'<div class="fury-appearance-actions"><button class="primary" onclick="furySaveAppearance()">СОХРАНИТЬ ОФОРМЛЕНИЕ</button><button class="ghost" onclick="furyCancelAppearance()">ОТМЕНИТЬ ИЗМЕНЕНИЯ</button></div>';
- furyUpdateAppearancePreview();
-}
-function furyUpdateAppearancePreview(){
- for(const part of ['header','sidebar']){
-  const target=document.getElementById('furyAppearancePreview-'+part);
-  if(!target)continue;
-  const d=furyAppearance[part];
-  target.style.backgroundImage=d.url?'linear-gradient(rgba(0,0,0,'+(d.dark/100)+'),rgba(0,0,0,'+(d.dark/100)+')),url("'+d.url+'")':'none';
-  target.style.backgroundPosition='center,'+d.x+'% '+d.y+'%';
-  target.style.backgroundSize='cover,'+d.zoom+'% auto';
- }
- furyApplyAppearance(furyAppearance);
-}
-function furyChangeAppearance(part,key,value){
- if(db.profile.access!=='admin')return;
- furyAppearance[part][key]=Number(value);
- const label=document.getElementById('furyAppearanceValue-'+part+'-'+key);
- if(label)label.textContent=value+'%';
- furyUpdateAppearancePreview();
-}
-async function furyUploadAppearance(input,part){
- if(db.profile.access!=='admin'||!onlineMember||!sb)return;
- const file=input.files?.[0];
- if(!file)return;
- if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>8*1024*1024){toast('Выбери PNG, JPG или WebP до 8 МБ');input.value='';return}
- input.disabled=true;
- try{
-  const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
-  const path=onlineMember.squad_id+'/appearance/'+part+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
-  const {error}=await sb.storage.from('squad-photos').upload(path,file,{contentType:file.type,upsert:false});
-  if(error)throw error;
-  furyAppearance[part].url=sb.storage.from('squad-photos').getPublicUrl(path).data.publicUrl;
-  furyUpdateAppearancePreview();
-  toast('Фото загружено. Нажми «Сохранить оформление»');
- }catch(e){console.error('Appearance upload',e);toast('Не удалось загрузить фото')}
- finally{input.disabled=false;input.value=''}
-}
-function furyResetAppearance(part){
- if(db.profile.access!=='admin')return;
- furyAppearance[part]={...furyAppearanceDefaults[part]};
- renderAppearanceEditor();
-}
-async function furySaveAppearance(){
- if(db.profile.access!=='admin'||!sb)return;
- const {data,error}=await sb.rpc('set_squad_appearance',{p_appearance:furyAppearance});
- if(error){console.error('Appearance save',error);toast('Ошибка сохранения: '+String(error.message||error.details||error.code||'неизвестная ошибка').slice(0,180));return}
- furyAppearance=furySafeAppearance(data);furyApplyAppearance(furyAppearance);
- toast('Оформление сохранено для всего отряда');
-}
-async function furyCancelAppearance(){
- await furyLoadAppearance();
- renderAppearanceEditor();
-}
-setInterval(()=>{if(onlineMember&&sb&&db.profile.access!=='admin')furyLoadAppearance()},90000);
 
 $('#pageTitle').textContent=page;nav();render();bootOnline();
 
