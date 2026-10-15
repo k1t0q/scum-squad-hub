@@ -2910,3 +2910,12 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  body.fury-map-page #view{overflow:hidden!important;min-height:0!important}
  body.fury-map-page #squadMapFrame{overscroll-behavior:contain}
 }
+
+/* Desktop scroll: stop at actual content, without smooth-scroll overshoot or extra bottom space. */
+@media (min-width:901px){
+ html{scroll-behavior:auto!important;overscroll-behavior-y:contain!important}
+ body{overscroll-behavior-y:contain!important}
+ .app{min-height:100vh!important;height:auto!important;align-items:start!important}
+ .app>main{min-height:0!important;height:auto!important;padding-bottom:12px!important}
+ #view{min-height:0!important;height:auto!important;padding-bottom:0!important}
+}
