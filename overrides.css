@@ -2911,11 +2911,10 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  body.fury-map-page #squadMapFrame{overscroll-behavior:contain}
 }
 
-/* Desktop scroll: stop at actual content, without smooth-scroll overshoot or extra bottom space. */
+/* Desktop: restore normal mouse-wheel scrolling throughout the site. */
 @media (min-width:901px){
- html{scroll-behavior:auto!important;overscroll-behavior-y:contain!important}
- body{overscroll-behavior-y:contain!important}
- .app{min-height:100vh!important;height:auto!important;align-items:start!important}
- .app>main{min-height:0!important;height:auto!important;padding-bottom:12px!important}
- #view{min-height:0!important;height:auto!important;padding-bottom:0!important}
+ html:not(.fury-map-page),body:not(.fury-map-page){overflow-y:auto!important;overscroll-behavior-y:auto!important}
+ html:not(.fury-map-page){scroll-behavior:auto!important}
+ body:not(.fury-map-page) .app{height:auto!important;min-height:100vh!important;overflow:visible!important}
+ body:not(.fury-map-page) .app>main,body:not(.fury-map-page) #view{height:auto!important;overflow:visible!important}
 }
