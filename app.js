@@ -95,6 +95,7 @@ function initMapFrame(){
 let mapSharedRefreshTimer=null;
 let mapSharedBusy=false;
 const mapPendingSaves=new Map();
+const mapPendingDeletes=new Set();
 let mapSharedReady=false;
 async function refreshSharedMapMarkers(){
  const frame=document.getElementById('squadMapFrame');
@@ -112,21 +113,24 @@ async function refreshSharedMapMarkers(){
   const othersById=new Map((otherPosts||[]).map(p=>[String(p.id),p]));
   const byId=new Map((posts||[]).map(p=>[String(p.id),p]));
   const basesById=new Map((basePosts||[]).map(p=>[String(p.id),p]));
-  const rawMarkers=(Array.isArray(data)?data:[]).filter(m=>(!String(m.id).startsWith('stash-post-')||byId.has(String(m.id).slice(11)))&&(!String(m.id).startsWith('base-post-')||basesById.has(String(m.id).slice(10)))&&(!String(m.id).startsWith('other-post-')||othersById.has(String(m.id).slice(11))));
+  const rawMarkers=(Array.isArray(data)?data:[]).filter(m=>!mapPendingDeletes.has(String(m.id))&&(!String(m.id).startsWith('stash-post-')||byId.has(String(m.id).slice(11)))&&(!String(m.id).startsWith('base-post-')||basesById.has(String(m.id).slice(10)))&&(!String(m.id).startsWith('other-post-')||othersById.has(String(m.id).slice(11))));
   for(const p of posts||[]){
    const id='stash-post-'+p.id;
+   if(mapPendingDeletes.has(id))continue;
    if(rawMarkers.some(m=>String(m.id)===id))continue;
    const pos=stashCoords(p.comment);
    if(pos)rawMarkers.push({id,...pos,type:'stash',icon:'📦',size:30,showLabel:true});
   }
   for(const p of basePosts||[]){
    const id='base-post-'+p.id;
+   if(mapPendingDeletes.has(id))continue;
    if(rawMarkers.some(m=>String(m.id)===id))continue;
    const pos=stashCoords(p.comment);
    if(pos)rawMarkers.push({id,...pos,type:'base',icon:'🏠',size:30,showLabel:true});
   }
   for(const p of otherPosts||[]){
    const id='other-post-'+p.id;
+   if(mapPendingDeletes.has(id))continue;
    if(rawMarkers.some(m=>String(m.id)===id))continue;
    const pos=stashCoords(p.comment);
    if(pos)rawMarkers.push({id,...pos,type:'base',icon:'📍',size:30,showLabel:true});
@@ -244,16 +248,19 @@ window.addEventListener('message',async e=>{
  }else if(msg.kind==='scumMapMarkerAction'&&onlineMember&&sb){
   const id=msg.action==='save'?String(msg.marker?.id||''):String(msg.id||'');
   if(msg.action==='save'&&id)mapPendingSaves.set(id,{...msg.marker});
+  if(msg.action==='delete'&&id){mapPendingDeletes.add(id);mapPendingSaves.delete(id)}
   try{
    const params=msg.action==='save'?{p_action:'save',p_marker:msg.marker}:{p_action:'delete',p_id:msg.id};
    const {error}=await sb.rpc('squad_map_sync',params);
    if(error)throw error;
    mapPendingSaves.delete(id);
    await refreshSharedMapMarkers();
+   mapPendingDeletes.delete(id);
    if(msg.action==='save')toast('Изменения метки сохранены');
   }catch(err){
    console.error('Marker sync',err);
    mapPendingSaves.delete(id);
+   mapPendingDeletes.delete(id);
    toast('Ошибка сохранения метки — проверь доступ');
    await refreshSharedMapMarkers();
   }
