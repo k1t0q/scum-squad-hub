@@ -241,22 +241,6 @@ window.addEventListener('message',async e=>{
   syncMapBasePublications();
   await refreshSharedMapMarkers();
   if(pendingStashMap){e.source.postMessage({kind:pendingStashMap.pick?'scumStashPick':'scumStashFocus',id:pendingStashMap.id,postKind:pendingStashMap.kind||'stash'},e.origin);pendingStashMap=null;}
-  // Import any previously saved local markers only once per marker ID.
-  if(Array.isArray(msg.localMarkers)&&msg.localMarkers.length){
-   try{
-    const {data,error}=await sb.rpc('squad_map_sync',{p_action:'list'});
-    if(error)throw error;
-    const existing=new Set((data||[]).map(m=>m.id));
-    for(const marker of msg.localMarkers){
-     // Publications own these marker IDs; never resurrect deleted posts from iframe cache.
-     if(/^(stash|base|other)-post-\d+$/.test(String(marker?.id||'')))continue;
-     if(!marker?.id||existing.has(marker.id))continue;
-     const result=await sb.rpc('squad_map_sync',{p_action:'save',p_marker:marker});
-     if(!result.error)existing.add(marker.id);else console.error('Map marker import',result.error);
-    }
-    await refreshSharedMapMarkers();
-   }catch(err){console.error('Map import',err)}
-  }
  }else if(msg.kind==='scumMapMarkerAction'&&onlineMember&&sb){
   const id=msg.action==='save'?String(msg.marker?.id||''):String(msg.id||'');
   if(msg.action==='save'&&id)mapPendingSaves.set(id,{...msg.marker});
