@@ -2918,3 +2918,6 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  body:not(.fury-map-page) .app{height:auto!important;min-height:100vh!important;overflow:visible!important}
  body:not(.fury-map-page) .app>main,body:not(.fury-map-page) #view{height:auto!important;overflow:visible!important}
 }
+
+/* Participation: no response is distinct from an explicit 'Не буду'. */
+.ref-status.unanswered{color:#9aa5aa!important;background:#182225!important;border-color:#354247!important}
