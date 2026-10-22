@@ -2921,3 +2921,10 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 
 /* Participation: no response is distinct from an explicit 'Не буду'. */
 .ref-status.unanswered{color:#9aa5aa!important;background:#182225!important;border-color:#354247!important}
+
+/* Attendance: keep time immediately next to the status badge. */
+@media(min-width:901px){
+ .ref-att-base .ref-member{grid-template-columns:minmax(0,1fr) 42px 96px!important;column-gap:6px!important}
+ .ref-att-base .ref-member-time{width:42px!important;justify-self:end!important;text-align:right!important}
+ .ref-att-base .ref-statuses{width:96px!important;justify-self:end!important}
+}
