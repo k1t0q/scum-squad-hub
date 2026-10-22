@@ -2928,3 +2928,10 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
  .ref-att-base .ref-member-time{width:42px!important;justify-self:end!important;text-align:right!important}
  .ref-att-base .ref-statuses{width:96px!important;justify-self:end!important}
 }
+
+/* Squad duties under each member */
+.squad-duty-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #253637}
+.squad-duty-summary>div{background:#0b1919;border:1px solid #263839;border-radius:6px;padding:9px 11px;min-width:0;overflow-wrap:anywhere;font-size:12px;line-height:1.5}
+.squad-duty-summary b{color:#e4eceb;margin-right:5px}
+.squad-duty-summary span{color:#aab8b7;white-space:pre-wrap}
+@media(max-width:700px){.squad-duty-summary{grid-template-columns:1fr;gap:5px}.squad-duty-summary>div{padding:7px 9px}.member-actions-row{flex-wrap:wrap!important}}
