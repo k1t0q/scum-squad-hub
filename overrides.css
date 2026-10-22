@@ -2935,3 +2935,6 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 .squad-duty-summary b{color:#e4eceb;margin-right:5px}
 .squad-duty-summary span{color:#aab8b7;white-space:pre-wrap}
 @media(max-width:700px){.squad-duty-summary{grid-template-columns:1fr;gap:5px}.squad-duty-summary>div{padding:7px 9px}.member-actions-row{flex-wrap:wrap!important}}
+
+/* Squad roster: show pointer cursor on actionable buttons */
+#view .member-actions-row button{cursor:pointer!important}
