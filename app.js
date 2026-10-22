@@ -400,16 +400,18 @@ function openRaidPhoto(url){
 }
 function viewOp(id){let o=db.ops.find(x=>x.id===id);if(!o)return;modal('<h2>'+esc(o.title)+'</h2><p>'+(o.date?formatPlanDate(o.date)+' · ':'')+esc(o.time)+'</p>'+(o.sector?'<p>Сектор: '+esc(o.sector)+'</p>':'')+(o.walls?'<p>Стены: '+o.walls+'</p>':'')+(o.transport?'<p>Транспорт: '+esc(o.transport)+'</p>':'')+(o.loadout?'<p>Что взять: '+esc(o.loadout)+'</p>':'')+(o.rally_point?'<p>Точка сбора: '+esc(o.rally_point)+'</p>':'')+(o.note?'<p>Комментарий: '+esc(o.note)+'</p>':'')+(o.images&&o.images.length?'<div class="raidphotos">'+o.images.map(u=>'<img src="'+esc(u)+'" alt="Фото для рейда" onclick="openRaidPhoto(\''+esc(u)+'\')" style="cursor:zoom-in">').join('')+'</div>':'')+'<div class="raid-detail-people"><span>УЧАСТНИКИ</span><div class="raid-roster">'+db.members.map(m=>'<span class="raid-roster-name '+((o.participants||[]).includes(m[0])?'is-in':'is-out')+'">'+esc(m[0])+'</span>').join('<span class="raid-comma">, </span>')+'</div></div><div class="dialogfoot raid-detail-actions"><button class="raid-join raid-participation '+((o.participants||[]).includes(db.profile.nick)?'leave':'join')+'" onclick="toggleRaid('+o.id+',true)">'+((o.participants||[]).includes(db.profile.nick)?'Не участвую':'Участвую')+'</button>'+((o.creator===db.profile.nick||db.profile.access==='admin')?'<button onclick="editOp('+o.id+')">Редактировать</button>':'')+'<button class="danger" onclick="deleteOp('+o.id+');closeModal()">Удалить</button>'+'<button class="ghost" onclick="closeModal()">Закрыть</button></div>')}
 const dutyLabels=[['raid','Рейд'],['def','Деф'],['counter','Антирейд']];
-let squadDuties={};
+let squadDuties={},squadDutiesLoaded=false;
 async function loadSquadDuties(){
  if(!sb||!onlineMember)return;
  const {data,error}=await sb.from('squad_member_duties').select('member_id,raid,def,counter').eq('squad_id',onlineMember.squad_id);
  if(error){console.warn('Duties not available',error);return}
  squadDuties=Object.fromEntries((data||[]).map(x=>[x.member_id,x]));
+ squadDutiesLoaded=true;
  if(page==='Состав')members();
 }
 function dutySummary(m){
  const d=squadDuties[m[4]]||{};
+ if(!squadDutiesLoaded)return '<div class="squad-duty-summary"><span class="muted">Загрузка обязанностей…</span></div>';
  return '<div class="squad-duty-summary">'+dutyLabels.map(([key,label])=>'<div><b>'+label+':</b> <span>'+esc(d[key]||'Не назначено')+'</span></div>').join('')+'</div>';
 }
 function editMemberDuties(id,nick){
