@@ -30,6 +30,7 @@ result.querySelector("p:last-child").textContent="Сессия действуе�
 if(field)field.textContent="SteamID64: "+data.steamid;
 const editor=document.getElementById("profile-editor"),nick=document.getElementById("game-nick"),role=document.getElementById("game-role"),message=document.getElementById("profile-message");
 editor.style.display="block";
+const linkedSquads=document.createElement("div");linkedSquads.style.cssText="margin:14px 0;padding:14px;border:1px solid #365247;border-radius:9px;color:#a6dabb";linkedSquads.textContent="Проверяем привязанные отряды…";document.getElementById("profile-editor").before(linkedSquads);fetch("https://zicapopwsssopyxphhpo.supabase.co/functions/v1/scum-steam-openid-preview?action=legacy_status",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token})}).then(r=>r.ok?r.json():Promise.reject()).then(d=>{linkedSquads.textContent=d.squads?.length?"Мои действующие отряды: "+d.squads.map(s=>s.name).join(", "):"Действующие отряды пока не привязаны";}).catch(()=>{linkedSquads.textContent="Не удалось проверить действующие отряды"});
 const actions=document.getElementById("squad-actions"),joinForm=document.getElementById("join-form"),createForm=document.getElementById("create-form"),squadMessage=document.getElementById("squad-message");
 actions.style.display="block";
 document.getElementById("join-open").addEventListener("click",()=>{joinForm.style.display=joinForm.style.display==="none"?"block":"none";createForm.style.display="none";squadMessage.textContent=""});
