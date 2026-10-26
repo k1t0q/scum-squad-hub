@@ -14,7 +14,7 @@ if(!response.ok)throw Error("Session expired");
 const data=await response.json();
 if(!/^7656119[0-9]{10}$/.test(data.steamid))throw Error("Invalid profile");
 value.textContent=data.steamid;
-document.body.classList.remove("session-pending");document.body.classList.add("authenticated");
+document.body.classList.remove("session-pending");document.body.classList.add("authenticated");if(new URLSearchParams(location.search).get("link")==="1"&&window.opener){window.opener.postMessage({type:"scum-steam-link",steam_token:token},"https://scumhub.layero.app");const note=document.createElement("p");note.textContent="Steam подтверждён. Вернитесь в SCUM HUB — привязка выполняется.";note.style.color="#a6dabb";document.getElementById("steam-public").after(note);}
 result.style.display="none";
 document.getElementById("session-actions").style.display="block";
 document.getElementById("logout-slot").appendChild(document.getElementById("session-actions"));
