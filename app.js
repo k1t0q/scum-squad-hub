@@ -256,7 +256,7 @@ window.addEventListener('message',async e=>{
   if(msg.action==='save'&&id)mapPendingSaves.set(id,{...msg.marker});
   if(msg.action==='delete'&&id){mapPendingDeletes.add(id);mapPendingSaves.delete(id)}
   try{
-   if(msg.action==='save'&&msg.marker?.type==='stash'&&!/^stash-post-\d+$/.test(id)){
+   if(msg.action==='save'&&msg.marker?.type==='stash'&&!/^stash-post-\d+$/.test(id)&&!id.startsWith('stash-post-')){
     const {data:converted,error:conversionError}=await sb.rpc('convert_map_marker_to_stash',{p_marker:msg.marker});
     if(conversionError)throw conversionError;
     toast('Схрон добавлен во вкладку «Метка» · срок 14 дней');
@@ -273,7 +273,7 @@ window.addEventListener('message',async e=>{
    console.error('Marker sync',err);
    mapPendingSaves.delete(id);
    mapPendingDeletes.delete(id);
-   toast('Ошибка сохранения метки — проверь доступ');
+   toast('Ошибка метки: '+String(err.message||err).slice(0,130));
    await refreshSharedMapMarkers();
   }
  }
