@@ -153,7 +153,13 @@ async function refreshSharedMapMarkers(){
     const p=basesById.get(String(m.id).slice(10));
     return {...m,type:m.type||'base',icon:m.icon||'🏠',name:m.name||stashMapTitle(p).replace(/^Схрон /,'База '),stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e05252'};
    }
-   if(!String(m.id).startsWith('stash-post-'))return m;
+   if(!String(m.id).startsWith('stash-post-')){
+    if(m.type!=='stash')return m;
+    const checked=new Date(m.created_at||m.updated_at||Date.now()).getTime();
+    const valid=Number.isFinite(checked);
+    const left=valid?Math.max(0,Math.ceil((checked+14*86400000-Date.now())/86400000)):14;
+    return {...m,stashOwner:m.stashOwner||'Участник',stashDays:left,stashCheckedBy:m.stashCheckedBy||'Не проверялся',color:left===0?'#888888':left<=1?'#e05252':left<=5?'#e5aa30':'#34a853'};
+   }
    const p=byId.get(String(m.id).slice(11));
    const checked=new Date(p.stash_checked_at||p.created_at).getTime();
    const left=Math.max(0,Math.ceil((checked+14*86400000-Date.now())/86400000));
