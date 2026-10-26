@@ -870,11 +870,32 @@ function settingsPage(){
  '<div class="settings-row fury-settings-main-row"><div><b>Уведомления</b><p class="muted fury-setting-description">Оповещения о рейдах, задачах, протекте, схронах и событиях отряда.</p><p class="muted fury-setting-status">Статус: '+(!supported?'не поддерживаются этим браузером':active?'включены':'выключены')+'</p></div><button class="ghost fury-setting-action fury-setting-action-'+(requested?'danger':'success')+'" type="button" onclick="togglePushPreference()"'+(!supported?' disabled':'')+'>'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div>'+
  '<div class="settings-row fury-settings-main-row"><div><b>Discord</b><p class="muted fury-setting-description">Привяжите аккаунт, чтобы получать личные сообщения от SCUM HUB в Discord.</p><p class="muted fury-setting-status" id="furyDiscordLinkStatus">Проверяем привязку…</p></div><button class="ghost fury-setting-action fury-setting-action-success" type="button" id="furyDiscordLinkButton" onclick="createDiscordLinkCode()" disabled style="visibility:hidden">ПРОВЕРЯЕМ…</button></div>'+
 
- (db.profile.access==='admin'?'<div class="fury-discord-admin"><b>Управление уведомлениями участников</b><p class="muted">Привязки Discord и уведомления сайта для всех участников отряда.</p><div id="furyDiscordAdminList" class="muted">Загрузка списка…</div></div>':'')+'</div>';
+ (db.profile.access==='admin'&&db.profile.nick==='k1t0'?'<div class="settings-row fury-settings-main-row"><div><b>Steam</b><p class="muted fury-setting-description">Привязать Steam к профилю администратора ДУБЛЬ.</p><p class="muted fury-setting-status" id="furySteamLinkStatus">Не привязан в новом кабинете</p></div><button class="ghost fury-setting-action fury-setting-action-success" type="button" onclick="startSteamLink()">ПРИВЯЗАТЬ STEAM</button></div>':'')+\n (db.profile.access==='admin'?'<div class="fury-discord-admin"><b>Управление уведомлениями участников</b><p class="muted">Привязки Discord и уведомления сайта для всех участников отряда.</p><div id="furyDiscordAdminList" class="muted">Загрузка списка…</div></div>':'')+'</div>';
  loadDiscordLinkStatus();
  if(db.profile.access==='admin')loadDiscordAdminList();
 }
-async function loadDiscordAdminList(){
+
+let steamLinkPopup=null;
+function startSteamLink(){
+ if(!onlineMember||db.profile.access!=='admin'||db.profile.nick!=='k1t0'){toast('Недостаточно прав');return}
+ steamLinkPopup=window.open('https://k1t0q.github.io/scum-squad-hub/steam-login-preview.html?link=1','scumSteamLink','width=960,height=800');
+ if(!steamLinkPopup){toast('Разреши всплывающее окно для Steam');return}
+ const status=document.getElementById('furySteamLinkStatus');if(status)status.textContent='Подтверди Steam во всплывающем окне…';
+}
+window.addEventListener('message',async event=>{
+ if(event.origin!=='https://k1t0q.github.io'||event.source!==steamLinkPopup||event.data?.type!=='scum-steam-link')return;
+ const status=document.getElementById('furySteamLinkStatus');
+ try{
+  if(!sb||!onlineMember||db.profile.access!=='admin'||db.profile.nick!=='k1t0')throw Error('Требуется вход администратора');
+  const {data:{session}}=await sb.auth.getSession();if(!session?.access_token)throw Error('Сессия истекла');
+  if(status)status.textContent='Проверяем обе учётные записи…';
+  const res=await fetch('https://zicapopwsssopyxphhpo.supabase.co/functions/v1/scum-steam-openid-preview?action=link_legacy',{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+session.access_token},body:JSON.stringify({steam_token:event.data.steam_token})});
+  const result=await res.json();if(!res.ok||!result.linked)throw Error(result.error||'Не удалось привязать');
+  if(status)status.textContent='Steam привязан к отряду ДУБЛЬ';toast('Steam успешно привязан');
+  steamLinkPopup?.close();
+ }catch(err){if(status)status.textContent='Ошибка: '+err.message;toast('Ошибка привязки Steam')}
+});
+\nasync function loadDiscordAdminList(){
  const target=document.getElementById('furyDiscordAdminList');
  if(!target||!sb)return;
  try{
