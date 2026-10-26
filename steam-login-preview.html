@@ -9,6 +9,11 @@ const params=new URLSearchParams(location.hash.slice(1));
 let token=params.get("session");
 if(token){sessionStorage.setItem("scum_preview_session",token);history.replaceState(null,"",location.pathname+location.search)}
 else token=sessionStorage.getItem("scum_preview_session");
+if(token&&sessionStorage.getItem("scum_steam_link_pending")==="1"&&!window.opener){
+ sessionStorage.removeItem("scum_steam_link_pending");
+ location.replace("https://k1t0q.github.io/scum-squad-hub/#steam_link="+encodeURIComponent(token));
+ return;
+}
 if(!token){document.body.classList.remove("session-pending");return;}
 try{
 const response=await fetch(endpoint,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token}),cache:"no-store"});
