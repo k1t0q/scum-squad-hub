@@ -896,7 +896,7 @@ window.addEventListener('message',async event=>{
   steamLinkPopup?.close();
  }catch(err){if(status)status.textContent='Ошибка: '+err.message;toast('Ошибка привязки Steam')}
 });
-\nasync function loadDiscordAdminList(){
+async function loadDiscordAdminList(){
  const target=document.getElementById('furyDiscordAdminList');
  if(!target||!sb)return;
  try{
