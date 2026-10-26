@@ -879,8 +879,7 @@ function settingsPage(){
 
 function startSteamLink(){
  if(!onlineMember||db.profile.access!=='admin'||db.profile.nick!=='k1t0'){toast('Недостаточно прав');return}
- sessionStorage.setItem('scum_steam_link_return',location.origin+location.pathname);
- location.assign('https://k1t0q.github.io/scum-squad-hub/steam-login-preview.html?link=1');
+ location.assign('https://k1t0q.github.io/scum-squad-hub/steam-login-preview.html?link=1&return='+encodeURIComponent(location.origin+location.pathname));
 }
 async function completeSteamLink(){
  const hash=new URLSearchParams(location.hash.slice(1));const steamToken=hash.get('steam_link');
@@ -899,7 +898,7 @@ async function completeSteamLink(){
   toast('Steam успешно привязан');
  }catch(err){sessionStorage.setItem('scum_steam_link_result','Ошибка привязки Steam: '+err.message);if(status)status.textContent='Ошибка: '+err.message;toast('Ошибка привязки Steam')}
 }
-window.addEventListener('load',()=>setTimeout(completeSteamLink,1200));
+window.addEventListener('load',()=>setTimeout(completeSteamLink,2000));
 async function loadDiscordAdminList(){
  const target=document.getElementById('furyDiscordAdminList');
  if(!target||!sb)return;
