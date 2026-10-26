@@ -256,7 +256,7 @@ window.addEventListener('message',async e=>{
   if(msg.action==='save'&&id)mapPendingSaves.set(id,{...msg.marker});
   if(msg.action==='delete'&&id){mapPendingDeletes.add(id);mapPendingSaves.delete(id)}
   try{
-   if(msg.action==='save'&&msg.marker?.type==='stash'&&!/^stash-post-\\d+$/.test(id)){
+   if(msg.action==='save'&&msg.marker?.type==='stash'&&!/^stash-post-\d+$/.test(id)){
     const {data:converted,error:conversionError}=await sb.rpc('convert_map_marker_to_stash',{p_marker:msg.marker});
     if(conversionError)throw conversionError;
     toast('Схрон добавлен во вкладку «Метка» · срок 14 дней');
