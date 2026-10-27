@@ -4,6 +4,8 @@ on:
     branches: [scum-hub-migration]
     paths:
       - 'src/migration-worker.mjs'
+      - 'src/explosives-update.mjs'
+      - 'tests/explosives-update.test.mjs'
       - 'src/session-auth.mjs'
       - 'src/steam-openid-config.mjs'
       - 'src/steam-openid.mjs'
