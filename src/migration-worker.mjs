@@ -63,6 +63,25 @@ export default {
           return new Response(JSON.stringify({items:result.results||[]}),{status:200,headers});
         } catch {return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers});}
       }
+      if (request.method === 'GET' && url.pathname === '/api/place-posts') {
+        const squadId=url.searchParams.get('squad_id');
+        const kind=url.searchParams.get('kind');
+        if (!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
+        if (!['stash','base','other'].includes(kind))return new Response(JSON.stringify({error:'invalid_kind'}),{status:400,headers});
+        const membership=await authorizeSquad(env,identity.steamId,squadId);
+        if (!membership)return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
+        try {
+          const result=await env.DB.prepare(
+            'SELECT id,kind,images,comment,created_by,created_at,stash_checked_at,stash_checked_by,map_marker_name FROM squad_place_posts WHERE squad_id = ? AND kind = ? ORDER BY created_at DESC LIMIT 200'
+          ).bind(squadId,kind).all();
+          const items=(result.results||[]).map(item=>{
+            let images=item.images;
+            if(typeof images==='string'){try{images=JSON.parse(images)}catch{images=[]}}
+            return {...item,images:Array.isArray(images)?images:[]};
+          });
+          return new Response(JSON.stringify({items}),{status:200,headers});
+        }catch{return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers});}
+      }
       if (request.method === 'GET' && url.pathname === '/api/map-markers') {
         const squadId=url.searchParams.get('squad_id');
         if (!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
