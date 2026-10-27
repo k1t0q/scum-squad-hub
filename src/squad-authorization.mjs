@@ -5,7 +5,7 @@ export async function authorizeSquad(env, steamId, squadId) {
  if (!env.DB || typeof env.DB.prepare!=='function') return null;
  try {
   const result=await env.DB.prepare(
-   'SELECT m.id AS member_id, m.squad_id AS squad_id, m.access_role AS access_role FROM steam_member_links AS l JOIN members AS m ON m.id = l.member_id WHERE l.steam_id = ? AND m.squad_id = ? AND l.revoked_at IS NULL LIMIT 1'
+   'SELECT m.id AS member_id, m.squad_id AS squad_id, m.access_role AS access_role FROM scum_verified_steam_links AS l JOIN members AS m ON m.id = l.member_id WHERE l.steamid = ? AND l.squad_id = ? AND m.squad_id = l.squad_id AND m.is_active = 1 LIMIT 1'
   ).bind(steamId,squadId).first();
   if (!result || result.squad_id!==squadId || !result.member_id) return null;
   return {memberId:result.member_id,squadId:result.squad_id,role:result.access_role};
