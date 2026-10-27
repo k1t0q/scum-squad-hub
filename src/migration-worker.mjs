@@ -1,3 +1,4 @@
+import { updateExplosives } from './explosives-update.mjs';
 import { authorizeSquad } from './squad-authorization.mjs';
 import { createSteamLoginUrl } from './steam-openid.mjs';
 import { verifySteamAssertion } from './steam-verify.mjs';
@@ -58,6 +59,13 @@ export default {
           const result=await env.DB.prepare(sql).bind(squadId).all();
           return new Response(JSON.stringify({items:result.results||[]}),{status:200,headers});
         } catch {return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers});}
+      }
+      if (request.method === 'PATCH' && url.pathname === '/api/explosives') {
+        const squadId = url.searchParams.get('squad_id');
+        if (!squadId) return new Response(JSON.stringify({error:'missing_squad_id'}), {status:400,headers});
+        const membership = await authorizeSquad(env, identity.steamId, squadId);
+        if (!membership) return new Response(JSON.stringify({error:'forbidden'}), {status:403,headers});
+        return updateExplosives(request, env, membership, squadId, headers);
       }
       return new Response(JSON.stringify({ error: 'not_implemented', message: 'Squad data APIs are not enabled' }), { status: 501, headers });
     }
