@@ -4,8 +4,8 @@ export async function createMapMarker(request,env,membership,squadId,headers){
  try{data=await request.json();}catch{return reply({error:'invalid_json'},400,headers);}
  if(!data || typeof data.name!=='string' || !data.name.trim() || data.name.length>100 ||
     typeof data.note!=='string' || data.note.length>2000 ||
-    typeof data.x!=='number' || !Number.isFinite(data.x) || data.x<0 || data.x>100 ||
-    typeof data.y!=='number' || !Number.isFinite(data.y) || data.y<0 || data.y>100)
+    typeof data.x!=='number' || !Number.isFinite(data.x) || data.x<0 || data.x>1 ||
+    typeof data.y!=='number' || !Number.isFinite(data.y) || data.y<0 || data.y>1)
    return reply({error:'invalid_marker'},400,headers);
  const id=crypto.randomUUID();
  try{
