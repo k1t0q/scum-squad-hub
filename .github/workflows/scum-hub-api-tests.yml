@@ -7,6 +7,8 @@ on:
       - 'src/explosives-update.mjs'
       - 'src/stash-update.mjs'
       - 'src/map-marker-update.mjs'
+      - 'src/map-marker-create.mjs'
+      - 'tests/map-marker-create.test.mjs'
       - 'tests/map-marker-update.test.mjs'
       - 'tests/map-markers-api.test.mjs'
       - 'tests/stash-update.test.mjs'
