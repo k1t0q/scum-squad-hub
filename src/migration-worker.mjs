@@ -1,3 +1,4 @@
+import { authorizeSquad } from './squad-authorization.mjs';
 import { createSteamLoginUrl } from './steam-openid.mjs';
 import { verifySteamAssertion } from './steam-verify.mjs';
 import { createLoginState, verifyLoginState } from './steam-state.mjs';
@@ -37,7 +38,14 @@ export default {
     if (url.pathname.startsWith('/api/')) {
       const identity = await verifySession(request, env);
       if (!identity) return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers });
-      return new Response(JSON.stringify({ error: 'not_implemented', message: 'Squad authorization is not yet enabled' }), { status: 501, headers });
+      if (request.method === 'GET' && url.pathname === '/api/squad-access') {
+        const squadId = url.searchParams.get('squad_id');
+        if (!squadId) return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
+        const membership = await authorizeSquad(env,identity.steamId,squadId);
+        if (!membership) return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
+        return new Response(JSON.stringify({member_id:membership.memberId,squad_id:membership.squadId,access_role:membership.role}),{status:200,headers});
+      }
+      return new Response(JSON.stringify({ error: 'not_implemented', message: 'Squad data APIs are not enabled' }), { status: 501, headers });
     }
     return new Response(JSON.stringify({ error: 'not_found' }), { status: 404, headers });
   }
