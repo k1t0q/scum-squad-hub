@@ -5,6 +5,8 @@ on:
     paths:
       - 'src/migration-worker.mjs'
       - 'src/explosives-update.mjs'
+      - 'src/stash-update.mjs'
+      - 'tests/stash-update.test.mjs'
       - 'tests/explosives-update.test.mjs'
       - 'src/session-auth.mjs'
       - 'src/steam-openid-config.mjs'
