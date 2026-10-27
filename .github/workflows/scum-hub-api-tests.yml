@@ -5,6 +5,10 @@ on:
     paths:
       - 'src/migration-worker.mjs'
       - 'src/session-auth.mjs'
+      - 'src/steam-openid-config.mjs'
+      - 'src/steam-openid.mjs'
+      - 'src/steam-verify.mjs'
+      - 'tests/steam-openid.test.mjs'
       - 'tests/session-auth.test.mjs'
       - 'tests/migration-worker.test.mjs'
       - '.github/workflows/scum-hub-api-tests.yml'
