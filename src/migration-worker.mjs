@@ -1,3 +1,4 @@
+import { checkStash } from './stash-update.mjs';
 import { updateExplosives } from './explosives-update.mjs';
 import { authorizeSquad } from './squad-authorization.mjs';
 import { createSteamLoginUrl } from './steam-openid.mjs';
@@ -66,6 +67,13 @@ export default {
         const membership = await authorizeSquad(env, identity.steamId, squadId);
         if (!membership) return new Response(JSON.stringify({error:'forbidden'}), {status:403,headers});
         return updateExplosives(request, env, membership, squadId, headers);
+      }
+      if (request.method === 'POST' && url.pathname === '/api/stashes/check') {
+        const squadId=url.searchParams.get('squad_id');
+        if (!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
+        const membership=await authorizeSquad(env,identity.steamId,squadId);
+        if (!membership)return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
+        return checkStash(request,env,membership,squadId,headers);
       }
       return new Response(JSON.stringify({ error: 'not_implemented', message: 'Squad data APIs are not enabled' }), { status: 501, headers });
     }
