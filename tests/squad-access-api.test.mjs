@@ -7,7 +7,7 @@ const steam='76561198000000000';
 const headers=async()=>({authorization:'Bearer '+await issueSession(steam,{SESSION_HMAC_KEY:secret})});
 function env(member){
  return {SESSION_HMAC_KEY:secret,DB:{prepare(sql){
-  assert.match(sql,/steam_member_links/);
+  assert.match(sql,/scum_verified_steam_links/);
   return {bind(id,squad){assert.equal(id,steam);return {first:async()=>member?.squad_id===squad?member:null}}};
  }}};
 }
