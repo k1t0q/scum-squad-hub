@@ -4,7 +4,7 @@ import {authorizeSquad} from '../src/squad-authorization.mjs';
 const steam='76561198000000000';
 function database(row) {
  return {DB:{prepare(sql){
-  assert.match(sql,/l\.revoked_at IS NULL/);
+  assert.match(sql,/m\.is_active = 1/);
   return {bind(id,squad){assert.equal(id,steam);return {first:async()=>row?.squad_id===squad?row:null}}};
  }}};
 }
