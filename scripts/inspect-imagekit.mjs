@@ -10,3 +10,5 @@ for(const path of paths){
  const items=await r.json();
  console.log('Path:',path,'entries:',items.length,'folders:',items.filter(x=>x.type==='folder').map(x=>x.name).join(', '));
 }
+
+// Inventory is read-only and intentionally prints no API keys.
