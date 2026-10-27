@@ -9,6 +9,7 @@ on:
       - 'src/map-marker-update.mjs'
       - 'src/map-marker-create.mjs'
       - 'tests/map-marker-create.test.mjs'
+      - 'tests/place-posts-api.test.mjs'
       - 'tests/map-marker-update.test.mjs'
       - 'tests/map-markers-api.test.mjs'
       - 'tests/stash-update.test.mjs'
