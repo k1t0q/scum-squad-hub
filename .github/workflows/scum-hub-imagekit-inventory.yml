@@ -1,0 +1,24 @@
+name: SCUM HUB ImageKit inventory
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - scum-hub-migration
+    paths:
+      - scripts/inspect-imagekit.mjs
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: scum-hub-migration
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inspect ImageKit folders
+        env:
+          SCUM_IMAGEKIT_PRIVATE_KEY: ${{ secrets.SCUM_IMAGEKIT_PRIVATE_KEY }}
+        run: node scripts/inspect-imagekit.mjs
