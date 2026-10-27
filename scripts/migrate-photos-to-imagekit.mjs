@@ -27,7 +27,7 @@ for(const bucket of buckets){
   form.set('folder','/scum-hub/'+bucket+'/'+path.split('/').slice(0,-1).join('/'));
   form.set('useUniqueFileName','false');
   const upload=await fetch('https://upload.imagekit.io/api/v1/files/upload',{method:'POST',headers:{Authorization:imagekitAuth},body:form});
-  if(!upload.ok)throw Error('ImageKit upload failed '+bucket+'/'+path+': HTTP '+upload.status);
+  if(!upload.ok){const raw=(await upload.text()).slice(0,1000);let detail='';try{const data=JSON.parse(raw);detail=JSON.stringify({message:data.message,help:data.help,code:data.code});}catch{detail='Non-JSON error response';}throw Error('ImageKit upload failed '+bucket+'/'+path+': HTTP '+upload.status+' '+detail);}
   console.log('uploaded '+bucket+'/'+path);
  }
 }
