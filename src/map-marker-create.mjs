@@ -11,8 +11,8 @@ export async function createMapMarker(request,env,membership,squadId,headers){
  try{
   const result=await env.DB.prepare(
    "INSERT INTO squad_map_markers (id,squad_id,x,y,type,name,note,icon,color,size,show_label,locked,created_by,updated_at,enemy_nicks) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP,?)"
-  ).bind(id,squadId,data.x,data.y,'enemy_base',data.name,data.note,'','',1,1,0,membership.memberId,'[]').run();
+  ).bind(id,squadId,data.x,data.y,'base',data.name,data.note,'','',1,1,0,membership.memberId,'[]').run();
   if(result?.success!==true)return reply({error:'database_unavailable'},503,headers);
-  return reply({id,squad_id:squadId,x:data.x,y:data.y,type:'enemy_base',name:data.name,note:data.note},201,headers);
+  return reply({id,squad_id:squadId,x:data.x,y:data.y,type:'base',name:data.name,note:data.note},201,headers);
  }catch{return reply({error:'database_unavailable'},503,headers);}
 }
