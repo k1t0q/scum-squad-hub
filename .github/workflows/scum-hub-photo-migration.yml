@@ -1,0 +1,29 @@
+name: SCUM HUB photo migration (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      apply_images:
+        description: 'Upload photos to ImageKit (false = inventory only)'
+        type: boolean
+        default: false
+        required: true
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: scum-hub-migration
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inventory or upload photos
+        env:
+          SCUM_SUPABASE_URL: ${{ secrets.SCUM_SUPABASE_URL }}
+          SCUM_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SCUM_SUPABASE_SERVICE_ROLE_KEY }}
+          SCUM_IMAGEKIT_PRIVATE_KEY: ${{ secrets.SCUM_IMAGEKIT_PRIVATE_KEY }}
+          APPLY_IMAGES: ${{ inputs.apply_images }}
+        run: node scripts/migrate-photos-to-imagekit.mjs
