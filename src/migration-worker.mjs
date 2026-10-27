@@ -45,6 +45,20 @@ export default {
         if (!membership) return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
         return new Response(JSON.stringify({member_id:membership.memberId,squad_id:membership.squadId,access_role:membership.role}),{status:200,headers});
       }
+      if (request.method === 'GET' && (url.pathname === '/api/stashes' || url.pathname === '/api/explosives')) {
+        const squadId=url.searchParams.get('squad_id');
+        if (!squadId) return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
+        const membership=await authorizeSquad(env,identity.steamId,squadId);
+        if (!membership) return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
+        try {
+          const stashes=url.pathname==='/api/stashes';
+          const sql=stashes
+            ? "SELECT id,kind,images,comment,created_at,stash_checked_at,stash_checked_by,map_marker_name FROM squad_place_posts WHERE squad_id = ? AND kind = 'stash' ORDER BY created_at DESC LIMIT 200"
+            : "SELECT item,quantity,updated_at FROM explosives_inventory WHERE squad_id = ? ORDER BY item LIMIT 200";
+          const result=await env.DB.prepare(sql).bind(squadId).all();
+          return new Response(JSON.stringify({items:result.results||[]}),{status:200,headers});
+        } catch {return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers});}
+      }
       return new Response(JSON.stringify({ error: 'not_implemented', message: 'Squad data APIs are not enabled' }), { status: 501, headers });
     }
     return new Response(JSON.stringify({ error: 'not_found' }), { status: 404, headers });
