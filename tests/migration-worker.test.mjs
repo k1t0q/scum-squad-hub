@@ -9,7 +9,7 @@ test('health checks D1 without exposing rows', async () => {
 });
 test('API fails closed until auth is implemented',async()=>{
  const r=await worker.fetch(new Request('https://example.com/api/squads'),env);
- assert.equal(r.status,501);
+ assert.equal(r.status,401);
  assert.equal(r.headers.get('cache-control'),'no-store');
 });
 test('health does not leak DB exceptions',async()=>{
