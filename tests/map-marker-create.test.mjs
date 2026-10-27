@@ -6,7 +6,7 @@ const request=body=>new Request('https://test/api/map-markers',{method:'POST',he
 const member={memberId:'m1'};
 const valid={x:0.25,y:0.75,name:'Enemy base',note:''};
 test('marker creation writes only to authenticated squad',async()=>{
- const env={DB:{prepare(sql){assert.match(sql,/INSERT INTO squad_map_markers/);return {bind(id,squad,x,y,type,name,note){assert.equal(squad,'own');assert.equal(x,0.25);assert.equal(y,0.75);assert.equal(type,'enemy_base');assert.equal(name,'Enemy base');return {run:async()=>({success:true})};}};}}};
+ const env={DB:{prepare(sql){assert.match(sql,/INSERT INTO squad_map_markers/);return {bind(id,squad,x,y,type,name,note){assert.equal(squad,'own');assert.equal(x,0.25);assert.equal(y,0.75);assert.equal(type,'base');assert.equal(name,'Enemy base');return {run:async()=>({success:true})};}};}}};
  const res=await createMapMarker(request(valid),env,member,'own',headers);
  assert.equal(res.status,201);
  assert.equal((await res.json()).squad_id,'own');
