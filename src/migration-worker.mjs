@@ -1,3 +1,4 @@
+import { createMapMarker } from './map-marker-create.mjs';
 import { updateMapMarker } from './map-marker-update.mjs';
 import { checkStash } from './stash-update.mjs';
 import { updateExplosives } from './explosives-update.mjs';
@@ -73,6 +74,13 @@ export default {
           ).bind(squadId).all();
           return new Response(JSON.stringify({items:result.results||[]}),{status:200,headers});
         }catch{return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers});}
+      }
+      if (request.method === 'POST' && url.pathname === '/api/map-markers') {
+        const squadId=url.searchParams.get('squad_id');
+        if(!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
+        const membership=await authorizeSquad(env,identity.steamId,squadId);
+        if(!membership)return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
+        return createMapMarker(request,env,membership,squadId,headers);
       }
       if (request.method === 'PATCH' && url.pathname === '/api/map-markers') {
         const squadId=url.searchParams.get('squad_id');
