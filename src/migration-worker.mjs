@@ -1,3 +1,4 @@
+import { verifySession } from './session-auth.mjs';
 // Isolated SCUM HUB migration Worker. Never expose squad records without verified sessions.
 export default {
   async fetch(request, env) {
@@ -12,7 +13,9 @@ export default {
       }
     }
     if (url.pathname.startsWith('/api/')) {
-      return new Response(JSON.stringify({ error: 'not_implemented', message: 'Authentication and squad authorization required before enabling data APIs' }), { status: 501, headers });
+      const identity = await verifySession(request, env);
+      if (!identity) return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers });
+      return new Response(JSON.stringify({ error: 'not_implemented', message: 'Squad authorization is not yet enabled' }), { status: 501, headers });
     }
     return new Response(JSON.stringify({ error: 'not_found' }), { status: 404, headers });
   }
