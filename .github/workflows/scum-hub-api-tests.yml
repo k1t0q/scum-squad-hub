@@ -4,6 +4,8 @@ on:
     branches: [scum-hub-migration]
     paths:
       - 'src/migration-worker.mjs'
+      - 'src/session-auth.mjs'
+      - 'tests/session-auth.test.mjs'
       - 'tests/migration-worker.test.mjs'
       - '.github/workflows/scum-hub-api-tests.yml'
   workflow_dispatch:
