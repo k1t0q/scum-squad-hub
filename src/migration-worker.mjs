@@ -61,6 +61,18 @@ export default {
           return new Response(JSON.stringify({items:result.results||[]}),{status:200,headers});
         } catch {return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers});}
       }
+      if (request.method === 'GET' && url.pathname === '/api/map-markers') {
+        const squadId=url.searchParams.get('squad_id');
+        if (!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
+        const membership=await authorizeSquad(env,identity.steamId,squadId);
+        if (!membership)return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
+        try {
+          const result=await env.DB.prepare(
+            'SELECT id,x,y,type,name,note,icon,color,size,show_label,locked,created_by,updated_at,enemy_nicks FROM squad_map_markers WHERE squad_id = ? ORDER BY updated_at DESC LIMIT 1000'
+          ).bind(squadId).all();
+          return new Response(JSON.stringify({items:result.results||[]}),{status:200,headers});
+        }catch{return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers});}
+      }
       if (request.method === 'PATCH' && url.pathname === '/api/explosives') {
         const squadId = url.searchParams.get('squad_id');
         if (!squadId) return new Response(JSON.stringify({error:'missing_squad_id'}), {status:400,headers});
