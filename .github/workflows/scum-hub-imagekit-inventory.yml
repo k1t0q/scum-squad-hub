@@ -1,6 +1,11 @@
 name: SCUM HUB ImageKit inventory
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - scum-hub-migration
+    paths:
+      - scripts/inspect-imagekit.mjs
 jobs:
   inventory:
     runs-on: ubuntu-latest
