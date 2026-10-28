@@ -268,6 +268,9 @@ export default {
       }
       return new Response(JSON.stringify({ error: 'not_implemented', message: 'Squad data APIs are not enabled' }), { status: 501, headers });
     }
+    if ((request.method === 'GET' || request.method === 'HEAD') && env.ASSETS) {
+      return env.ASSETS.fetch(request);
+    }
     return new Response(JSON.stringify({ error: 'not_found' }), { status: 404, headers });
   }
 };
