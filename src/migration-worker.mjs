@@ -91,7 +91,12 @@ export default {
           const result=await env.DB.prepare(
             'SELECT id,x,y,type,name,note,icon,color,size,show_label,locked,created_by,updated_at,enemy_nicks FROM squad_map_markers WHERE squad_id = ? ORDER BY updated_at DESC LIMIT 1000'
           ).bind(squadId).all();
-          return new Response(JSON.stringify({items:result.results||[]}),{status:200,headers});
+          const items=(result.results||[]).map(marker=>{
+            let enemyNicks=marker.enemy_nicks;
+            if(typeof enemyNicks==='string'){try{enemyNicks=JSON.parse(enemyNicks)}catch{enemyNicks=[]}}
+            return {...marker,showLabel:marker.show_label===1||marker.show_label===true,locked:marker.locked===1||marker.locked===true,enemyNicks:Array.isArray(enemyNicks)?enemyNicks:[]};
+          });
+          return new Response(JSON.stringify({items}),{status:200,headers});
         }catch{return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers});}
       }
       if (request.method === 'POST' && url.pathname === '/api/map-markers') {
