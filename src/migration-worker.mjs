@@ -115,12 +115,27 @@ export default {
               } catch { photoAudit.other_references++; }
             }
           }
+          const photoSamples=[];
+          for(const post of posts.results||[]){
+            let images=[];
+            try{images=JSON.parse(post.images||'[]')}catch{continue}
+            if(!Array.isArray(images))continue;
+            for(const source of images){
+              if(typeof source!=='string')continue;
+              try{
+                const u=new URL(source);
+                if(u.protocol!=='https:')continue;
+                if(!['ik.imagekit.io','zicapopwsssopyxphhpo.supabase.co'].includes(u.hostname))continue;
+                if(photoSamples.length<20)photoSamples.push({post_id:post.id,host:u.hostname,path:u.pathname});
+              }catch{}
+            }
+          }
           const latest={};
           for(const [table,column] of [['squad_map_markers','updated_at'],['squad_place_posts','created_at'],['protect_updates','updated_at']]){
             const row=await env.DB.prepare('SELECT MAX('+column+') AS latest FROM '+table+' WHERE squad_id = ?').bind(squadId).first();
             latest[table]=row?.latest||null;
           }
-          return new Response(JSON.stringify({source:'d1',live_sync:false,counts,latest,photo_audit:photoAudit,checked_at:new Date().toISOString()}),{status:200,headers});
+          return new Response(JSON.stringify({source:'d1',live_sync:false,counts,latest,photo_audit:photoAudit,photo_samples:photoSamples,checked_at:new Date().toISOString()}),{status:200,headers});
         } catch { return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers}); }
       }
       if (request.method === 'GET' && ['/api/members','/api/protect','/api/tasks'].includes(url.pathname)) {
