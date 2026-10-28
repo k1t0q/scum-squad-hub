@@ -97,7 +97,25 @@ export default {
             const row = await env.DB.prepare('SELECT COUNT(*) AS n FROM '+name+' WHERE squad_id = ?').bind(squadId).first();
             counts[name] = row?.n ?? 0;
           }
-          return new Response(JSON.stringify({source:'d1',live_sync:false,counts}),{status:200,headers});
+          const posts = await env.DB.prepare('SELECT id,kind,images FROM squad_place_posts WHERE squad_id = ?').bind(squadId).all();
+          const photoAudit = {posts_with_images:0,total_references:0,legacy_supabase_references:0,imagekit_references:0,other_references:0,invalid_image_lists:0};
+          for (const post of posts.results || []) {
+            let images = [];
+            try { images = JSON.parse(post.images || '[]'); } catch { photoAudit.invalid_image_lists++; continue; }
+            if (!Array.isArray(images)) { photoAudit.invalid_image_lists++; continue; }
+            if (images.length) photoAudit.posts_with_images++;
+            for (const source of images) {
+              photoAudit.total_references++;
+              if (typeof source !== 'string') { photoAudit.other_references++; continue; }
+              try {
+                const host = new URL(source).hostname;
+                if (host === 'zicapopwsssopyxphhpo.supabase.co') photoAudit.legacy_supabase_references++;
+                else if (host === 'ik.imagekit.io') photoAudit.imagekit_references++;
+                else photoAudit.other_references++;
+              } catch { photoAudit.other_references++; }
+            }
+          }
+          return new Response(JSON.stringify({source:'d1',live_sync:false,counts,photo_audit:photoAudit}),{status:200,headers});
         } catch { return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers}); }
       }
       if (request.method === 'GET' && ['/api/members','/api/protect','/api/tasks'].includes(url.pathname)) {
