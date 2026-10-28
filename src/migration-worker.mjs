@@ -147,7 +147,7 @@ export default {
           const queries={
             '/api/members':'SELECT id,nick,game_role,access_role,joined_at FROM members WHERE squad_id = ? AND is_active = 1 ORDER BY nick LIMIT 200',
             '/api/protect':'SELECT p.id,p.member_id,m.nick AS updated_by,p.updated_at,p.effective_at FROM protect_updates p LEFT JOIN members m ON m.id=p.member_id WHERE p.squad_id = ? ORDER BY p.updated_at DESC LIMIT 30',
-            '/api/tasks':'SELECT id,title,quantity,unit,place,priority,deadline,status,created_at FROM tasks WHERE squad_id = ? ORDER BY created_at DESC LIMIT 200'
+            '/api/tasks':'SELECT id,creator_id,assignee_id,title,quantity,unit,place,priority,deadline,comment,status,created_at FROM tasks WHERE squad_id = ? ORDER BY created_at DESC LIMIT 200'
           };
           const result=await env.DB.prepare(queries[url.pathname]).bind(squadId).all();
           return new Response(JSON.stringify({items:result.results||[]}),{status:200,headers});
