@@ -1,12 +1,12 @@
 // Code-based login for the migration Worker; Steam is not required.
-// Credentials must be provisioned as Worker secrets. Never expose the code or hash.
+// Compare against the existing server-side D1 squad code; never return it to clients.
 const encoder=new TextEncoder();
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json','cache-control':'no-store'}});
 async function digest(value){const bytes=await crypto.subtle.digest('SHA-256',encoder.encode(value));return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('')}
 function constantEqual(a,b){if(typeof a!=='string'||typeof b!=='string'||a.length!==b.length)return false;let diff=0;for(let i=0;i<a.length;i++)diff|=a.charCodeAt(i)^b.charCodeAt(i);return diff===0}
 export async function verifySquadCode(request,env){
   if(request.headers.get('origin')!==new URL(request.url).origin)return json({error:'invalid_origin'},403);
-  if(!env.SQUAD_CODE_PEPPER||!env.DB)return json({error:'code_login_not_configured'},503);
+  if(!env.DB)return json({error:'code_login_not_configured'},503);
   // Reject verification if the Worker has no configured abuse protection.
   if (!env.CODE_LOGIN_LIMITER) return json({error:'rate_limit_unavailable'},503);
   const clientIp=request.headers.get('cf-connecting-ip');
@@ -22,10 +22,10 @@ export async function verifySquadCode(request,env){
   // current squad codes without requiring users to re-register or use Steam.
   // The imported legacy invite_code column must later be migrated to a salted hash.
   const member=await env.DB.prepare('SELECT m.id,m.squad_id,m.nick,m.game_role,m.access_role,s.invite_code FROM members m JOIN squads s ON s.id=m.squad_id WHERE lower(m.nick)=lower(?) AND m.is_active=1 LIMIT 100').bind(nick).all();
-  const supplied=await digest(env.SQUAD_CODE_PEPPER+':'+code);
+  const supplied=await digest(code);
   const matches=[];
   for(const record of member.results||[]){
-    const expected=await digest(env.SQUAD_CODE_PEPPER+':'+String(record.invite_code||''));
+    const expected=await digest(String(record.invite_code||''));
     if(constantEqual(expected,supplied)&&record.game_role===role)matches.push(record);
   }
   if(matches.length!==1)return json({error:'invalid_credentials'},401);
