@@ -10,13 +10,13 @@ function env(allowed=true){
  return {SESSION_HMAC_KEY:key,DB:{prepare(sql){
   if(sql.includes('scum_verified_steam_links'))return {bind(id,squad){assert.equal(id,steam);return {first:async()=>allowed&&squad==='own'?{member_id:'m1',squad_id:'own',access_role:'member'}:null}}};
   assert.match(sql,/FROM squad_map_markers WHERE squad_id = \?/);
-  return {bind(squad){assert.equal(squad,'own');return {all:async()=>({results:[{id:'marker1',name:'Enemy base'}]})}}};
+  return {bind(squad){assert.equal(squad,'own');return {all:async()=>({results:[{id:'marker1',name:'Enemy base',show_label:1,locked:0,enemy_nicks:'[\"rival\"]'}]})}}};
  }}};
 }
 test('linked squad reads only its markers',async()=>{
  const res=await worker.fetch(new Request('https://test/api/map-markers?squad_id=own',{headers}),env());
  assert.equal(res.status,200);
- assert.deepEqual((await res.json()).items,[{id:'marker1',name:'Enemy base'}]);
+ assert.deepEqual((await res.json()).items,[{id:'marker1',name:'Enemy base',show_label:1,locked:false,enemy_nicks:'[\"rival\"]',showLabel:true,enemyNicks:['rival']}]);
 });
 test('foreign squad markers are forbidden',async()=>{
  const res=await worker.fetch(new Request('https://test/api/map-markers?squad_id=foreign',{headers}),env());
