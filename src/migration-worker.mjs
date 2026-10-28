@@ -1,3 +1,4 @@
+import { steamLinkStatus } from './steam-link-status.mjs';
 import { linkLegacyAccount } from './legacy-account-link.mjs';
 import { deleteMapMarker } from './map-marker-delete.mjs';
 import { createMapMarker } from './map-marker-create.mjs';
@@ -44,6 +45,7 @@ export default {
     if (url.pathname.startsWith('/api/')) {
       const identity = await verifySession(request, env);
       if (!identity) return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers });
+      if (request.method === 'GET' && url.pathname === '/api/link-status') return steamLinkStatus(env,identity.steamId,headers);
       if (request.method === 'POST' && url.pathname === '/api/link-legacy-account') return linkLegacyAccount(request,env,identity.steamId,headers);
       if (request.method === 'GET' && url.pathname === '/api/squad-access') {
         const squadId = url.searchParams.get('squad_id');
