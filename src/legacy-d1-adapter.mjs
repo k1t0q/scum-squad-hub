@@ -62,3 +62,14 @@ export function renderReadOnlyD1(snapshot){
     part('Схроны и базы',posts,['map_marker_name','kind',x=>Array.isArray(x.images)?x.images.length+' фото':'0 фото'])+
     part('Взрывчатка',explosives,['item','quantity'])+gallery+'</div>';
 }
+
+export async function updateTaskStatusD1(id,status){
+ const r=await fetch('/api/member/tasks/status',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({id,status})});
+ if(!r.ok)throw Error('Task update failed: '+r.status);
+ return r.json();
+}
+export async function checkStashD1(id){
+ const r=await fetch('/api/member/stashes/check',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({id})});
+ if(!r.ok)throw Error('Stash check failed: '+r.status);
+ return r.json();
+}
