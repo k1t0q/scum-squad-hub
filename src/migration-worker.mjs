@@ -85,6 +85,21 @@ export default {
         if (!membership) return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
         return new Response(JSON.stringify({member_id:membership.memberId,squad_id:membership.squadId,access_role:membership.role}),{status:200,headers});
       }
+      if (request.method === 'GET' && ['/api/members','/api/protect','/api/tasks'].includes(url.pathname)) {
+        const squadId=url.searchParams.get('squad_id');
+        if(!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
+        const membership=await authorizeSquad(env,identity.steamId,squadId);
+        if(!membership)return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
+        try {
+          const queries={
+            '/api/members':'SELECT id,nick,game_role,access_role,joined_at FROM members WHERE squad_id = ? AND is_active = 1 ORDER BY nick LIMIT 200',
+            '/api/protect':'SELECT p.id,p.member_id,m.nick AS updated_by,p.updated_at,p.effective_at FROM protect_updates p LEFT JOIN members m ON m.id=p.member_id WHERE p.squad_id = ? ORDER BY p.updated_at DESC LIMIT 30',
+            '/api/tasks':'SELECT id,title,quantity,unit,place,priority,deadline,status,created_at FROM tasks WHERE squad_id = ? ORDER BY created_at DESC LIMIT 200'
+          };
+          const result=await env.DB.prepare(queries[url.pathname]).bind(squadId).all();
+          return new Response(JSON.stringify({items:result.results||[]}),{status:200,headers});
+        }catch{return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers});}
+      }
       if (request.method === 'GET' && (url.pathname === '/api/stashes' || url.pathname === '/api/explosives')) {
         const squadId=url.searchParams.get('squad_id');
         if (!squadId) return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
