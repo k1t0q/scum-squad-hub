@@ -231,6 +231,20 @@ export default {
         if (!membership) return new Response(JSON.stringify({error:'forbidden'}), {status:403,headers});
         return updateExplosives(request, env, membership, squadId, headers);
       }
+      if (request.method === 'POST' && url.pathname === '/api/tasks') {
+        const squadId=url.searchParams.get('squad_id');
+        if(!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
+        const membership=await authorizeSquad(env,identity.steamId,squadId);
+        if(!membership)return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
+        let body;
+        try{body=await request.json()}catch{return new Response(JSON.stringify({error:'invalid_json'}),{status:400,headers})}
+        const title=typeof body?.title==='string'?body.title.trim():'';
+        if(!title||title.length>160)return new Response(JSON.stringify({error:'invalid_task_title'}),{status:400,headers});
+        try{
+          const result=await env.DB.prepare("INSERT INTO tasks (squad_id,creator_id,title,status,priority,created_at) VALUES (?, ?, ?, 'В процессе', 'Обычный', CURRENT_TIMESTAMP)").bind(squadId,membership.memberId,title).run();
+          return new Response(JSON.stringify({id:result.meta.last_row_id,title,status:'В процессе'}),{status:201,headers});
+        }catch{return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers})}
+      }
       if (request.method === 'PATCH' && url.pathname === '/api/tasks') {
         const squadId=url.searchParams.get('squad_id');
         if(!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
