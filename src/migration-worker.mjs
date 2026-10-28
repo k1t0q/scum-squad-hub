@@ -1,3 +1,4 @@
+import { deleteMapMarker } from './map-marker-delete.mjs';
 import { createMapMarker } from './map-marker-create.mjs';
 import { updateMapMarker } from './map-marker-update.mjs';
 import { checkStash } from './stash-update.mjs';
@@ -105,6 +106,13 @@ export default {
         const membership=await authorizeSquad(env,identity.steamId,squadId);
         if(!membership)return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
         return createMapMarker(request,env,membership,squadId,headers);
+      }
+      if (request.method === 'DELETE' && url.pathname === '/api/map-markers') {
+        const squadId=url.searchParams.get('squad_id');
+        if(!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
+        const membership=await authorizeSquad(env,identity.steamId,squadId);
+        if(!membership)return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
+        return deleteMapMarker(request,env,membership,squadId,headers);
       }
       if (request.method === 'PATCH' && url.pathname === '/api/map-markers') {
         const squadId=url.searchParams.get('squad_id');
