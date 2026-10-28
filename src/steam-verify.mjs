@@ -25,10 +25,14 @@ export async function verifySteamAssertion(callbackUrl, origin, fetcher = fetch,
       method: 'POST',
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
       body: body.toString(),
-      redirect: 'error'
+      redirect: 'manual'
     });
-    if (!response.ok) return fail('provider_http');
+    if (response.status >= 300 && response.status < 400) return fail('provider_redirect');
+    if (!response.ok) return fail('provider_http_'+response.status);
     const text = await response.text();
     return text.split('\n').some(line => line.trim() === 'is_valid:true') ? steamId : fail('provider_rejected');
-  } catch { return fail('provider_network'); }
+  } catch (error) {
+    console.warn('steam_provider_fetch_error', error instanceof Error ? error.name : 'unknown', error instanceof Error ? String(error.message).slice(0,180) : 'unknown');
+    return fail('provider_network');
+  }
 }
