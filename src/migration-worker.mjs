@@ -115,7 +115,7 @@ export default {
               } catch { photoAudit.other_references++; }
             }
           }
-          return new Response(JSON.stringify({source:'d1',live_sync:false,counts,photo_audit:photoAudit}),{status:200,headers});
+          return new Response(JSON.stringify({source:'d1',live_sync:false,counts,photo_audit:photoAudit,checked_at:new Date().toISOString()}),{status:200,headers});
         } catch { return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers}); }
       }
       if (request.method === 'GET' && ['/api/members','/api/protect','/api/tasks'].includes(url.pathname)) {
