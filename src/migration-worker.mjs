@@ -1,4 +1,5 @@
 import { verifySquadCode } from './code-login-verification.mjs';
+import { createMemberSession, verifyMemberSession, memberCookie, clearMemberCookie } from './member-session.mjs';
 import { steamLinkStatus } from './steam-link-status.mjs';
 import { linkLegacyAccount } from './legacy-account-link.mjs';
 import { deleteMapMarker } from './map-marker-delete.mjs';
@@ -71,6 +72,22 @@ export default {
     }
     if (request.method === 'POST' && url.pathname === '/api/code-login/verify') {
       return verifySquadCode(request,env);
+    }
+    if (request.method === 'POST' && url.pathname === '/api/member/login') {
+      if(typeof env.MEMBER_SESSION_KEY!=='string'||env.MEMBER_SESSION_KEY.length<32)return new Response(JSON.stringify({error:'session_not_configured'}),{status:503,headers});
+      const checked=await verifySquadCode(request,env);
+      if(!checked.ok)return checked;
+      const result=await checked.json();
+      const token=await createMemberSession(result.member,env);
+      return new Response(JSON.stringify({member:result.member}),{status:200,headers:{...headers,'set-cookie':memberCookie(token)}});
+    }
+    if (request.method === 'GET' && url.pathname === '/api/member/me') {
+      const member=await verifyMemberSession(request,env);
+      return new Response(JSON.stringify(member?{authenticated:true,member}:{authenticated:false}),{status:member?200:401,headers});
+    }
+    if (request.method === 'POST' && url.pathname === '/api/member/logout') {
+      if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
+      return new Response(JSON.stringify({ok:true}),{status:200,headers:{...headers,'set-cookie':clearMemberCookie}});
     }
     if (url.pathname.startsWith('/api/')) {
       if(!['GET','HEAD','OPTIONS'].includes(request.method) && request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
