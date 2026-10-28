@@ -238,7 +238,7 @@ export default {
         if(!membership)return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
         let payload;
         try{payload=await request.json()}catch{return new Response(JSON.stringify({error:'invalid_json'}),{status:400,headers})}
-        if(typeof payload?.id!=='string'||payload.id.length>128||!payload.id||!['done','active'].includes(payload.status))return new Response(JSON.stringify({error:'invalid_task_update'}),{status:400,headers});
+        if(!Number.isSafeInteger(payload?.id)||payload.id<=0||!['Выполнено','В процессе'].includes(payload.status))return new Response(JSON.stringify({error:'invalid_task_update'}),{status:400,headers});
         try{
           const result=await env.DB.prepare('UPDATE tasks SET status = ? WHERE id = ? AND squad_id = ?').bind(payload.status,payload.id,squadId).run();
           if(result?.meta?.changes!==1)return new Response(JSON.stringify({error:'task_not_found'}),{status:404,headers});
