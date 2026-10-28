@@ -85,6 +85,21 @@ export default {
         if (!membership) return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
         return new Response(JSON.stringify({member_id:membership.memberId,squad_id:membership.squadId,access_role:membership.role}),{status:200,headers});
       }
+      if (request.method === 'GET' && url.pathname === '/api/migration-audit') {
+        const squadId = url.searchParams.get('squad_id');
+        if (!squadId) return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
+        const membership = await authorizeSquad(env,identity.steamId,squadId);
+        if (!membership || membership.role !== 'admin') return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
+        try {
+          const names = ['members','squad_map_markers','squad_place_posts','tasks','protect_updates','explosives_inventory'];
+          const counts = {};
+          for (const name of names) {
+            const row = await env.DB.prepare('SELECT COUNT(*) AS n FROM '+name+' WHERE squad_id = ?').bind(squadId).first();
+            counts[name] = row?.n ?? 0;
+          }
+          return new Response(JSON.stringify({source:'d1',live_sync:false,counts}),{status:200,headers});
+        } catch { return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers}); }
+      }
       if (request.method === 'GET' && ['/api/members','/api/protect','/api/tasks'].includes(url.pathname)) {
         const squadId=url.searchParams.get('squad_id');
         if(!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
