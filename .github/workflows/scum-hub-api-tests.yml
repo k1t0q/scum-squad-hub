@@ -51,3 +51,5 @@ jobs:
         with:
           node-version: '22'
       - run: node --test tests/*.test.mjs
+      - name: Validate Cloudflare Worker bundle without deployment
+        run: npx --yes wrangler@4 deploy --dry-run --outdir /tmp/scum-hub-migration-bundle --config wrangler.migration.toml
