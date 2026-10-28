@@ -14,3 +14,10 @@ database_id = "924cdc85-bd75-462a-87f6-a9a739054905"
 # Configure SESSION_HMAC_KEY and legacy auth
 # through Cloudflare Worker secrets before enabling Steam login.
 # Never put secret values in this file.
+
+# Serve the original SCUM HUB frontend on the migration Worker origin.
+# CI builds this directory from the existing public site files.
+[assets]
+directory = "./migration-public"
+binding = "ASSETS"
+run_worker_first = true
