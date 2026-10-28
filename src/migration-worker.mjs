@@ -34,7 +34,21 @@ export default {
       const steamId=await verifySteamAssertion(request.url,origin,fetch,reason=>{verificationReason=reason;console.warn('steam_openid_verification_failed',reason);});
       if (!steamId)return new Response(JSON.stringify({error:'steam_verification_failed',reason:verificationReason}),{status:401,headers});
       const token=await issueSession(steamId,env);
-      return new Response(JSON.stringify({token_type:'Bearer',access_token:token,expires_in:3600}),{status:200,headers:{...headers,'set-cookie':'steam_state=; Path=/auth/steam; HttpOnly; Secure; SameSite=Lax; Max-Age=0'}});
+      const responseHeaders=new Headers(headers);
+      responseHeaders.set('location','/link');
+      responseHeaders.append('set-cookie','steam_state=; Path=/auth/steam; HttpOnly; Secure; SameSite=Lax; Max-Age=0');
+      responseHeaders.append('set-cookie','scum_steam_session='+token+'; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=3600');
+      return new Response(null,{status:303,headers:responseHeaders});
+    }
+    if (request.method === 'GET' && url.pathname === '/link') {
+      const identity=await verifySession(request,env);
+      if(!identity)return Response.redirect(url.origin+'/auth/steam/start',302);
+      const {linkPage}=await import('./migration-link-page.mjs');
+      return new Response(linkPage,{headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store','content-security-policy':"default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'self' https://zicapopwsssopyxphhpo.supabase.co; form-action 'none'; base-uri 'none'; frame-ancestors 'none'",'referrer-policy':'no-referrer'}});
+    }
+    if (request.method === 'GET' && url.pathname === '/migration-link.js') {
+      const {linkScript}=await import('./migration-link-script.mjs');
+      return new Response(linkScript,{headers:{'content-type':'text/javascript; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'}});
     }
     if (request.method === 'GET' && url.pathname === '/health') {
       try {
@@ -48,7 +62,10 @@ export default {
       const identity = await verifySession(request, env);
       if (!identity) return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers });
       if (request.method === 'GET' && url.pathname === '/api/link-status') return steamLinkStatus(env,identity.steamId,headers);
-      if (request.method === 'POST' && url.pathname === '/api/link-legacy-account') return linkLegacyAccount(request,env,identity.steamId,headers);
+      if (request.method === 'POST' && url.pathname === '/api/link-legacy-account') {
+        if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
+        return linkLegacyAccount(request,env,identity.steamId,headers);
+      }
       if (request.method === 'GET' && url.pathname === '/api/squad-access') {
         const squadId = url.searchParams.get('squad_id');
         if (!squadId) return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
