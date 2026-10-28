@@ -46,3 +46,22 @@ test('missing rate limiter fails closed',async()=>{
  delete env.CODE_LOGIN_LIMITER;
  assert.equal((await verifySquadCode(request({nick:'Player',code,role:'Rifler'}),env)).status,503);
 });
+
+test('same nickname in different squads uses the matching squad code',async()=>{
+ const {env,request,code}=await fixture();
+ const original=env.DB.prepare;
+ env.DB.prepare=()=>({bind:()=>({all:async()=>({results:[
+  {id:'m1',squad_id:'s1',nick:'Player',game_role:'Rifler',access_role:'member',invite_code:'different-code'},
+  {id:'m2',squad_id:'s2',nick:'Player',game_role:'Rifler',access_role:'member',invite_code:code}
+ ]})})});
+ const r=await verifySquadCode(request({nick:'Player',code,role:'Rifler'}),env);
+ assert.equal(r.status,200);
+ assert.equal((await r.json()).member.squad_id,'s2');
+});
+test('unknown nickname never grants a session',async()=>{
+ const {env,request,code}=await fixture();
+ env.DB.prepare=()=>({bind:()=>({all:async()=>({results:[]})})});
+ const r=await verifySquadCode(request({nick:'Unknown',code,role:'Rifler'}),env);
+ assert.equal(r.status,401);
+ assert.equal(r.headers.get('set-cookie'),null);
+});
