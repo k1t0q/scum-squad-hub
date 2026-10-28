@@ -95,12 +95,16 @@ export default {
       const member=await verifyMemberSession(request,env);
       if(!member)return new Response(JSON.stringify({error:'unauthorized'}),{status:401,headers});
       try {
-        const [members,protect,tasks]=await Promise.all([
+        const [members,protect,tasks,markers,posts,explosives]=await Promise.all([
           env.DB.prepare('SELECT id,nick,game_role,access_role,joined_at FROM members WHERE squad_id=? AND is_active=1 ORDER BY nick LIMIT 200').bind(member.squad_id).all(),
           env.DB.prepare('SELECT p.id,p.member_id,m.nick AS updated_by,p.updated_at,p.effective_at FROM protect_updates p LEFT JOIN members m ON m.id=p.member_id WHERE p.squad_id=? ORDER BY p.updated_at DESC LIMIT 30').bind(member.squad_id).all(),
-          env.DB.prepare('SELECT id,creator_id,assignee_id,title,quantity,unit,place,priority,deadline,comment,status,created_at FROM tasks WHERE squad_id=? ORDER BY created_at DESC LIMIT 200').bind(member.squad_id).all()
+          env.DB.prepare('SELECT id,creator_id,assignee_id,title,quantity,unit,place,priority,deadline,comment,status,created_at FROM tasks WHERE squad_id=? ORDER BY created_at DESC LIMIT 200').bind(member.squad_id).all(),
+          env.DB.prepare('SELECT id,x,y,type,name,note,icon,color,size,show_label,locked,created_by,updated_at,enemy_nicks FROM squad_map_markers WHERE squad_id=? ORDER BY updated_at DESC LIMIT 1000').bind(member.squad_id).all(),
+          env.DB.prepare('SELECT id,kind,images,comment,created_by,created_at,stash_checked_at,stash_checked_by,map_marker_name FROM squad_place_posts WHERE squad_id=? ORDER BY created_at DESC LIMIT 200').bind(member.squad_id).all(),
+          env.DB.prepare('SELECT item,quantity,updated_at FROM explosives_inventory WHERE squad_id=? ORDER BY item LIMIT 200').bind(member.squad_id).all()
         ]);
-        return new Response(JSON.stringify({member,members:members.results||[],protect:protect.results||[],tasks:tasks.results||[]}),{status:200,headers});
+        const parseImages=post=>{let images=post.images;try{if(typeof images==='string')images=JSON.parse(images)}catch{images=[]}return {...post,images:Array.isArray(images)?images:[]}};
+        return new Response(JSON.stringify({member,members:members.results||[],protect:protect.results||[],tasks:tasks.results||[],markers:markers.results||[],posts:(posts.results||[]).map(parseImages),explosives:explosives.results||[]}),{status:200,headers});
       }catch{return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers})}
     }
     if (url.pathname.startsWith('/api/')) {
