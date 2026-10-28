@@ -5,7 +5,8 @@ function decodeBase64Url(value){
   return Uint8Array.from(atob(base),ch=>ch.charCodeAt(0));
 }
 export async function verifySession(request,env){
-  const authorization=request.headers.get('authorization')||'';
+  const cookie=(request.headers.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('scum_steam_session='));
+  const authorization=request.headers.get('authorization')||(cookie?'Bearer '+cookie.slice('scum_steam_session='.length):'');
   const match=/^Bearer ([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/.exec(authorization);
   if(!match||typeof env.SESSION_HMAC_KEY!=='string'||env.SESSION_HMAC_KEY.length<32)return null;
   try{
