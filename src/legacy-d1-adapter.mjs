@@ -52,11 +52,13 @@ export function renderReadOnlyD1(snapshot){
   const rows=(items,cols)=>'<table style="width:100%;font-size:13px"><tbody>'+items.map(x=>'<tr>'+cols.map(k=>'<td style="padding:7px;border-bottom:1px solid #444">'+esc(typeof k==='function'?k(x):x[k])+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
   const part=(title,items,cols)=>'<h3>'+esc(title)+' ('+items.length+')</h3>'+rows(items,cols);
   const members=snapshot.members||[],tasks=snapshot.tasks||[],protect=snapshot.protect||[],markers=snapshot.markers||[],posts=snapshot.posts||[],explosives=snapshot.explosives||[];
+  const images=posts.flatMap(p=>(Array.isArray(p.images)?p.images:[]).map(src=>({src,post:p.map_marker_name||p.kind}))).filter(x=>{try{const u=new URL(x.src);return u.protocol==='https:'&&u.hostname==='ik.imagekit.io'}catch{return false}}).slice(0,24);
+  const gallery='<h3>Фото из ImageKit ('+images.length+')</h3><div style="display:flex;flex-wrap:wrap;gap:8px">'+images.map(x=>'<a href="'+esc(x.src)+'" target="_blank" rel="noopener noreferrer"><img src="'+esc(x.src)+'" alt="'+esc(x.post)+'" loading="lazy" style="width:105px;height:80px;object-fit:cover;border-radius:6px"></a>').join('')+'</div>';
   return '<div style="max-height:65vh;overflow:auto"><h2>SCUM HUB · D1</h2><p class="muted">Только просмотр · '+esc(snapshot.member?.nick)+'</p>'+
     part('Состав',members,['nick','game_role'])+
     part('Задачи',tasks,['title','quantity','status'])+
     part('Протект',protect,['updated_by','effective_at'])+
     part('Метки карты',markers,['name','type','x','y'])+
     part('Схроны и базы',posts,['map_marker_name','kind',x=>Array.isArray(x.images)?x.images.length+' фото':'0 фото'])+
-    part('Взрывчатка',explosives,['item','quantity'])+'</div>';
+    part('Взрывчатка',explosives,['item','quantity'])+gallery+'</div>';
 }
