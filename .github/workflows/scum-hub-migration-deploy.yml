@@ -22,6 +22,12 @@ jobs:
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "Missing Cloudflare token"; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "Missing Cloudflare account ID"; exit 1; }
+      - name: Deploy migration Worker only
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@4 deploy --config wrangler.migration.toml
+
       - name: Configure Steam session secret
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -31,8 +37,3 @@ jobs:
           test -n "$SCUM_SESSION_HMAC_KEY" || { echo "Missing SCUM_SESSION_HMAC_KEY"; exit 1; }
           test "${#SCUM_SESSION_HMAC_KEY}" -ge 32 || { echo "Session key too short"; exit 1; }
           printf '%s' "$SCUM_SESSION_HMAC_KEY" | npx --yes wrangler@4 secret put SESSION_HMAC_KEY --config wrangler.migration.toml
-      - name: Deploy migration Worker only
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@4 deploy --config wrangler.migration.toml
