@@ -4,7 +4,7 @@ import {deleteMapMarker} from '../src/map-marker-delete.mjs';
 const headers={'content-type':'application/json'};
 const req=body=>new Request('https://test/api/map-markers',{method:'DELETE',headers,body:JSON.stringify(body)});
 test('delete only unlocked marker in authenticated squad',async()=>{
- const env={DB:{prepare(sql){assert.match(sql,/DELETE FROM squad_map_markers WHERE id = \? AND squad_id = \? AND locked = 0/);return {bind(id,squad){assert.equal(id,'m1');assert.equal(squad,'own');return {run:async()=>({meta:{changes:1}})};}}}};
+ const env={DB:{prepare(sql){assert.match(sql,/DELETE FROM squad_map_markers WHERE id = \? AND squad_id = \? AND locked = 0/);return {bind(id,squad){assert.equal(id,'m1');assert.equal(squad,'own');return {run:async()=>({meta:{changes:1}})};}};}}};
  const res=await deleteMapMarker(req({id:'m1',squad_id:'other'}),env,{memberId:'member1'},'own',headers);
  assert.equal(res.status,200);assert.deepEqual(await res.json(),{id:'m1',deleted:true});
 });
