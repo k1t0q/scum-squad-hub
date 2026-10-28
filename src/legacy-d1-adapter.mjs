@@ -39,3 +39,10 @@ export function adaptD1Snapshot(snapshot) {
     }))
   };
 }
+
+// Member-code sessions fetch only their own squad. No Steam identity is needed.
+export async function fetchMemberSnapshot(apiBase=location.origin) {
+  const response=await fetch(new URL('/api/member/snapshot',apiBase),{credentials:'include'});
+  if(!response.ok)throw new Error('member snapshot: HTTP '+response.status);
+  return response.json();
+}
