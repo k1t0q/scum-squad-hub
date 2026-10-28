@@ -62,7 +62,7 @@ test('database errors do not reveal internal details', async () => {
 test('write requests cannot modify stash or explosives yet', async () => {
   for (const path of ['stashes', 'explosives']) {
     const response = await worker.fetch(new Request('https://test/api/' + path + '?squad_id=own', {
-      method: 'POST', headers: { ...auth, 'content-type': 'application/json' }, body: '{}'
+      method: 'POST', headers: { ...auth, origin: 'https://test', 'content-type': 'application/json' }, body: '{}'
     }), env());
     assert.equal(response.status, 501);
   }
