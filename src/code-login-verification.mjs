@@ -21,12 +21,15 @@ export async function verifySquadCode(request,env){
   // Verify the existing legacy squad code against its own squad. This preserves
   // current squad codes without requiring users to re-register or use Steam.
   // The imported legacy invite_code column must later be migrated to a salted hash.
-  const member=await env.DB.prepare('SELECT m.id,m.squad_id,m.nick,m.game_role,m.access_role,s.invite_code FROM members m JOIN squads s ON s.id=m.squad_id WHERE lower(m.nick)=lower(?) AND m.is_active=1 LIMIT 2').bind(nick).all();
-  if(member.results?.length!==1)return json({error:'invalid_credentials'},401);
-  const record=member.results[0];
-  const expected=await digest(env.SQUAD_CODE_PEPPER+':'+String(record.invite_code||''));
+  const member=await env.DB.prepare('SELECT m.id,m.squad_id,m.nick,m.game_role,m.access_role,s.invite_code FROM members m JOIN squads s ON s.id=m.squad_id WHERE lower(m.nick)=lower(?) AND m.is_active=1 LIMIT 100').bind(nick).all();
   const supplied=await digest(env.SQUAD_CODE_PEPPER+':'+code);
-  if(!constantEqual(expected,supplied)||record.game_role!==role)return json({error:'invalid_credentials'},401);
+  const matches=[];
+  for(const record of member.results||[]){
+    const expected=await digest(env.SQUAD_CODE_PEPPER+':'+String(record.invite_code||''));
+    if(constantEqual(expected,supplied)&&record.game_role===role)matches.push(record);
+  }
+  if(matches.length!==1)return json({error:'invalid_credentials'},401);
+  const record=matches[0];
   // A shared squad code must never authenticate or impersonate an administrator.
   if(member.results[0].access_role==='admin')return json({error:'admin_requires_separate_login'},403);
   // This is only a verification result, NOT an authenticated session.
