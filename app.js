@@ -1094,3 +1094,12 @@ async function createDiscordLinkCode() {
 })();
 
 
+
+/* Migration-only bridge for the ORIGINAL SCUM HUB UI.
+   Explicit invocation only: never replaces live Supabase data automatically. */
+window.scumHubD1Preview=async function(){
+  const adapter=await import('./src/legacy-d1-adapter.mjs');
+  const api='https://scum-hub-migration.nikitinrf.workers.dev';
+  const snapshot=await adapter.fetchSquadSnapshot(api);
+  return adapter.adaptD1Snapshot(snapshot);
+};
