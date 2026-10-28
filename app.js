@@ -1097,6 +1097,22 @@ async function createDiscordLinkCode() {
 
 /* Migration-only bridge for the ORIGINAL SCUM HUB UI.
    Explicit invocation only: never replaces live Supabase data automatically. */
+// Migration-only, explicitly invoked test path. Does not alter the production login.
+window.scumHubD1CodeLogin=async function({code,nick,role}){
+  if(location.hostname!=='scum-hub-migration.nikitinrf.workers.dev')throw new Error('Доступно только на тестовом Cloudflare Worker');
+  const response=await fetch('/api/member/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({code,nick,role})});
+  const result=await response.json();
+  if(!response.ok)throw new Error(result.error||'Ошибка входа');
+  const adapter=await import('./src/legacy-d1-adapter.mjs');
+  const snapshot=await adapter.fetchMemberSnapshot(location.origin);
+  return {member:result.member,preview:adapter.adaptD1Snapshot(snapshot),raw:snapshot};
+};
+window.scumHubD1CodeLogout=async function(){
+  if(location.hostname!=='scum-hub-migration.nikitinrf.workers.dev')return;
+  const response=await fetch('/api/member/logout',{method:'POST',credentials:'include',headers:{'content-type':'application/json'}});
+  if(!response.ok)throw new Error('Не удалось завершить тестовую сессию');
+};
+
 window.scumHubD1Preview=async function(){
   const adapter=await import('./src/legacy-d1-adapter.mjs');
   // Browser session cookies are scoped to the Worker origin.
