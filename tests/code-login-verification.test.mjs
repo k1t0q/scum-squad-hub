@@ -1,0 +1,37 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { webcrypto } from 'node:crypto';
+import { verifySquadCode } from '../src/code-login-verification.mjs';
+if(!globalThis.crypto)globalThis.crypto=webcrypto;
+const encoder=new TextEncoder();
+async function hash(s){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(s)))].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function fixture(member={id:'m1',squad_id:'s1',nick:'Player',game_role:'Rifler',access_role:'member'}){
+ const pepper='test-pepper',code='sample-secret-code';
+ const env={SQUAD_CODE_PEPPER:pepper,SQUAD_CODE_HASH:await hash(pepper+':'+code),DB:{prepare(){return {bind(){return {async all(){return {results:[member]}}}}}}}};
+ const request=(body,origin='https://scum-hub.example')=>new Request('https://scum-hub.example/api/code-login',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(body)});
+ return {env,request,code};
+}
+test('valid member verification does not create session',async()=>{
+ const {env,request,code}=await fixture();
+ const r=await verifySquadCode(request({nick:'Player',code,role:'Rifler'}),env);
+ assert.equal(r.status,200);
+ assert.equal(r.headers.get('set-cookie'),null);
+ assert.equal((await r.json()).member.access_role,undefined);
+});
+test('wrong code is rejected',async()=>{
+ const {env,request}=await fixture();
+ assert.equal((await verifySquadCode(request({nick:'Player',code:'wrong-code',role:'Rifler'}),env)).status,401);
+});
+test('shared code cannot authenticate admin',async()=>{
+ const {env,request,code}=await fixture({id:'m1',squad_id:'s1',nick:'Player',game_role:'Rifler',access_role:'admin'});
+ assert.equal((await verifySquadCode(request({nick:'Player',code,role:'Rifler'}),env)).status,403);
+});
+test('cross-origin requests are rejected',async()=>{
+ const {env,request,code}=await fixture();
+ assert.equal((await verifySquadCode(request({nick:'Player',code,role:'Rifler'},'https://attacker.example'),env)).status,403);
+});
+test('missing secret configuration fails closed',async()=>{
+ const {env,request,code}=await fixture();
+ delete env.SQUAD_CODE_HASH;
+ assert.equal((await verifySquadCode(request({nick:'Player',code,role:'Rifler'}),env)).status,503);
+});
