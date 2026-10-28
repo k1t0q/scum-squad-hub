@@ -59,6 +59,7 @@ export default {
       }
     }
     if (url.pathname.startsWith('/api/')) {
+      if(!['GET','HEAD','OPTIONS'].includes(request.method) && request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
       const identity = await verifySession(request, env);
       if (!identity) return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers });
       if (request.method === 'GET' && url.pathname === '/api/link-status') return steamLinkStatus(env,identity.steamId,headers);
