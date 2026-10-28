@@ -115,7 +115,12 @@ export default {
               } catch { photoAudit.other_references++; }
             }
           }
-          return new Response(JSON.stringify({source:'d1',live_sync:false,counts,photo_audit:photoAudit,checked_at:new Date().toISOString()}),{status:200,headers});
+          const latest={};
+          for(const [table,column] of [['squad_map_markers','updated_at'],['squad_place_posts','created_at'],['protect_updates','updated_at']]){
+            const row=await env.DB.prepare('SELECT MAX('+column+') AS latest FROM '+table+' WHERE squad_id = ?').bind(squadId).first();
+            latest[table]=row?.latest||null;
+          }
+          return new Response(JSON.stringify({source:'d1',live_sync:false,counts,latest,photo_audit:photoAudit,checked_at:new Date().toISOString()}),{status:200,headers});
         } catch { return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers}); }
       }
       if (request.method === 'GET' && ['/api/members','/api/protect','/api/tasks'].includes(url.pathname)) {
