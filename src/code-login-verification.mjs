@@ -31,7 +31,7 @@ export async function verifySquadCode(request,env){
   if(matches.length!==1)return json({error:'invalid_credentials'},401);
   const record=matches[0];
   // A shared squad code must never authenticate or impersonate an administrator.
-  if(member.results[0].access_role==='admin')return json({error:'admin_requires_separate_login'},403);
+  if(record.access_role==='admin')return json({error:'admin_requires_separate_login'},403);
   // This is only a verification result, NOT an authenticated session.
-  return json({verified:true,member:{id:member.results[0].id,squad_id:member.results[0].squad_id,nick:member.results[0].nick,game_role:member.results[0].game_role}});
+  return json({verified:true,member:{id:record.id,squad_id:record.squad_id,nick:record.nick,game_role:record.game_role}});
 }
