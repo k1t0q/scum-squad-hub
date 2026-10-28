@@ -28,7 +28,7 @@ jobs:
       - name: Prepare original SCUM HUB public assets for isolated preview
         run: |
           mkdir -p migration-public/src
-          find . -maxdepth 1 -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.svg' -o -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' -o -name '*.ico' -o -name '*.webmanifest' -o -name '*.json' \) -exec cp {} migration-public/ \;
+          find . -maxdepth 1 -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.svg' -o -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' -o -name '*.ico' -o -name '*.webmanifest' \) -exec cp {} migration-public/ \;
           cp src/legacy-d1-adapter.mjs migration-public/src/legacy-d1-adapter.mjs
           test -s migration-public/index.html
           test -s migration-public/app.js
