@@ -17,5 +17,8 @@ export async function verifySquadCode(request,env){
   const member=await env.DB.prepare('SELECT id,squad_id,nick,game_role,access_role FROM members WHERE lower(nick)=lower(?) AND is_active=1 LIMIT 2').bind(nick).all();
   if(member.results?.length!==1)return json({error:'member_not_found_or_ambiguous'},403);
   if(member.results[0].game_role!==role)return json({error:'invalid_credentials'},401);
-  return json({verified:true,member:member.results[0]});
+  // A shared squad code must never authenticate or impersonate an administrator.
+  if(member.results[0].access_role==='admin')return json({error:'admin_requires_separate_login'},403);
+  // This is only a verification result, NOT an authenticated session.
+  return json({verified:true,member:{id:member.results[0].id,squad_id:member.results[0].squad_id,nick:member.results[0].nick,game_role:member.results[0].game_role}});
 }
