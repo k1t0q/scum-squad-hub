@@ -231,6 +231,20 @@ export default {
         if (!membership) return new Response(JSON.stringify({error:'forbidden'}), {status:403,headers});
         return updateExplosives(request, env, membership, squadId, headers);
       }
+      if (request.method === 'PATCH' && url.pathname === '/api/tasks') {
+        const squadId=url.searchParams.get('squad_id');
+        if(!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
+        const membership=await authorizeSquad(env,identity.steamId,squadId);
+        if(!membership)return new Response(JSON.stringify({error:'forbidden'}),{status:403,headers});
+        let payload;
+        try{payload=await request.json()}catch{return new Response(JSON.stringify({error:'invalid_json'}),{status:400,headers})}
+        if(typeof payload?.id!=='string'||payload.id.length>128||!payload.id||!['done','active'].includes(payload.status))return new Response(JSON.stringify({error:'invalid_task_update'}),{status:400,headers});
+        try{
+          const result=await env.DB.prepare('UPDATE tasks SET status = ? WHERE id = ? AND squad_id = ?').bind(payload.status,payload.id,squadId).run();
+          if(result?.meta?.changes!==1)return new Response(JSON.stringify({error:'task_not_found'}),{status:404,headers});
+          return new Response(JSON.stringify({id:payload.id,status:payload.status}),{status:200,headers});
+        }catch{return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers})}
+      }
       if (request.method === 'POST' && url.pathname === '/api/stashes/check') {
         const squadId=url.searchParams.get('squad_id');
         if (!squadId)return new Response(JSON.stringify({error:'missing_squad_id'}),{status:400,headers});
