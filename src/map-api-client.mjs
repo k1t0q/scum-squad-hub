@@ -18,6 +18,7 @@ export function createMapApiClient({baseUrl, getToken, getSquadId, fetcher=fetch
   listMarkers:()=>request('/api/map-markers').then(data=>data.items),
   listPosts:posts,
   createMarker:marker=>request('/api/map-markers',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(marker)}),
+  deleteMarker:id=>request('/api/map-markers',{method:'DELETE',headers:{'content-type':'application/json'},body:JSON.stringify({id})}),
   updateMarker:marker=>request('/api/map-markers',{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify(marker)}),
   checkStash:id=>request('/api/stashes/check',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id})})
  };
