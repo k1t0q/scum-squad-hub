@@ -89,6 +89,20 @@ export default {
       if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
       return new Response(JSON.stringify({ok:true}),{status:200,headers:{...headers,'set-cookie':clearMemberCookie}});
     }
+    // Read-only squad snapshot for code-login sessions. Squad is derived from
+    // the signed cookie and current D1 membership, never from query parameters.
+    if (request.method === 'GET' && url.pathname === '/api/member/snapshot') {
+      const member=await verifyMemberSession(request,env);
+      if(!member)return new Response(JSON.stringify({error:'unauthorized'}),{status:401,headers});
+      try {
+        const [members,protect,tasks]=await Promise.all([
+          env.DB.prepare('SELECT id,nick,game_role,access_role,joined_at FROM members WHERE squad_id=? AND is_active=1 ORDER BY nick LIMIT 200').bind(member.squad_id).all(),
+          env.DB.prepare('SELECT p.id,p.member_id,m.nick AS updated_by,p.updated_at,p.effective_at FROM protect_updates p LEFT JOIN members m ON m.id=p.member_id WHERE p.squad_id=? ORDER BY p.updated_at DESC LIMIT 30').bind(member.squad_id).all(),
+          env.DB.prepare('SELECT id,creator_id,assignee_id,title,quantity,unit,place,priority,deadline,comment,status,created_at FROM tasks WHERE squad_id=? ORDER BY created_at DESC LIMIT 200').bind(member.squad_id).all()
+        ]);
+        return new Response(JSON.stringify({member,members:members.results||[],protect:protect.results||[],tasks:tasks.results||[]}),{status:200,headers});
+      }catch{return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers})}
+    }
     if (url.pathname.startsWith('/api/')) {
       if(!['GET','HEAD','OPTIONS'].includes(request.method) && request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
       const identity = await verifySession(request, env);
