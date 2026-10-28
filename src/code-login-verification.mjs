@@ -6,7 +6,7 @@ async function digest(value){const bytes=await crypto.subtle.digest('SHA-256',en
 function constantEqual(a,b){if(typeof a!=='string'||typeof b!=='string'||a.length!==b.length)return false;let diff=0;for(let i=0;i<a.length;i++)diff|=a.charCodeAt(i)^b.charCodeAt(i);return diff===0}
 export async function verifySquadCode(request,env){
   if(request.headers.get('origin')!==new URL(request.url).origin)return json({error:'invalid_origin'},403);
-  if(!env.SQUAD_CODE_PEPPER||!env.SQUAD_CODE_HASH||!env.DB)return json({error:'code_login_not_configured'},503);
+  if(!env.SQUAD_CODE_PEPPER||!env.DB)return json({error:'code_login_not_configured'},503);
   // Reject verification if the Worker has no configured abuse protection.
   if (!env.CODE_LOGIN_LIMITER) return json({error:'rate_limit_unavailable'},503);
   const clientIp=request.headers.get('cf-connecting-ip');
@@ -18,13 +18,15 @@ export async function verifySquadCode(request,env){
   let body;try{body=await request.json()}catch{return json({error:'invalid_json'},400)}
   const nick=String(body?.nick||'').trim(),code=String(body?.code||''),role=String(body?.role||'');
   if(!/^[^<>\u0000-\u001f]{2,32}$/.test(nick)||code.length<4||code.length>128||!['Rifler','Sniper','Bomber','Locker','Builder','Helper'].includes(role))return json({error:'invalid_credentials'},400);
-  // Hash with a server-only pepper; the raw squad code never enters the database.
-  const hash=await digest(env.SQUAD_CODE_PEPPER+':'+code);
-  if(!constantEqual(hash,env.SQUAD_CODE_HASH))return json({error:'invalid_credentials'},401);
-  // Only a previously registered, active member may log in; no implicit admin grants.
-  const member=await env.DB.prepare('SELECT id,squad_id,nick,game_role,access_role FROM members WHERE lower(nick)=lower(?) AND is_active=1 LIMIT 2').bind(nick).all();
-  if(member.results?.length!==1)return json({error:'member_not_found_or_ambiguous'},403);
-  if(member.results[0].game_role!==role)return json({error:'invalid_credentials'},401);
+  // Verify the existing legacy squad code against its own squad. This preserves
+  // current squad codes without requiring users to re-register or use Steam.
+  // The imported legacy invite_code column must later be migrated to a salted hash.
+  const member=await env.DB.prepare('SELECT m.id,m.squad_id,m.nick,m.game_role,m.access_role,s.invite_code FROM members m JOIN squads s ON s.id=m.squad_id WHERE lower(m.nick)=lower(?) AND m.is_active=1 LIMIT 2').bind(nick).all();
+  if(member.results?.length!==1)return json({error:'invalid_credentials'},401);
+  const record=member.results[0];
+  const expected=await digest(env.SQUAD_CODE_PEPPER+':'+String(record.invite_code||''));
+  const supplied=await digest(env.SQUAD_CODE_PEPPER+':'+code);
+  if(!constantEqual(expected,supplied)||record.game_role!==role)return json({error:'invalid_credentials'},401);
   // A shared squad code must never authenticate or impersonate an administrator.
   if(member.results[0].access_role==='admin')return json({error:'admin_requires_separate_login'},403);
   // This is only a verification result, NOT an authenticated session.
