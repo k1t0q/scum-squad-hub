@@ -1,3 +1,4 @@
+import { verifySquadCode } from './code-login-verification.mjs';
 import { steamLinkStatus } from './steam-link-status.mjs';
 import { linkLegacyAccount } from './legacy-account-link.mjs';
 import { deleteMapMarker } from './map-marker-delete.mjs';
@@ -67,6 +68,9 @@ export default {
       } catch {
         return new Response(JSON.stringify({ service: 'scum-hub-migration', database: 'unavailable' }), { status: 503, headers });
       }
+    }
+    if (request.method === 'POST' && url.pathname === '/api/code-login/verify') {
+      return verifySquadCode(request,env);
     }
     if (url.pathname.startsWith('/api/')) {
       if(!['GET','HEAD','OPTIONS'].includes(request.method) && request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
