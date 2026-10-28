@@ -7,6 +7,14 @@ function constantEqual(a,b){if(typeof a!=='string'||typeof b!=='string'||a.lengt
 export async function verifySquadCode(request,env){
   if(request.headers.get('origin')!==new URL(request.url).origin)return json({error:'invalid_origin'},403);
   if(!env.SQUAD_CODE_PEPPER||!env.SQUAD_CODE_HASH||!env.DB)return json({error:'code_login_not_configured'},503);
+  // Reject verification if the Worker has no configured abuse protection.
+  if (!env.CODE_LOGIN_LIMITER) return json({error:'rate_limit_unavailable'},503);
+  const clientIp=request.headers.get('cf-connecting-ip');
+  if (!clientIp) return json({error:'client_ip_unavailable'},403);
+  try {
+    const result=await env.CODE_LOGIN_LIMITER.limit({key:clientIp});
+    if (!result.success) return json({error:'too_many_attempts'},429);
+  } catch { return json({error:'rate_limit_unavailable'},503); }
   let body;try{body=await request.json()}catch{return json({error:'invalid_json'},400)}
   const nick=String(body?.nick||'').trim(),code=String(body?.code||''),role=String(body?.role||'');
   if(!/^[^<>\u0000-\u001f]{2,32}$/.test(nick)||code.length<4||code.length>128||!['Rifler','Sniper','Bomber','Locker','Builder','Helper'].includes(role))return json({error:'invalid_credentials'},400);
