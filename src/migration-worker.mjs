@@ -70,9 +70,6 @@ export default {
         return new Response(JSON.stringify({ service: 'scum-hub-migration', database: 'unavailable' }), { status: 503, headers });
       }
     }
-    if (request.method === 'POST' && url.pathname === '/api/code-login/verify') {
-      return verifySquadCode(request,env);
-    }
     if (request.method === 'POST' && url.pathname === '/api/member/login') {
       if(typeof env.MEMBER_SESSION_KEY!=='string'||env.MEMBER_SESSION_KEY.length<32)return new Response(JSON.stringify({error:'session_not_configured'}),{status:503,headers});
       const checked=await verifySquadCode(request,env);
