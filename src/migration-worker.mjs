@@ -30,7 +30,7 @@ export default {
       const stored=cookie?decodeURIComponent(cookie.slice('steam_state='.length)):null;
       const state=url.searchParams.get('state');
       if (!stored || !state || stored!==state || !(await verifyLoginState(state,env)))return new Response(JSON.stringify({error:'invalid_state'}),{status:401,headers});
-      const steamId=await verifySteamAssertion(request.url,origin);
+      const steamId=await verifySteamAssertion(request.url,origin,fetch,reason=>console.warn('steam_openid_verification_failed',reason));
       if (!steamId)return new Response(JSON.stringify({error:'steam_verification_failed'}),{status:401,headers});
       const token=await issueSession(steamId,env);
       return new Response(JSON.stringify({token_type:'Bearer',access_token:token,expires_in:3600}),{status:200,headers:{...headers,'set-cookie':'steam_state=; Path=/auth/steam; HttpOnly; Secure; SameSite=Lax; Max-Age=0'}});
