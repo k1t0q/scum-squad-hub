@@ -1,21 +1,22 @@
 import { STEAM_OPENID_ENDPOINT, STEAM_OPENID_NAMESPACE } from './steam-openid-config.mjs';
 
-export async function verifySteamAssertion(callbackUrl, origin, fetcher = fetch) {
+export async function verifySteamAssertion(callbackUrl, origin, fetcher = fetch, onFailure = () => {}) {
   const params = new URL(callbackUrl).searchParams;
   const claimed = params.get('openid.claimed_id') || '';
   const identity = params.get('openid.identity');
   const steamId = claimed.startsWith('https://steamcommunity.com/openid/id/')
     ? claimed.slice('https://steamcommunity.com/openid/id/'.length) : '';
-  if (!/^7656119[0-9]{10}$/.test(steamId) || identity !== claimed) return null;
-  if (params.get('openid.ns') !== STEAM_OPENID_NAMESPACE) return null;
-  if (params.get('openid.mode') !== 'id_res') return null;
-  if (params.get('openid.op_endpoint') !== STEAM_OPENID_ENDPOINT) return null;
+  const fail = reason => { onFailure(reason); return null; };
+  if (!/^7656119[0-9]{10}$/.test(steamId) || identity !== claimed) return fail('identity');
+  if (params.get('openid.ns') !== STEAM_OPENID_NAMESPACE) return fail('namespace');
+  if (params.get('openid.mode') !== 'id_res') return fail('mode');
+  if (params.get('openid.op_endpoint') !== STEAM_OPENID_ENDPOINT) return fail('endpoint');
   const returnTo = params.get('openid.return_to');
-  if (!returnTo) return null;
+  if (!returnTo) return fail('return_to_missing');
   let target;
-  try { target = new URL(returnTo); } catch { return null; }
-  if (target.origin !== new URL(origin).origin || target.pathname !== '/auth/steam/callback') return null;
-  if (!target.searchParams.get('state') || target.searchParams.get('state') !== params.get('state')) return null;
+  try { target = new URL(returnTo); } catch { return fail('return_to_invalid'); }
+  if (target.origin !== new URL(origin).origin || target.pathname !== '/auth/steam/callback') return fail('return_to_mismatch');
+  if (!target.searchParams.get('state') || target.searchParams.get('state') !== params.get('state')) return fail('state_mismatch');
   const body = new URLSearchParams();
   for (const [key, value] of params) if (key.startsWith('openid.')) body.set(key, value);
   body.set('openid.mode', 'check_authentication');
@@ -26,8 +27,8 @@ export async function verifySteamAssertion(callbackUrl, origin, fetcher = fetch)
       body: body.toString(),
       redirect: 'error'
     });
-    if (!response.ok) return null;
+    if (!response.ok) return fail('provider_http');
     const text = await response.text();
-    return text.split('\n').some(line => line.trim() === 'is_valid:true') ? steamId : null;
-  } catch { return null; }
+    return text.split('\n').some(line => line.trim() === 'is_valid:true') ? steamId : fail('provider_rejected');
+  } catch { return fail('provider_network'); }
 }
