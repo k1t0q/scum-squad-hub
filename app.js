@@ -1102,6 +1102,7 @@ window.scumHubD1Preview=async function(){
   // Browser session cookies are scoped to the Worker origin.
   // This preview requires /api to be routed through the SAME origin as the site.
   const api=location.origin;
-  const snapshot=await adapter.fetchSquadSnapshot(api);
+  if(!onlineMember?.squad_id)throw new Error('Сначала войдите в отряд');
+  const snapshot=await adapter.fetchSquadSnapshot(api,onlineMember.squad_id);
   return adapter.adaptD1Snapshot(snapshot);
 };
