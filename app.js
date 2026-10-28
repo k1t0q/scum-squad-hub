@@ -690,13 +690,8 @@ if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev'){
   if(submit)submit.disabled=true;
   try{
     const result=await window.scumHubD1CodeLogin({code,nick,role:f.get('role')});
-    const view=result.preview;
-    // Only a read-only migration inspection is available until all writes
-    // and the separate admin login are ported to D1.
-    modal('<h2>Данные отряда из Cloudflare D1</h2><p class="muted">Тестовый режим: только просмотр. Изменения пока отключены.</p>'+
-      '<p><b>Игрок:</b> '+esc(result.member.nick)+'</p>'+
-      '<p><b>Состав:</b> '+view.members.length+' · <b>Задачи:</b> '+view.tasks.length+' · <b>Обновления протекта:</b> '+view.protectHistory.length+'</p>'+
-      '<button class="primary" onclick="window.scumHubD1CodeLogout().then(()=>authScreen()).catch(e=>toast(e.message))">ВЫЙТИ</button>','fury-role-dialog');
+    const adapter=await import('./src/legacy-d1-adapter.mjs');
+    modal(adapter.renderReadOnlyD1(result.raw)+'<button class="primary" onclick="window.scumHubD1CodeLogout().then(()=>authScreen()).catch(e=>toast(e.message))">ВЫЙТИ</button>','fury-role-dialog');
   }catch(err){toast(err.message||'Ошибка входа');}
   finally{if(submit)submit.disabled=false;}
   return;
