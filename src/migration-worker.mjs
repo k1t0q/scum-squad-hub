@@ -50,6 +50,16 @@ export default {
       const {linkScript}=await import('./migration-link-script.mjs');
       return new Response(linkScript,{headers:{'content-type':'text/javascript; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'}});
     }
+    if (request.method === 'GET' && url.pathname === '/migration-dashboard') {
+      const identity=await verifySession(request,env);
+      if(!identity)return Response.redirect(url.origin+'/auth/steam/start',302);
+      const {dashboardPage}=await import('./migration-dashboard-page.mjs');
+      return new Response(dashboardPage,{headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store','content-security-policy':"default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'"}});
+    }
+    if (request.method === 'GET' && url.pathname === '/migration-dashboard.js') {
+      const {dashboardScript}=await import('./migration-dashboard-script.mjs');
+      return new Response(dashboardScript,{headers:{'content-type':'text/javascript; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'}});
+    }
     if (request.method === 'GET' && url.pathname === '/health') {
       try {
         const result = await env.DB.prepare('SELECT 1 AS ok').first();
