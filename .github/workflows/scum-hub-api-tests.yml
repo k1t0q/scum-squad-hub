@@ -16,6 +16,8 @@ on:
       - 'tests/map-marker-delete.test.mjs'
       - 'src/legacy-account-link.mjs'
       - 'tests/legacy-account-link.test.mjs'
+      - 'src/steam-link-client.mjs'
+      - 'tests/steam-link-client.test.mjs'
       - 'src/steam-link-status.mjs'
       - 'tests/steam-link-status.test.mjs'
       - 'tests/map-marker-update.test.mjs'
