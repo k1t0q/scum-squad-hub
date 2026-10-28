@@ -1,5 +1,8 @@
 name: Deploy isolated SCUM HUB migration Worker
 on:
+  push:
+    branches:
+      - scum-hub-migration
   workflow_dispatch:
 jobs:
   deploy:
