@@ -1099,7 +1099,9 @@ async function createDiscordLinkCode() {
    Explicit invocation only: never replaces live Supabase data automatically. */
 window.scumHubD1Preview=async function(){
   const adapter=await import('./src/legacy-d1-adapter.mjs');
-  const api='https://scum-hub-migration.nikitinrf.workers.dev';
+  // Browser session cookies are scoped to the Worker origin.
+  // This preview requires /api to be routed through the SAME origin as the site.
+  const api=location.origin;
   const snapshot=await adapter.fetchSquadSnapshot(api);
   return adapter.adaptD1Snapshot(snapshot);
 };
