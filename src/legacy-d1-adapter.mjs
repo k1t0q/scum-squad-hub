@@ -1,7 +1,7 @@
 // D1-to-legacy UI data adapter. Only used by the migration branch.
 // The existing SCUM HUB interface expects the shapes returned here.
-export const D1_SQUAD_ID='b6305fbe-04a7-451f-920e-d347e3faf953';
-export async function fetchSquadSnapshot(apiBase, squadId=D1_SQUAD_ID) {
+export async function fetchSquadSnapshot(apiBase, squadId) {
+  if(typeof squadId!=='string'||!squadId.trim())throw new Error('squad_id is required');
   const paths=['members','tasks','protect'];
   const responses=await Promise.all(paths.map(async path=>{
     const url=new URL('/api/'+path,apiBase);
