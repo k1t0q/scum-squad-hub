@@ -86,6 +86,27 @@ export default {
       if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
       return new Response(JSON.stringify({ok:true}),{status:200,headers:{...headers,'set-cookie':clearMemberCookie}});
     }
+    // Member-code writes are scoped to the active member's signed cookie.
+    // No client-provided squad_id or member_id is trusted.
+    if (request.method === 'POST' && url.pathname === '/api/member/stashes/check') {
+      if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
+      const member=await verifyMemberSession(request,env);
+      if(!member)return new Response(JSON.stringify({error:'unauthorized'}),{status:401,headers});
+      return checkStash(request,env,{memberId:member.id,squadId:member.squad_id,role:member.access_role},member.squad_id,headers);
+    }
+    if (request.method === 'POST' && url.pathname === '/api/member/tasks/status') {
+      if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
+      const member=await verifyMemberSession(request,env);
+      if(!member)return new Response(JSON.stringify({error:'unauthorized'}),{status:401,headers});
+      let payload;
+      try{payload=await request.json()}catch{return new Response(JSON.stringify({error:'invalid_json'}),{status:400,headers})}
+      if(!Number.isSafeInteger(payload?.id)||payload.id<1||!['Выполнено','В процессе'].includes(payload.status))return new Response(JSON.stringify({error:'invalid_task_update'}),{status:400,headers});
+      try{
+        const result=await env.DB.prepare('UPDATE tasks SET status=? WHERE id=? AND squad_id=?').bind(payload.status,payload.id,member.squad_id).run();
+        if(result?.meta?.changes!==1)return new Response(JSON.stringify({error:'task_not_found'}),{status:404,headers});
+        return new Response(JSON.stringify({id:payload.id,status:payload.status}),{status:200,headers});
+      }catch{return new Response(JSON.stringify({error:'database_unavailable'}),{status:503,headers})}
+    }
     // Read-only squad snapshot for code-login sessions. Squad is derived from
     // the signed cookie and current D1 membership, never from query parameters.
     if (request.method === 'GET' && url.pathname === '/api/member/snapshot') {
