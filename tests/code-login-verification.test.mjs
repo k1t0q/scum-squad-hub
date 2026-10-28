@@ -7,8 +7,8 @@ const encoder=new TextEncoder();
 async function hash(s){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(s)))].map(x=>x.toString(16).padStart(2,'0')).join('')}
 async function fixture(member={id:'m1',squad_id:'s1',nick:'Player',game_role:'Rifler',access_role:'member'}){
  const pepper='test-pepper',code='sample-secret-code';
- const env={SQUAD_CODE_PEPPER:pepper,SQUAD_CODE_HASH:await hash(pepper+':'+code),DB:{prepare(){return {bind(){return {async all(){return {results:[member]}}}}}}}};
- const request=(body,origin='https://scum-hub.example')=>new Request('https://scum-hub.example/api/code-login',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(body)});
+ const env={CODE_LOGIN_LIMITER:{async limit(){return {success:true}}},SQUAD_CODE_PEPPER:pepper,SQUAD_CODE_HASH:await hash(pepper+':'+code),DB:{prepare(){return {bind(){return {async all(){return {results:[member]}}}}}}}};
+ const request=(body,origin='https://scum-hub.example')=>new Request('https://scum-hub.example/api/code-login',{method:'POST',headers:{origin,'content-type':'application/json','cf-connecting-ip':'203.0.113.12'},body:JSON.stringify(body)});
  return {env,request,code};
 }
 test('valid member verification does not create session',async()=>{
@@ -33,5 +33,16 @@ test('cross-origin requests are rejected',async()=>{
 test('missing secret configuration fails closed',async()=>{
  const {env,request,code}=await fixture();
  delete env.SQUAD_CODE_HASH;
+ assert.equal((await verifySquadCode(request({nick:'Player',code,role:'Rifler'}),env)).status,503);
+});
+
+test('rate limit rejects excess attempts',async()=>{
+ const {env,request,code}=await fixture();
+ env.CODE_LOGIN_LIMITER={async limit(){return {success:false}}};
+ assert.equal((await verifySquadCode(request({nick:'Player',code,role:'Rifler'}),env)).status,429);
+});
+test('missing rate limiter fails closed',async()=>{
+ const {env,request,code}=await fixture();
+ delete env.CODE_LOGIN_LIMITER;
  assert.equal((await verifySquadCode(request({nick:'Player',code,role:'Rifler'}),env)).status,503);
 });
