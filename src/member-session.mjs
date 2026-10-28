@@ -19,7 +19,7 @@ export async function verifyMemberSession(request,env){
   if(!valid)return null;
   const data=JSON.parse(new TextDecoder().decode(unb64(parts[0])));
   const now=Math.floor(Date.now()/1000);
-  if(data.v!==1||typeof data.mid!=='string'||typeof data.sid!=='string'||!Number.isSafeInteger(data.iat)||!Number.isSafeInteger(data.exp)||data.exp<=now||data.exp>now+3600||data.iat>now+60)return null;
+  if(data.v!==1||typeof data.mid!=='string'||typeof data.sid!=='string'||!Number.isSafeInteger(data.iat)||!Number.isSafeInteger(data.exp)||data.exp<=now||data.exp>now+3600||data.iat>now+60||data.iat>data.exp||data.exp-data.iat!==3600)return null;
   const member=await env.DB.prepare('SELECT id,squad_id,nick,game_role,access_role FROM members WHERE id=? AND squad_id=? AND is_active=1 LIMIT 1').bind(data.mid,data.sid).first();
   if(!member||member.access_role==='admin')return null;
   return member;
