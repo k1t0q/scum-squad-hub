@@ -19,6 +19,7 @@ export default {
     const origin = env.PUBLIC_ORIGIN;
     if (request.method === 'GET' && url.pathname === '/auth/steam/start') {
       if (!origin || new URL(origin).origin !== url.origin) return new Response(JSON.stringify({error:'origin_not_configured'}),{status:503,headers});
+      if (typeof env.SESSION_HMAC_KEY !== 'string' || env.SESSION_HMAC_KEY.length < 32) return new Response(JSON.stringify({error:'session_key_not_configured'}),{status:503,headers});
       const state=await createLoginState(env);
       const cookie='steam_state='+encodeURIComponent(state)+'; Path=/auth/steam; HttpOnly; Secure; SameSite=Lax; Max-Age=300';
       return new Response(null,{status:302,headers:{location:createSteamLoginUrl(origin,state),'set-cookie':cookie,'cache-control':'no-store'}});
