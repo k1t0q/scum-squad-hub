@@ -12,6 +12,8 @@ on:
       - 'tests/place-posts-api.test.mjs'
       - 'src/map-api-client.mjs'
       - 'tests/map-api-client.test.mjs'
+      - 'src/map-marker-delete.mjs'
+      - 'tests/map-marker-delete.test.mjs'
       - 'tests/map-marker-update.test.mjs'
       - 'tests/map-markers-api.test.mjs'
       - 'tests/stash-update.test.mjs'
