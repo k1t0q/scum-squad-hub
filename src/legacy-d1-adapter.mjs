@@ -46,3 +46,17 @@ export async function fetchMemberSnapshot(apiBase=location.origin) {
   if(!response.ok)throw new Error('member snapshot: HTTP '+response.status);
   return response.json();
 }
+
+export function renderReadOnlyD1(snapshot){
+  const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const rows=(items,cols)=>'<table style="width:100%;font-size:13px"><tbody>'+items.map(x=>'<tr>'+cols.map(k=>'<td style="padding:7px;border-bottom:1px solid #444">'+esc(typeof k==='function'?k(x):x[k])+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+  const part=(title,items,cols)=>'<h3>'+esc(title)+' ('+items.length+')</h3>'+rows(items,cols);
+  const members=snapshot.members||[],tasks=snapshot.tasks||[],protect=snapshot.protect||[],markers=snapshot.markers||[],posts=snapshot.posts||[],explosives=snapshot.explosives||[];
+  return '<div style="max-height:65vh;overflow:auto"><h2>SCUM HUB · D1</h2><p class="muted">Только просмотр · '+esc(snapshot.member?.nick)+'</p>'+
+    part('Состав',members,['nick','game_role'])+
+    part('Задачи',tasks,['title','quantity','status'])+
+    part('Протект',protect,['updated_by','effective_at'])+
+    part('Метки карты',markers,['name','type','x','y'])+
+    part('Схроны и базы',posts,['map_marker_name','kind',x=>Array.isArray(x.images)?x.images.length+' фото':'0 фото'])+
+    part('Взрывчатка',explosives,['item','quantity'])+'</div>';
+}
