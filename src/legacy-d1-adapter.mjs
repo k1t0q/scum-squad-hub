@@ -103,8 +103,9 @@ export function mountRecoveryPortal(snapshot){
     try{
       if(task)await updateTaskStatusD1(Number(task.dataset.task),task.dataset.status);
       if(stash)await checkStashD1(Number(stash.dataset.stash));
+      const section=task?'Задачи':'Схроны';
       mountRecoveryPortal(await fetchMemberSnapshot());
-      show(task?'Задачи':'Схроны');
+      document.querySelector('#d1-recovery-portal [data-section="'+section+'"]')?.click();
     }catch(err){alert(err.message)}finally{e.target.disabled=false}
   });
   root.querySelector('#d1-refresh').onclick=async()=>mountRecoveryPortal(await fetchMemberSnapshot());
