@@ -691,7 +691,8 @@ if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev'){
   try{
     const result=await window.scumHubD1CodeLogin({code,nick,role:f.get('role')});
     const adapter=await import('./src/legacy-d1-adapter.mjs');
-    modal(adapter.renderReadOnlyD1(result.raw)+'<button class="primary" onclick="window.scumHubD1CodeLogout().then(()=>authScreen()).catch(e=>toast(e.message))">ВЫЙТИ</button>','fury-role-dialog');
+    closeModal();
+    adapter.mountRecoveryPortal(result.raw);
   }catch(err){toast(err.message||'Ошибка входа');}
   finally{if(submit)submit.disabled=false;}
   return;
@@ -807,7 +808,7 @@ async function bootOnline(){
       if(session.ok){
         const adapter=await import('./src/legacy-d1-adapter.mjs');
         const snapshot=await adapter.fetchMemberSnapshot(location.origin);
-        modal(adapter.renderReadOnlyD1(snapshot)+'<button class="primary" onclick="window.scumHubD1CodeLogout().then(()=>authScreen()).catch(e=>toast(e.message))">ВЫЙТИ</button>','fury-role-dialog');
+        adapter.mountRecoveryPortal(snapshot);
         return;
       }
     }catch(err){console.warn('d1_session_restore_failed',err)}
