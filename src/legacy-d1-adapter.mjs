@@ -73,3 +73,41 @@ export async function checkStashD1(id){
  if(!r.ok)throw Error('Stash check failed: '+r.status);
  return r.json();
 }
+
+export function mountRecoveryPortal(snapshot){
+  const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  let root=document.getElementById('d1-recovery-portal');
+  if(!root){root=document.createElement('div');root.id='d1-recovery-portal';document.body.appendChild(root)}
+  root.style.cssText='position:fixed;inset:0;z-index:999999;overflow:auto;background:#0b1015;color:#e6ecec;padding:20px;font:14px Arial,sans-serif';
+  const items=(snapshot.markers||[]).map(m=>'<div style="padding:8px;border-bottom:1px solid #26343b"><b>'+esc(m.name||'Метка')+'</b> · '+esc(m.type||'')+' <small>'+esc(m.note||'')+'</small></div>').join('');
+  const mapPins=(snapshot.markers||[]).filter(m=>Number.isFinite(Number(m.x))&&Number.isFinite(Number(m.y))).map(m=>'<span title="'+esc(m.name||'Метка')+'" style="position:absolute;left:'+Math.min(100,Math.max(0,Number(m.x)*100))+'%;top:'+Math.min(100,Math.max(0,Number(m.y)*100))+'%;width:9px;height:9px;border-radius:50%;background:#ffbd52;box-shadow:0 0 7px #000"></span>').join('');
+  const imageUrls=(snapshot.posts||[]).flatMap(p=>Array.isArray(p.images)?p.images:[]).filter(u=>{try{const x=new URL(u);return x.protocol==='https:'&&['ik.imagekit.io','zicapopwsssopyxphhpo.supabase.co'].includes(x.hostname)}catch{return false}});
+  const photoHtml=imageUrls.map(u=>'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer"><img src="'+esc(u)+'" loading="lazy" style="width:140px;height:110px;object-fit:cover;border-radius:8px"></a>').join('');
+  const sections={
+   'Обзор':'<h2>Данные отряда</h2>'+renderReadOnlyD1(snapshot),
+   'Карта':'<h2>Карта меток ('+(snapshot.markers||[]).length+')</h2><p>Координаты меток сохранены. Для игровой подложки открой <a style="color:#8ecbff" target="_blank" href="https://k1t0q.github.io/scum-map-k1t0/">SCUM MAP k1t0</a>.</p><div style="max-width:720px;aspect-ratio:1;position:relative;background:repeating-linear-gradient(0deg,#18242a,#18242a 12.3%,#35444a 12.5%),repeating-linear-gradient(90deg,transparent,transparent 12.3%,#35444a 12.5%);border:1px solid #52636a">'+mapPins+'</div>'+items,
+   'Задачи':'<h2>Задачи</h2>'+(snapshot.tasks||[]).map(t=>'<div style="padding:12px;border-bottom:1px solid #26343b"><b>'+esc(t.title)+'</b> · '+esc(t.quantity)+' '+esc(t.unit)+' · '+esc(t.status)+' <button data-task="'+esc(t.id)+'" data-status="'+(t.status==='Выполнено'?'В процессе':'Выполнено')+'">Сменить статус</button></div>').join(''),
+   'Схроны':'<h2>Схроны и базы</h2>'+(snapshot.posts||[]).map(p=>'<div style="padding:12px;border-bottom:1px solid #26343b"><b>'+esc(p.map_marker_name||p.kind)+'</b> · '+esc(p.kind)+' · '+esc(p.stash_checked_at||'нет проверки')+(p.kind==='stash'?'<button data-stash="'+esc(p.id)+'">Проверил схрон</button>':'')+'</div>').join('')+'<h3>Фотографии ('+imageUrls.length+')</h3><div style="display:flex;flex-wrap:wrap;gap:8px">'+photoHtml+'</div>',
+   'Взрыв': '<h2>Взрывчатка</h2>'+(snapshot.explosives||[]).map(x=>'<p>'+esc(x.item)+': '+esc(x.quantity)+'</p>').join(''),
+   'Состав':'<h2>Участники</h2>'+(snapshot.members||[]).map(m=>'<p>'+esc(m.nick)+' · '+esc(m.game_role)+'</p>').join('')
+  };
+  const nav=Object.keys(sections).map((name,i)=>'<button data-section="'+esc(name)+'" style="padding:10px;background:#23323b;color:white;border:1px solid #3b4a52;border-radius:8px">'+esc(name)+'</button>').join('');
+  root.innerHTML='<header style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between"><h1 style="font-size:21px">SCUM HUB · Cloudflare D1</h1><div><button id="d1-refresh">Обновить</button> <button id="d1-logout">Выйти</button></div></header><p style="color:#a7b9c2">Восстановленный доступ · '+esc(snapshot.member?.nick)+' · данные из резервной копии D1</p><nav style="display:flex;flex-wrap:wrap;gap:8px;margin:15px 0">'+nav+'</nav><main id="d1-recovery-body"></main>';
+  const body=root.querySelector('#d1-recovery-body');
+  const show=name=>{body.innerHTML=sections[name]||sections['Обзор'];root.querySelectorAll('[data-section]').forEach(b=>b.style.background=b.dataset.section===name?'#356e75':'#23323b')};
+  root.querySelectorAll('[data-section]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.section)));
+  body.addEventListener('click',async e=>{
+    const task=e.target.closest('[data-task]'),stash=e.target.closest('[data-stash]');
+    if(!task&&!stash)return;
+    e.target.disabled=true;
+    try{
+      if(task)await updateTaskStatusD1(Number(task.dataset.task),task.dataset.status);
+      if(stash)await checkStashD1(Number(stash.dataset.stash));
+      mountRecoveryPortal(await fetchMemberSnapshot());
+      show(task?'Задачи':'Схроны');
+    }catch(err){alert(err.message)}finally{e.target.disabled=false}
+  });
+  root.querySelector('#d1-refresh').onclick=async()=>mountRecoveryPortal(await fetchMemberSnapshot());
+  root.querySelector('#d1-logout').onclick=async()=>{await window.scumHubD1CodeLogout();root.remove();document.documentElement.classList.add('auth-lock');window.authScreen()};
+  show('Обзор');
+}
