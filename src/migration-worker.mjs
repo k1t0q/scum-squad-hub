@@ -1,3 +1,4 @@
+import { adminLogin, verifyAdminSession, clearAdminCookie } from './admin-code-login.mjs';
 import { verifySquadCode } from './code-login-verification.mjs';
 import { createMemberSession, verifyMemberSession, memberCookie, clearMemberCookie } from './member-session.mjs';
 import { steamLinkStatus } from './steam-link-status.mjs';
@@ -70,6 +71,15 @@ export default {
         return new Response(JSON.stringify({ service: 'scum-hub-migration', database: 'unavailable' }), { status: 503, headers });
       }
     }
+    if (request.method === 'POST' && url.pathname === '/api/admin/login')return adminLogin(request,env);
+    if (request.method === 'GET' && url.pathname === '/api/admin/me'){
+      const admin=await verifyAdminSession(request,env);
+      return new Response(JSON.stringify(admin?{authenticated:true,member:admin}:{authenticated:false}),{status:admin?200:401,headers});
+    }
+    if (request.method === 'POST' && url.pathname === '/api/admin/logout'){
+      if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
+      return new Response(JSON.stringify({ok:true}),{headers:{...headers,'set-cookie':clearAdminCookie}});
+    }
     if (request.method === 'POST' && url.pathname === '/api/member/login') {
       if(typeof env.MEMBER_SESSION_KEY!=='string'||env.MEMBER_SESSION_KEY.length<32)return new Response(JSON.stringify({error:'session_not_configured'}),{status:503,headers});
       const checked=await verifySquadCode(request,env);
@@ -79,7 +89,7 @@ export default {
       return new Response(JSON.stringify({member:result.member}),{status:200,headers:{...headers,'set-cookie':memberCookie(token)}});
     }
     if (request.method === 'GET' && url.pathname === '/api/member/me') {
-      const member=await verifyMemberSession(request,env);
+      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env);
       return new Response(JSON.stringify(member?{authenticated:true,member}:{authenticated:false}),{status:member?200:401,headers});
     }
     if (request.method === 'POST' && url.pathname === '/api/member/logout') {
@@ -90,13 +100,13 @@ export default {
     // No client-provided squad_id or member_id is trusted.
     if (request.method === 'POST' && url.pathname === '/api/member/stashes/check') {
       if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
-      const member=await verifyMemberSession(request,env);
+      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env);
       if(!member)return new Response(JSON.stringify({error:'unauthorized'}),{status:401,headers});
       return checkStash(request,env,{memberId:member.id,squadId:member.squad_id,role:member.access_role},member.squad_id,headers);
     }
     if (request.method === 'POST' && url.pathname === '/api/member/tasks/status') {
       if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
-      const member=await verifyMemberSession(request,env);
+      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env);
       if(!member)return new Response(JSON.stringify({error:'unauthorized'}),{status:401,headers});
       let payload;
       try{payload=await request.json()}catch{return new Response(JSON.stringify({error:'invalid_json'}),{status:400,headers})}
@@ -110,7 +120,7 @@ export default {
     // Read-only squad snapshot for code-login sessions. Squad is derived from
     // the signed cookie and current D1 membership, never from query parameters.
     if (request.method === 'GET' && url.pathname === '/api/member/snapshot') {
-      const member=await verifyMemberSession(request,env);
+      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env);
       if(!member)return new Response(JSON.stringify({error:'unauthorized'}),{status:401,headers});
       try {
         const [members,protect,tasks,markers,posts,explosives]=await Promise.all([
