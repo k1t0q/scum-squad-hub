@@ -677,7 +677,7 @@ async function renderHomeEvents(){
  const fmt=new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
  body.innerHTML='<div class="ref-events-list">'+events.map(e=>{
   const t=types[e.category]||{icon:'•',label:'Событие',page:''};
-  const rawDate=String(e.created_at||'').replace(' ','T').replace(/([+-][0-9]{2})$/,'$1:00');
+  const rawDate=String(e.created_at||'').replace(' ','T').replace(/(\.[0-9]{3})[0-9]+/,'$1').replace(/([+-][0-9]{2})$/,'$1:00');
   const eventDate=new Date(rawDate);
   const when=Number.isFinite(eventDate.getTime())?fmt.format(eventDate):'';
   const actor=e.actor_nick?' · '+esc(e.actor_nick):'';
