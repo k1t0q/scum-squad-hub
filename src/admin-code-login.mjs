@@ -11,7 +11,7 @@ export async function adminLogin(request,env){
  try{const limit=await env.CODE_LOGIN_LIMITER.limit({key:ip});if(!limit.success)return fail('too_many_attempts',429)}catch{return fail('rate_limit_unavailable',503)}
  let body;try{body=await request.json()}catch{return fail('invalid_json',400)}
  const code=String(body?.code||'');
- if(code.length<12||code.length>128)return fail('invalid_credentials',401);
+ if(code.length<8||code.length>128)return fail('invalid_credentials',401);
  const digest=await crypto.subtle.digest('SHA-256',enc.encode(code));
  const hex=[...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
  const expected=env.ADMIN_CODE_HASH;
