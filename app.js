@@ -1,3 +1,4 @@
+function isD1HubHost(){return ['scum-hub.ru','www.scum-hub.ru','scum-hub-migration.nikitinrf.workers.dev'].includes(location.hostname)}
 window.addEventListener('message',async e=>{
  if(e.origin!=='https://k1t0q.github.io'||e.source!==document.getElementById('squadMapFrame')?.contentWindow)return;
  if(!window.scumHubD1Recovery)return;
@@ -754,14 +755,14 @@ async function exitOriginalD1Hub(){
 }
 function authScreen(){modal('<h2>Вход в ДУБЛЬ</h2><div id="authForm"></div>','fury-role-dialog');showMemberLogin()}
 function showMemberLogin(){let a=$('#authForm');if(!a)return;a.innerHTML='<form class="form" onsubmit="doJoin(event)"><input name="code" required placeholder="Код состава"><input name="nick" required value="" autocomplete="off" placeholder="Ник">'+furySelectPicker('role',['Rifler','Bomber','Locker','Builder','Helper','Sniper'],'','Выбрать роль')+'<button class="primary">ВОЙТИ В СОСТАВ</button></form>'}
-function showAdminLogin(){if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev'){toast('Вход администратора переносится отдельно');return}let a=$('#authForm');if(!a)return;$('#adminTab')?.classList.add('on');$('#memberTab')?.classList.remove('on');a.innerHTML='<form class="form" onsubmit="adminLogin(event)"><input name="email" type="email" required autocomplete="username" placeholder="E-mail"><input name="password" type="password" required minlength="6" autocomplete="current-password" placeholder="Пароль"><button class="primary">ВОЙТИ КАК АДМИН</button><button type="button" class="ghost" onclick="adminSignup(event)">ПЕРВЫЙ ВХОД / СОЗДАТЬ ПАРОЛЬ</button><div id="adminAuthStatus" class="muted" style="min-height:18px"></div></form><small class="muted">При первом входе создай пароль. После этого используй обычный вход администратора.</small>'}
+function showAdminLogin(){if(isD1HubHost()){toast('Вход администратора переносится отдельно');return}let a=$('#authForm');if(!a)return;$('#adminTab')?.classList.add('on');$('#memberTab')?.classList.remove('on');a.innerHTML='<form class="form" onsubmit="adminLogin(event)"><input name="email" type="email" required autocomplete="username" placeholder="E-mail"><input name="password" type="password" required minlength="6" autocomplete="current-password" placeholder="Пароль"><button class="primary">ВОЙТИ КАК АДМИН</button><button type="button" class="ghost" onclick="adminSignup(event)">ПЕРВЫЙ ВХОД / СОЗДАТЬ ПАРОЛЬ</button><div id="adminAuthStatus" class="muted" style="min-height:18px"></div></form><small class="muted">При первом входе создай пароль. После этого используй обычный вход администратора.</small>'}
 async function adminSignup(e){if(e)e.preventDefault();let st=$('#adminAuthStatus'),form=$('#authForm form');if(!form)return;let f=new FormData(form),email=String(f.get('email')||'').trim(),password=String(f.get('password')||'');if(!email){if(st)st.textContent='Введи e-mail';return}if(password.length<6){if(st)st.textContent='Пароль минимум 6 символов';return}if(st)st.textContent='Создаю учётную запись…';let r=await sb.auth.signUp({email,password});if(r.error){if(st)st.textContent='Ошибка: '+r.error.message;return}if(!r.data.session){if(st)st.textContent='Готово. Проверь почту и подтверди e-mail, затем нажми «ВОЙТИ КАК АДМИН».';return}if(st)st.textContent='Учётная запись создана. Вхожу…';await finishAdminLogin()}
 async function adminLogin(e){e.preventDefault();let f=new FormData(e.target);await sb.auth.signOut({scope:'local'});let r=await sb.auth.signInWithPassword({email:f.get('email'),password:f.get('password')});if(r.error){toast('Неверный e-mail или пароль');return}await finishAdminLogin()}
 async function finishAdminLogin(){let r=await sb.rpc('claim_admin_account');if(r.error){toast('Эта учётка не является администратором');await sb.auth.signOut({scope:'local'});return}onlineMember=r.data;db.profile={nick:r.data.nick,role:r.data.game_role,access:r.data.access_role};save();closeModal();await syncOnline();await loadSquadName();unlockApp();toast('Вход администратора выполнен')}
 async function joinOnline(){if(!sb)return;let {data:{session}}=await sb.auth.getSession();if(session){let {data:m}=await sb.rpc('current_member');if(m){onlineMember=m;db.profile={nick:m.nick,role:m.game_role,access:m.access_role};save();await syncOnline();await loadSquadName();unlockApp();return}if(!session.user.is_anonymous&&session.user.email?.toLowerCase()==='nikitinrf@bk.ru'){await finishAdminLogin();return}}authScreen()}
 async function ensureAnonymous(){let {data:{session}}=await sb.auth.getSession();if(!session||!session.user.is_anonymous){if(session)await sb.auth.signOut({scope:'local'});let r=await sb.auth.signInAnonymously();if(r.error)throw r.error}}
-async function doJoin(e){e.preventDefault();let f=new FormData(e.target),nick=String(f.get('nick')||'').trim(),code=String(f.get('code')||'').trim();if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev'&&nick.toLowerCase()==='k1t0'){try{const r=await fetch('/api/admin/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({code})});const data=await r.json();if(!r.ok)throw Error(data.error||'Неверный код администратора');const adapter=await import('./src/legacy-d1-adapter.mjs');closeModal();await mountOriginalD1Hub(await adapter.fetchMemberSnapshot())}catch(err){toast(err.message)}return}if(!f.get('role')){toast('Выбери роль');return}
-if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev'){
+async function doJoin(e){e.preventDefault();let f=new FormData(e.target),nick=String(f.get('nick')||'').trim(),code=String(f.get('code')||'').trim();if(isD1HubHost()&&nick.toLowerCase()==='k1t0'){try{const r=await fetch('/api/admin/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({code})});const data=await r.json();if(!r.ok)throw Error(data.error||'Неверный код администратора');const adapter=await import('./src/legacy-d1-adapter.mjs');closeModal();await mountOriginalD1Hub(await adapter.fetchMemberSnapshot())}catch(err){toast(err.message)}return}if(!f.get('role')){toast('Выбери роль');return}
+if(isD1HubHost()){
   const submit=e.target.querySelector('button[type=submit],button.primary');
   if(submit)submit.disabled=true;
   try{
@@ -877,7 +878,7 @@ sb.from('raid_participants').select('*'),
 sb.from('protect_updates').select('*').eq('squad_id',onlineMember.squad_id).order('updated_at',{ascending:false})
 ]);if(mr.error||pr.error||tr.error||cr.error||rr.error||rpr.error||por.error){toast('Ошибка синхронизации');return}let allMembers=mr.data||[],ms=allMembers.filter(m=>m.is_active!==false),ph=pr.data||[],nameById=Object.fromEntries(allMembers.map(m=>[m.id,m.nick]));db.members=ms.map(m=>{let p=ph.find(x=>x.member_id===m.id);return[m.nick,m.game_role,p?.join_time?.slice(0,5)||'',p?.status||'Не ответил',m.id]});db.tasks=(tr.data||[]).map(t=>{let hs=(cr.data||[]).filter(c=>c.task_id===t.id).map(c=>({id:c.id,nick:nameById[c.member_id]||'Боец',qty:c.amount}));let done=hs.reduce((n,h)=>n+h.qty,0);return{id:t.id,title:t.title,need:t.quantity||0,done,unit:t.unit||'шт.',place:t.place||'',priority:t.priority,deadline:t.deadline||'',owner:nameById[t.assignee_id]||'',comment:t.comment||'',status:t.status,creator:nameById[t.creator_id]||'',history:hs}});db.ops=(rr.data||[]).map(r=>({id:r.id,title:r.title,date:r.raid_date||'',time:r.raid_time?.slice(0,5)||'20:00',note:r.note||'',sector:r.sector||'',walls:r.walls||0,loadout:r.loadout||'',transport:r.transport||'',rally_point:r.rally_point||'',images:r.target_images||[],creator:nameById[r.creator_id]||'',participants:(rpr.data||[]).filter(x=>x.raid_id===r.id).map(x=>nameById[x.member_id]).filter(Boolean)})).sort((a,b)=>{let av=a.date?(a.date+'T'+(a.time||'00:00')):'9999-12-31T23:59',bv=b.date?(b.date+'T'+(b.time||'00:00')):'9999-12-31T23:59';return av.localeCompare(bv)});db.protectHistory=(por.data||[]).map(x=>({id:x.id,member_id:x.member_id,nick:nameById[x.member_id]||'—',pressedAt:x.updated_at,time:x.effective_at||x.updated_at}));db.protect=db.protectHistory[0]||null;db.protectMemberNames=nameById;let me=ms.find(x=>x.id===onlineMember.id);if(me){onlineMember=me;db.profile={nick:me.nick,role:me.game_role,access:me.access_role};let mp=$('#mobileProfileNick');if(mp)mp.textContent=me.nick}let p=ph.find(x=>x.member_id===onlineMember.id);db.presence=p?{status:p.status,time:p.join_time?.slice(0,5)||''}:{status:'Не ответил',time:''};save();if(!window.furySilentSync)render();else updateHomePresenceUI();if(page==='Состав')loadSquadDuties();startSharedSync();if(localStorage.getItem('fury_push_requested')==='yes')furySyncSubscription().catch(console.error)}
 async function bootOnline(){
-  if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev'){
+  if(isD1HubHost()){
     // Isolated preview: never initialize the production Supabase client.
     try{
       const session=await fetch('/api/member/me',{credentials:'include'});
@@ -966,7 +967,7 @@ function furyNoticeToggle(k,on){localStorage.setItem('fury_notice_'+k,on?'on':'o
 const FURY_VAPID_PUBLIC='BMqTv-h0JU-rtMtn4VdaQpe7CBuOeyoW2EQAc8pdu439DqZs8A6pa_Og1mF8vOKy-WzThR9iHsz3Naw0fxrZe4k';
 function furyPushKey(base64){const p='='.repeat((4-base64.length%4)%4);const raw=atob((base64+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(raw,c=>c.charCodeAt(0))}
 async function furyPushRequest(body){
- if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev')throw Error('Push-рассылка ещё не перенесена на Cloudflare');
+ if(isD1HubHost())throw Error('Push-рассылка ещё не перенесена на Cloudflare');
  if(!sb||!onlineMember)throw Error('Сначала войдите в отряд');
  const {data:{session}}=await sb.auth.getSession();
  if(!session?.access_token)throw Error('Нет активной сессии');
@@ -1203,7 +1204,7 @@ async function createDiscordLinkCode() {
    Explicit invocation only: never replaces live Supabase data automatically. */
 // Migration-only, explicitly invoked test path. Does not alter the production login.
 window.scumHubD1CodeLogin=async function({code,nick,role}){
-  if(location.hostname!=='scum-hub-migration.nikitinrf.workers.dev')throw new Error('Доступно только на тестовом Cloudflare Worker');
+  if(!isD1HubHost())throw new Error('Доступно только на тестовом Cloudflare Worker');
   const response=await fetch('/api/member/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({code,nick,role})});
   const result=await response.json();
   if(!response.ok)throw new Error(result.error||'Ошибка входа');
@@ -1212,7 +1213,7 @@ window.scumHubD1CodeLogin=async function({code,nick,role}){
   return {member:result.member,preview:adapter.adaptD1Snapshot(snapshot),raw:snapshot};
 };
 window.scumHubD1CodeLogout=async function(){
-  if(location.hostname!=='scum-hub-migration.nikitinrf.workers.dev')return;
+  if(!isD1HubHost())return;
   const [member,admin]=await Promise.all(['/api/member/logout','/api/admin/logout'].map(path=>fetch(path,{method:'POST',credentials:'include',headers:{'content-type':'application/json'}})));
   if(!member.ok||!admin.ok)throw new Error('Не удалось завершить сессию');
 };
