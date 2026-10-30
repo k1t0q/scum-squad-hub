@@ -35,7 +35,16 @@ export async function legacyApi(body,env,m){
  case 'create_discord_link_code':{const code=Array.from(crypto.getRandomValues(new Uint8Array(18))).map(x=>x.toString(16).padStart(2,'0')).join('');const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(code)))).map(x=>x.toString(16).padStart(2,'0')).join('');const expires=new Date(Date.now()+600000).toISOString();await run('INSERT INTO discord_link_codes (code_hash,member_id,expires_at,created_at) VALUES (?,?,?,?)',[hash,m.id,expires,now]);return code}
  case 'admin_notification_members':if(!admin)fail('forbidden');return (await all('SELECT m.id AS member_id,m.nick,d.discord_user_id FROM members m LEFT JOIN discord_member_links d ON d.member_id=m.id WHERE m.squad_id=? AND m.is_active=1',[m.squad_id])).map(r=>({...r,discord_linked:!!r.discord_user_id}));
  case 'admin_revoke_member_channel':if(!admin)fail('forbidden');await member(p.target_member);if(p.channel==='discord')await run('DELETE FROM discord_member_links WHERE member_id=?',[p.target_member]);else await run('UPDATE protect_push_subscriptions SET enabled=0 WHERE member_id=?',[p.target_member]);return true;
- case 'raise_raid_alarm':fail('alarm_distribution_disabled');
+ case 'raise_raid_alarm':{
+ const previous=(await all('SELECT created_at FROM squad_raid_alarms WHERE squad_id=? ORDER BY created_at DESC LIMIT 1',[m.squad_id]))[0];
+ if(previous&&Date.now()-Date.parse(previous.created_at)<300000)fail('alarm_rate_limited');
+ const alarmId=Date.now()*1000+crypto.getRandomValues(new Uint16Array(1))[0]%1000;
+ await db.batch([
+ db.prepare('INSERT INTO squad_raid_alarms(id,squad_id,member_id,created_at) VALUES(?,?,?,?)').bind(alarmId,m.squad_id,m.id,now),
+ db.prepare('INSERT INTO fury_alarm_channel_jobs(alarm_id,sent_count,updated_at) VALUES(?,0,?)').bind(alarmId,now)
+ ]);
+ await event('alarm','НАС РЕЙДЯТ');return true;
+ }
  }
  fail('rpc_not_implemented:'+body.rpc);
  }
