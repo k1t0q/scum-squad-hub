@@ -2,7 +2,8 @@ window.addEventListener('message',async e=>{
  if(e.origin!=='https://k1t0q.github.io'||e.source!==document.getElementById('squadMapFrame')?.contentWindow)return;
  if(!window.scumHubD1Recovery)return;
  if(e.data?.kind==='scumMapReady'||e.data?.kind==='scumMapParentHello'){
-  const markers=(d1RecoverySnapshot?.markers||[]).map(m=>({...m,showLabel:!!m.show_label}));
+  e.stopImmediatePropagation();
+  const markers=(d1RecoverySnapshot?.markers||[]).map(m=>({...m,show_label:!!m.show_label,locked:!!m.locked}));
   e.source.postMessage({kind:'scumMapSharedMarkers',markers},e.origin);
  }
 },true);
