@@ -974,7 +974,7 @@ async function furyPushRequest(body){
  if(!r.ok){let details={};try{details=await r.json()}catch(e){}throw Error(details.error||'Ошибка сервера ('+r.status+')')}
  return r.json();
 }
-async function furySyncSubscription(){
+async function furySyncSubscription(){return;
  if(localStorage.getItem('fury_push_requested')!=='yes'||!('serviceWorker' in navigator)||!onlineMember)return;
  const reg=await navigator.serviceWorker.register('./sw.js');
  const sub=await reg.pushManager.getSubscription();
@@ -985,12 +985,11 @@ function settingsPage(){
  const granted=supported&&Notification.permission==='granted';
  const requested=localStorage.getItem('fury_push_requested')==='yes';
  const active=supported&&granted&&requested;
- $('#view').innerHTML='<div class="card fury-settings fury-simple-settings"><div class="toolbar"><div><h2>Настройки</h2><span class="muted">Уведомления и Discord</span></div></div>'+
- '<div class="settings-row fury-settings-main-row"><div><b>Уведомления</b><p class="muted fury-setting-description">Оповещения о рейдах, задачах, протекте, схронах и событиях отряда.</p><p class="muted fury-setting-status">Статус: '+(!supported?'не поддерживаются этим браузером':active?'включены':'выключены')+'</p></div><button class="ghost fury-setting-action fury-setting-action-'+(requested?'danger':'success')+'" type="button" onclick="togglePushPreference()"'+(!supported?' disabled':'')+'>'+(requested?'ВЫКЛЮЧИТЬ':'ВКЛЮЧИТЬ')+'</button></div>'+
+ $('#view').innerHTML='<div class="card fury-settings fury-simple-settings"><div class="toolbar"><div><h2>Настройки</h2><span class="muted">Уведомления Discord</span></div></div>'+
  '<div class="settings-row fury-settings-main-row"><div><b>Discord</b><p class="muted fury-setting-description">Привяжите аккаунт, чтобы получать личные сообщения от SCUM HUB в Discord.</p><p class="muted fury-setting-status" id="furyDiscordLinkStatus">Проверяем привязку…</p></div><button class="ghost fury-setting-action fury-setting-action-success" type="button" id="furyDiscordLinkButton" onclick="createDiscordLinkCode()" disabled style="visibility:hidden">ПРОВЕРЯЕМ…</button></div>'+
 
  (db.profile.access==='admin'&&db.profile.nick==='k1t0'?'<div class="settings-row fury-settings-main-row"><div><b>Steam</b><p class="muted fury-setting-description">Привязать Steam к профилю администратора ДУБЛЬ.</p><p class="muted fury-setting-status" id="furySteamLinkStatus">Не привязан в новом кабинете</p></div><button class="ghost fury-setting-action fury-setting-action-success" type="button" onclick="startSteamLink()">ПРИВЯЗАТЬ STEAM</button></div>':'')+
- (db.profile.access==='admin'?'<div class="fury-discord-admin"><b>Управление уведомлениями участников</b><p class="muted">Привязки Discord и уведомления сайта для всех участников отряда.</p><div id="furyDiscordAdminList" class="muted">Загрузка списка…</div></div>':'')+'</div>';
+ (db.profile.access==='admin'?'<div class="fury-discord-admin"><b>Управление уведомлениями участников</b><p class="muted">Привязки Discord участников отряда.</p><div id="furyDiscordAdminList" class="muted">Загрузка списка…</div></div>':'')+'</div>';
  const steamStatus=document.getElementById('furySteamLinkStatus');if(steamStatus){const result=sessionStorage.getItem('scum_steam_link_result');if(result)steamStatus.textContent=result}
  loadDiscordLinkStatus();
  if(db.profile.access==='admin')loadDiscordAdminList();
