@@ -370,6 +370,24 @@ export default {
       }
       return new Response(JSON.stringify({ error: 'not_implemented', message: 'Squad data APIs are not enabled' }), { status: 501, headers });
     }
+    if((request.method==='GET'||request.method==='HEAD')&&env.ASSETS){
+      if(url.pathname==='/hub/'){
+        const destination=new URL(request.url);destination.pathname='/hub';
+        return Response.redirect(destination.href,302);
+      }
+      if(url.pathname==='/'||url.pathname==='/index.html'){
+        if(url.searchParams.has('section')){
+          const destination=new URL(request.url);destination.pathname='/hub';
+          return Response.redirect(destination.href,302);
+        }
+        const asset=new URL(request.url);asset.pathname='/landing-preview.html';
+        return env.ASSETS.fetch(new Request(asset,request));
+      }
+      if(url.pathname==='/hub'){
+        const asset=new URL(request.url);asset.pathname='/';
+        return env.ASSETS.fetch(new Request(asset,request));
+      }
+    }
     if ((request.method === 'GET' || request.method === 'HEAD') && env.ASSETS) {
       return env.ASSETS.fetch(request);
     }
