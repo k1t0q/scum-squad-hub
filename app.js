@@ -664,19 +664,19 @@ async function renderHomeEvents(){
   return;
  }
  const types={
-  tasks:{icon:'✓',label:'Задачи',page:'Задачи'},
-  raids:{icon:'⚑',label:'Рейды',page:'План на рейд'},
-  stash:{icon:'▣',label:'Схроны',page:'Метка'},
-  base:{icon:'⌖',label:'Метки',page:'Метка'},
-  other:{icon:'✦',label:'Метки',page:'Метка'},
-  protect:{icon:'⬡',label:'Протект',page:''},
-  protect_updated:{icon:'⬡',label:'Протект',page:''},
-  alarm:{icon:'!',label:'Тревога',page:'Главная'},
-  explosives:{icon:'✳',label:'Взрыв',page:'Взрыв'}
+  tasks:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"5\" y=\"4\" width=\"14\" height=\"17\" rx=\"2\"/><path d=\"M9 4V2h6v2M8 10l2 2 4-4M8 16h8M8 18h5\"/></svg>",label:"Задачи",page:"Задачи"},
+  raids:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"7\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2v4M12 18v4M2 12h4M18 12h4M17 7l4-4\"/></svg>",label:"Рейды",page:"План на рейд"},
+  stash:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 8l9-5 9 5v10l-9 4-9-4zM3 8l9 5 9-5M12 13v9M8 5.2l9 5v4\"/></svg>",label:"Схроны",page:"Метка"},
+  base:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 21V9l8-6 8 6v12H4zM9 21v-7h6v7M7 10h2M15 10h2M3 9l9-7 9 7\"/></svg>",label:"Метки",page:"Метка"},
+  other:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 10c0 5-7 12-7 12S5 15 5 10a7 7 0 1 1 14 0z\"/><circle cx=\"12\" cy=\"10\" r=\"2.5\"/></svg>",label:"Метки",page:"Метка"},
+  protect:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 2l8 3v6c0 5-8 11-8 11S4 16 4 11V5zM8 11l3 3 5-6\"/></svg>",label:"Протект",page:""},
+  protect_updated:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 2l8 3v6c0 5-8 11-8 11S4 16 4 11V5zM8 11l3 3 5-6\"/></svg>",label:"Протект",page:""},
+  alarm:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10.3 4L2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0zM12 9v5\"/><circle cx=\"12\" cy=\"17\" r=\".6\" fill=\"currentColor\" stroke=\"none\"/></svg>",label:"Тревога",page:"Главная"},
+  explosives:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M14 5l2-2h3M15 6l3 3M18 4l2-2M20 7h2M17 1v2\"/><circle cx=\"10\" cy=\"14\" r=\"7\"/><path d=\"M6 12a4 4 0 0 1 3-2\"/></svg>",label:"Взрыв",page:"Взрыв"}
  };
  const fmt=new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
  body.innerHTML='<div class="ref-events-list">'+events.map(e=>{
-  const t=types[e.category]||{icon:'•',label:'Событие',page:''};
+  const t=types[e.category]||{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 12h4l3-7 4 14 3-7h4\"/></svg>",label:'Событие',page:''};
   const rawDate=String(e.created_at||'').replace(' ','T').replace(/(\.[0-9]{3})[0-9]+/,'$1').replace(/([+-][0-9]{2})$/,'$1:00');
   const eventDate=new Date(rawDate);
   const when=Number.isFinite(eventDate.getTime())?fmt.format(eventDate):'';
