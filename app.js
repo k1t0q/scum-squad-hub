@@ -676,6 +676,42 @@ function removePlaceEditPhoto(i){if(!placeEdit)return;placeEdit.comment=$('#plac
 async function uploadPlaceEditFiles(files){if(!placeEdit)return;placeEdit.comment=$('#placeEditComment')?.value??placeEdit.comment;files=[...(files||[])].filter(f=>f?.type?.startsWith('image/')).slice(0,5-placeEdit.images.length);for(let file of files){if(file.size>10*1024*1024){toast('Фото больше 10 МБ пропущено');continue}let ext=(file.name?.split('.').pop()||file.type.split('/')[1]||'png').replace(/[^a-zA-Z0-9]/g,'').toLowerCase(),path=onlineMember.squad_id+'/'+placeEdit.kind+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;let up=await sb.storage.from('squad-photos').upload(path,file,{contentType:file.type,upsert:false});if(up.error){toast('Не удалось загрузить фото');continue}placeEdit.images.push(sb.storage.from('squad-photos').getPublicUrl(path).data.publicUrl)}openPlaceEditModal()}
 async function savePlaceEdit(){if(!placeEdit)return;placeEdit.comment=$('#placeEditComment')?.value.trim()||'';let {error}=await sb.from('squad_place_posts').update({images:placeEdit.images.slice(0,5),comment:placeEdit.comment}).eq('id',placeEdit.id);if(error){toast('Не удалось сохранить');return}let kind=placeEdit.kind;placeEdit=null;closeModal();toast('Публикация обновлена');refreshPlaceKind(kind)}
 async function deletePlacePost(id,kind){if(!confirm('Удалить публикацию?'))return;let {error}=await sb.from('squad_place_posts').delete().eq('id',id);if(error){toast('Не удалось удалить');return}if(['stash','base','other'].includes(kind)){const r=await sb.rpc('squad_map_sync',{p_action:'delete',p_id:(kind==='base'?'base-post-':kind==='other'?'other-post-':'stash-post-')+id});if(r.error)console.warn('Stash map cleanup',r.error)}refreshPlaceKind(kind==='base'||kind==='other'?'stash':kind)}
+// Cloudflare recovery keeps the original SCUM HUB navigation and layout.
+let d1RecoverySnapshot=null;
+async function mountOriginalD1Hub(snapshot){
+ d1RecoverySnapshot=snapshot;
+ const member=snapshot.member||{};
+ db.profile={nick:member.nick||'',role:member.game_role||'Rifler',access:member.access_role||'member'};
+ db.members=(snapshot.members||[]).map(m=>[m.nick,m.game_role||'Rifler','','Не ответил',m.id]);
+ db.tasks=(snapshot.tasks||[]).map(t=>({id:t.id,title:t.title,need:Number(t.quantity)||0,done:0,unit:t.unit||'шт.',place:t.place||'',priority:t.priority||'Обычный',deadline:t.deadline||'',comment:t.comment||'',status:t.status||'В процессе',owner:(snapshot.members||[]).find(m=>m.id===t.assignee_id)?.nick||'',creator:(snapshot.members||[]).find(m=>m.id===t.creator_id)?.nick||''}));
+ db.protect=(snapshot.protect||[]).length?{time:snapshot.protect[0].effective_at||snapshot.protect[0].updated_at,nick:snapshot.protect[0].updated_by}:null;
+ db.protectHistory=(snapshot.protect||[]).map(p=>({nick:p.updated_by,time:p.effective_at||p.updated_at}));
+ db.ops=[];
+ onlineMember={id:member.id,squad_id:member.squad_id,nick:member.nick,game_role:member.game_role,access_role:member.access_role};
+ window.scumHubD1Recovery=true;
+ window.scumHubD1Snapshot=snapshot;
+ document.getElementById('d1-recovery-portal')?.remove();
+ closeModal();
+ unlockApp();
+ nav();
+ render();
+ const banner=document.getElementById('d1-original-banner')||document.createElement('div');
+ banner.id='d1-original-banner';
+ banner.style.cssText='position:fixed;bottom:10px;right:10px;z-index:100000;padding:9px 13px;border:1px solid #53656b;border-radius:9px;background:#14252b;color:#e8f3f5;font:12px Arial;box-shadow:0 4px 15px #0008';
+ banner.innerHTML='Cloudflare D1 · восстановление <button onclick="refreshOriginalD1Hub()" style="margin-left:9px">Обновить</button> <button onclick="exitOriginalD1Hub()">Выйти</button>';
+ document.body.appendChild(banner);
+}
+async function refreshOriginalD1Hub(){
+ try{const adapter=await import('./src/legacy-d1-adapter.mjs');await mountOriginalD1Hub(await adapter.fetchMemberSnapshot())}catch(e){toast('Ошибка D1: '+e.message)}
+}
+async function exitOriginalD1Hub(){
+ await window.scumHubD1CodeLogout();
+ window.scumHubD1Recovery=false;
+ d1RecoverySnapshot=null;
+ document.getElementById('d1-original-banner')?.remove();
+ document.documentElement.classList.add('auth-lock');
+ authScreen();
+}
 function authScreen(){modal('<h2>Вход в FURY</h2><div id="authForm"></div>','fury-role-dialog');showMemberLogin()}
 function showMemberLogin(){let a=$('#authForm');if(!a)return;a.innerHTML='<form class="form" onsubmit="doJoin(event)"><input name="code" required placeholder="Код состава"><input name="nick" required value="" autocomplete="off" placeholder="Ник">'+furySelectPicker('role',['Rifler','Bomber','Locker','Builder','Helper','Sniper'],'','Выбрать роль')+'<button class="primary">ВОЙТИ В СОСТАВ</button></form>'}
 function showAdminLogin(){if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev'){toast('Вход администратора переносится отдельно');return}let a=$('#authForm');if(!a)return;$('#adminTab')?.classList.add('on');$('#memberTab')?.classList.remove('on');a.innerHTML='<form class="form" onsubmit="adminLogin(event)"><input name="email" type="email" required autocomplete="username" placeholder="E-mail"><input name="password" type="password" required minlength="6" autocomplete="current-password" placeholder="Пароль"><button class="primary">ВОЙТИ КАК АДМИН</button><button type="button" class="ghost" onclick="adminSignup(event)">ПЕРВЫЙ ВХОД / СОЗДАТЬ ПАРОЛЬ</button><div id="adminAuthStatus" class="muted" style="min-height:18px"></div></form><small class="muted">При первом входе создай пароль. После этого используй обычный вход администратора.</small>'}
@@ -692,7 +728,7 @@ if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev'){
     const result=await window.scumHubD1CodeLogin({code,nick,role:f.get('role')});
     const adapter=await import('./src/legacy-d1-adapter.mjs');
     closeModal();
-    adapter.mountRecoveryPortal(result.raw);
+    await mountOriginalD1Hub(result.raw);
   }catch(err){toast(err.message||'Ошибка входа');}
   finally{if(submit)submit.disabled=false;}
   return;
@@ -809,7 +845,7 @@ async function bootOnline(){
       if(session.ok||adminSession?.ok){
         const adapter=await import('./src/legacy-d1-adapter.mjs');
         const snapshot=await adapter.fetchMemberSnapshot(location.origin);
-        adapter.mountRecoveryPortal(snapshot);
+        await mountOriginalD1Hub(snapshot);
         return;
       }
     }catch(err){console.warn('d1_session_restore_failed',err)}
