@@ -1,3 +1,11 @@
+window.addEventListener('message',async e=>{
+ if(e.origin!=='https://k1t0q.github.io'||e.source!==document.getElementById('squadMapFrame')?.contentWindow)return;
+ if(!window.scumHubD1Recovery)return;
+ if(e.data?.kind==='scumMapReady'||e.data?.kind==='scumMapParentHello'){
+  const markers=(d1RecoverySnapshot?.markers||[]).map(m=>({...m,showLabel:!!m.show_label}));
+  e.source.postMessage({kind:'scumMapSharedMarkers',markers},e.origin);
+ }
+},true);
 document.documentElement.classList.add('auth-lock');
 const SUPA_URL='https://zicapopwsssopyxphhpo.supabase.co',SUPA_KEY='sb_publishable_qTdHbhuI7OHKofDeNcyvKg_7tFDSBs7';let sb=null,onlineMember=null;const K='scumfury_v34';const base={profile:{nick:'k1t0',role:'Rifler',access:'admin'},presence:{status:'Не ответил',time:''},tasks:[{id:1,title:'Собрать металл',need:200,done:80,unit:'шт.',place:'Основная база',priority:'Высокий',deadline:'до сбора 21:00',owner:'k1t0',comment:'Складывать в ящик возле верстака',status:'В процессе',creator:'k1t0',history:[{nick:'k1t0',qty:30}]}],ops:[],members:[['k1t0','Rifler','20:00','Буду']]};let db=JSON.parse(localStorage.getItem(K)||'null')||base;db.ops=(db.ops||[]).map(o=>({...o,participants:Array.isArray(o.participants)?o.participants:[]}));const pages=['Главная','План на рейд','Задачи','Взрыв','Метка','Карта','Состав','Настройки'];let page=localStorage.getItem('fury_active_page')||'Главная';if(page==='Базы')page='Карта';if(page==='Схрон')page='Метка';const linkedSection=new URLSearchParams(location.search).get('section');if(linkedSection==='tasks')page='Задачи';if(linkedSection==='explosives')page='Взрыв';if(linkedSection==='map')page='Карта';if(!pages.includes(page))page='Главная';const $=s=>document.querySelector(s);function save(){localStorage.setItem(K,JSON.stringify(db))}function toast(s){$('#toast').textContent=s;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),1400)}function esc(s=''){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}function nav(){ $('#nav').innerHTML=pages.map(x=>'<button class="'+(x===page?'active':'')+'" onclick="go(\''+x+'\')">'+x+'</button>').join('')}function toggleMobileNav(){document.querySelector('aside')?.classList.toggle('mobile-nav-open')}function go(x,fromHistory=false){if(x===page&&!fromHistory)return;if(!fromHistory&&window.innerWidth<=900)history.pushState({furyPage:x},'',location.href);page=x;localStorage.setItem('fury_active_page',x);$('#pageTitle').textContent=x;document.querySelector('aside')?.classList.remove('mobile-nav-open');nav();render()}
 if(!history.state?.furyPage)history.replaceState({furyPage:page},'',location.href);
@@ -73,6 +81,13 @@ function renderOriginalD1Recovery(){
  const escD=s=>esc(String(s??''));
  const rows=(arr,cols)=>'<div class="list">'+arr.map(x=>'<div class="item"><div class="itemtop"><div>'+cols.map(k=>'<span style="display:block">'+escD(typeof k==='function'?k(x):x[k])+'</span>').join('')+'</div></div></div>').join('')+'</div>';
  if(page==='Карта'){
+  if(mapSharedRefreshTimer)clearInterval(mapSharedRefreshTimer);
+  squadMapPage();
+  const push=()=>{const frame=document.getElementById('squadMapFrame');if(!frame)return;const markers=(d1RecoverySnapshot?.markers||[]).map(m=>({...m,showLabel:!!m.show_label,enemyNicks:(()=>{try{return JSON.parse(m.enemy_nicks||'[]')}catch{return []}})()}));frame.contentWindow?.postMessage({kind:'scumMapSharedMarkers',markers},'https://k1t0q.github.io')};
+  const frame=document.getElementById('squadMapFrame');if(frame)frame.addEventListener('load',()=>{let n=0;const id=setInterval(()=>{if(page!=='Карта'||n++>8){clearInterval(id);return}push()},900)});
+  return;
+ }
+ if(false && page==='Карта'){
   const markers=snap.markers||[];
   const pins=markers.filter(m=>Number.isFinite(Number(m.x))&&Number.isFinite(Number(m.y))).map(m=>'<span title="'+escD(m.name)+'" style="position:absolute;left:'+Math.max(0,Math.min(100,Number(m.x)*100))+'%;top:'+Math.max(0,Math.min(100,Number(m.y)*100))+'%;width:10px;height:10px;border-radius:50%;background:#ffbf4c;box-shadow:0 0 8px #000"></span>').join('');
   $('#view').innerHTML='<div class="card"><h2>Карта отряда · '+markers.length+' меток</h2><p class="muted">Метки из D1. Игровая подложка пока восстанавливается. <a href="https://k1t0q.github.io/scum-map-k1t0/" target="_blank" rel="noopener noreferrer">Открыть SCUM MAP</a></p><div style="position:relative;width:100%;max-width:720px;aspect-ratio:1;background:#1b2b30;border:1px solid #435760;background-image:linear-gradient(#43576055 1px,transparent 1px),linear-gradient(90deg,#43576055 1px,transparent 1px);background-size:12.5% 12.5%">'+pins+'</div>'+rows(markers,['name','type',x=>'X '+x.x+' · Y '+x.y])+'</div>';return;
