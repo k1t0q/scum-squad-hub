@@ -17,7 +17,7 @@ const localCanvas=document.createElement('canvas');localCanvas.className='sh-set
 const local=localCanvas.getContext('2d');if(!local)return;host.appendChild(localCanvas);
 const screen=document.createElement('canvas');screen.className='sh-screen-particles';screen.setAttribute('aria-hidden','true');
 const ctx=screen.getContext('2d');if(!ctx){localCanvas.remove();return}document.body.appendChild(screen);
-let width=0,height=0,frame=0,visible=false,last=null,time=0,localSize=0;
+let width=0,height=0,frame=0,visible=false,last=null,startedAt=null,time=0,localSize=0;
 const clamp=t=>Math.max(0,Math.min(1,t)),smooth=t=>{t=clamp(t);return t*t*t*(t*(t*6-15)+10)};
 function amount(t,delay){return smooth((t-hold-delay)/3.4)}
 function drawLocal(){
@@ -32,14 +32,15 @@ host.classList.add('sh-canvas-ready');document.documentElement.classList.remove(
 function finish(){finished=true;cancelAnimationFrame(frame);frame=0;screen.style.display='none';localCanvas.style.visibility='visible';}
 function draw(){
 if(finished){localCanvas.style.visibility='visible';screen.style.display='none';return}
+if(!visible){localCanvas.style.visibility='hidden';screen.style.display='none';return}
 localCanvas.style.visibility='hidden';screen.style.display='block';
 const box=host.getBoundingClientRect(),scale=box.width/480;
 ctx.clearRect(0,0,width,height);
 for(let group=0;group<3;group++){
 const colorProgress=amount(time,group*.12);
-const red=Math.round(244+(240-244)*colorProgress),green=Math.round(246+(82-246)*colorProgress),blue=Math.round(249+(85-249)*colorProgress);
+const red=Math.round(214+(240-214)*colorProgress),green=Math.round(220+(82-220)*colorProgress),blue=Math.round(228+(85-228)*colorProgress);
 ctx.fillStyle='rgb('+red+','+green+','+blue+')';
-ctx.globalAlpha=(.28+group*.07)*(1-colorProgress)+(.88+group*.05)*colorProgress;ctx.beginPath();
+ctx.globalAlpha=(.12+group*.035)*(1-colorProgress)+(.88+group*.05)*colorProgress;ctx.beginPath();
 for(const p of points){if(p.group!==group)continue;
 const progress=amount(time,p.delay),air=1-progress;
 const tx=box.left+p.x*scale,ty=box.top+p.y*scale;
@@ -52,11 +53,11 @@ ctx.moveTo(x+r,y);ctx.arc(x,y,r,0,Math.PI*2)}
 ctx.fill()}ctx.globalAlpha=1;
 }
 function tick(now){
-frame=0;if(!visible||document.hidden){last=null;return}
-if(last!==null)time+=Math.max(0,(now-last)/1000);last=now;
+frame=0;if(startedAt===null){if(!visible)return;startedAt=now}
+time=Math.max(0,(now-startedAt)/1000);
 if(time>=duration){finish();return}draw();frame=requestAnimationFrame(tick);
 }
-function schedule(){if(!finished&&visible&&!frame)frame=requestAnimationFrame(tick)}
+function schedule(){if(!finished&&(visible||startedAt!==null)&&!frame)frame=requestAnimationFrame(tick)}
 function resize(){
 width=innerWidth;height=innerHeight;const dpr=Math.min(devicePixelRatio||1,3);
 screen.style.width=width+'px';screen.style.height=height+'px';
@@ -64,11 +65,11 @@ screen.width=Math.round(width*dpr);screen.height=Math.round(height*dpr);ctx.setT
 drawLocal();if(finished)finish();else{draw();schedule()}
 }
 resize();
-const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;last=null;if(visible)schedule();else{cancelAnimationFrame(frame);frame=0;screen.style.display='none';localCanvas.style.visibility=finished?'visible':'hidden'}},{threshold:.05});observer.observe(host);
+const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(!visible){screen.style.display='none';localCanvas.style.visibility=finished?'visible':'hidden'}else draw();schedule()},{threshold:.05});observer.observe(host);
 new ResizeObserver(()=>{if(Math.abs(host.getBoundingClientRect().width-localSize)>.5)resize()}).observe(host);
 addEventListener('resize',resize,{passive:true});
 addEventListener('scroll',()=>{if(!finished&&visible)draw()},{passive:true});
-document.addEventListener('visibilitychange',()=>{last=null;schedule()});
+document.addEventListener('visibilitychange',()=>{schedule()});
 if(window.visualViewport)visualViewport.addEventListener('resize',()=>{if(visualViewport.scale>1.02&&!finished)finish()},{passive:true});
 reduced.addEventListener('change',()=>{if(reduced.matches)finish()});
 })();
