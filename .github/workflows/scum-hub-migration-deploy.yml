@@ -33,6 +33,8 @@ jobs:
           mkdir -p migration-public/src
           find . -maxdepth 1 -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.svg' -o -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' -o -name '*.ico' -o -name '*.webmanifest' \) -exec cp {} migration-public/ \;
           cp src/legacy-d1-adapter.mjs src/d1-client.mjs migration-public/src/
+          python3 scripts/build-app-icons.py
+          test -s migration-public/apple-touch-icon.png
           test -s migration-public/index.html
           test -s migration-public/app.js
       - name: Deploy migration Worker only
