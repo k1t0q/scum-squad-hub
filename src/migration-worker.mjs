@@ -1,3 +1,4 @@
+import {verifiedSteamMember,clearSteamCookie} from './steam-hub-member.mjs';
 import {signImageValues,canonicalImageValues,signImageUrl} from './imagekit-delivery.mjs';
 import {legacyApi} from './legacy-api.mjs';
 import { adminLogin, verifyAdminSession, clearAdminCookie } from './admin-code-login.mjs';
@@ -24,7 +25,7 @@ export default {
     const origin = env.PUBLIC_ORIGIN;
     if (request.method === 'POST' && ['/api/legacy','/api/photos'].includes(url.pathname)) {
       if(request.headers.get('origin')!==url.origin)return Response.json({error:'invalid_origin'},{status:403,headers});
-      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env);
+      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env)||await verifiedSteamMember(request,env);
       if(!member)return Response.json({error:'unauthorized'},{status:401,headers});
       try {
         if(url.pathname==='/api/photos'){
@@ -59,10 +60,23 @@ export default {
       if (!steamId)return new Response(JSON.stringify({error:'steam_verification_failed',reason:verificationReason}),{status:401,headers});
       const token=await issueSession(steamId,env);
       const responseHeaders=new Headers(headers);
-      responseHeaders.set('location','/link');
+      responseHeaders.set('location','/steam-profile.html');
       responseHeaders.append('set-cookie','steam_state=; Path=/auth/steam; HttpOnly; Secure; SameSite=Lax; Max-Age=0');
       responseHeaders.append('set-cookie','scum_steam_session='+token+'; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=3600');
       return new Response(null,{status:303,headers:responseHeaders});
+    }
+    if(request.method==='GET'&&url.pathname==='/api/steam/profile'){
+      const identity=await verifySession(request,env);
+      if(!identity)return Response.json({error:'unauthorized'},{status:401,headers});
+      const member=await verifiedSteamMember(request,env);
+      const squad=member?await env.DB.prepare('SELECT id,name FROM squads WHERE id=?').bind(member.squad_id).first():null;
+      return Response.json({steam_id:identity.steamId,member,squad},{headers});
+    }
+    if(request.method==='POST'&&url.pathname==='/api/steam/logout'){
+      if(request.headers.get('origin')!==url.origin)return Response.json({error:'invalid_origin'},{status:403,headers});
+      const h=new Headers(headers);
+      for(const cookie of [clearSteamCookie,clearMemberCookie,clearAdminCookie])h.append('set-cookie',cookie);
+      return Response.json({ok:true},{headers:h});
     }
     if (request.method === 'GET' && url.pathname === '/link') {
       const identity=await verifySession(request,env);
@@ -110,7 +124,7 @@ export default {
       return new Response(JSON.stringify({member:result.member}),{status:200,headers:{...headers,'set-cookie':memberCookie(token)}});
     }
     if (request.method === 'GET' && url.pathname === '/api/member/me') {
-      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env);
+      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env)||await verifiedSteamMember(request,env);
       return new Response(JSON.stringify(member?{authenticated:true,member}:{authenticated:false}),{status:member?200:401,headers});
     }
     if (request.method === 'POST' && url.pathname === '/api/member/logout') {
@@ -121,13 +135,13 @@ export default {
     // No client-provided squad_id or member_id is trusted.
     if (request.method === 'POST' && url.pathname === '/api/member/stashes/check') {
       if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
-      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env);
+      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env)||await verifiedSteamMember(request,env);
       if(!member)return new Response(JSON.stringify({error:'unauthorized'}),{status:401,headers});
       return checkStash(request,env,{memberId:member.id,squadId:member.squad_id,role:member.access_role},member.squad_id,headers);
     }
     if (request.method === 'POST' && url.pathname === '/api/member/tasks/status') {
       if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
-      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env);
+      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env)||await verifiedSteamMember(request,env);
       if(!member)return new Response(JSON.stringify({error:'unauthorized'}),{status:401,headers});
       let payload;
       try{payload=await request.json()}catch{return new Response(JSON.stringify({error:'invalid_json'}),{status:400,headers})}
@@ -141,7 +155,7 @@ export default {
     // Read-only squad snapshot for code-login sessions. Squad is derived from
     // the signed cookie and current D1 membership, never from query parameters.
     if (request.method === 'GET' && url.pathname === '/api/member/snapshot') {
-      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env);
+      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env)||await verifiedSteamMember(request,env);
       if(!member)return new Response(JSON.stringify({error:'unauthorized'}),{status:401,headers});
       try {
         const [members,protect,tasks,markers,posts,explosives]=await Promise.all([
