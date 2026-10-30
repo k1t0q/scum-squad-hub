@@ -9,7 +9,7 @@ async function loadProfile(){
   $('nick').textContent=data.member?.nick||'Профиль Steam';
   $('squad').textContent=data.squad?.name||'Не привязан';
   $('role').textContent=data.member?(data.member.access_role==='admin'?'Администратор · ':'')+data.member.game_role:'—';
-  $('explanation').textContent=data.member?'Твой Steam подтверждён и связан с существующим участником. Отряд, фотографии и история сохранены.':'Steam подтверждён. Создание отряда и вступление через Steam будут доступны на следующем этапе. Пока можно пользоваться действующим входом по коду.';
+  $('explanation').textContent=data.member?'Ты вошёл через Steam. Открой штаб, чтобы перейти к своему отряду.':'Ты вошёл через Steam. Этот аккаунт пока не привязан к отряду. Войди по коду своего отряда или обратись в Discord: k1t0q.';
   $('enterHub').hidden=!data.member;$('codeLogin').hidden=!!data.member;
   $('status').hidden=true;$('profile').hidden=false;
  }catch{$('status').textContent='Не удалось загрузить профиль. Обнови страницу, чтобы повторить.'}
