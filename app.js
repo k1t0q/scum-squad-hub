@@ -339,7 +339,14 @@ async function syncMapBasePublications(){
  try{
   const {data,error}=await sb.rpc('get_squad_map_posts');
   if(error)throw error;
-  const posts=Array.isArray(data)?data:[];
+  // The embedded map matches publications by marker name. Never send unnamed
+  // posts: their missing name would otherwise match a new, empty marker.
+  const posts=(Array.isArray(data)?data:[]).map(p=>({
+   ...p,
+   marker:String(p.marker||p.map_marker_name||'').trim(),
+   author:p.author||p.author_nick||p.nick||'Участник',
+   date:p.date||p.created_at
+  })).filter(p=>p.marker);
   frame.contentWindow?.postMessage({kind:'scumHubMarkerPosts',posts},'https://k1t0q.github.io');
  }catch(e){console.error('Map publications',e)}
 }
