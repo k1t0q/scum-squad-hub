@@ -684,7 +684,7 @@ async function adminLogin(e){e.preventDefault();let f=new FormData(e.target);awa
 async function finishAdminLogin(){let r=await sb.rpc('claim_admin_account');if(r.error){toast('Эта учётка не является администратором');await sb.auth.signOut({scope:'local'});return}onlineMember=r.data;db.profile={nick:r.data.nick,role:r.data.game_role,access:r.data.access_role};save();closeModal();await syncOnline();await loadSquadName();unlockApp();toast('Вход администратора выполнен')}
 async function joinOnline(){if(!sb)return;let {data:{session}}=await sb.auth.getSession();if(session){let {data:m}=await sb.rpc('current_member');if(m){onlineMember=m;db.profile={nick:m.nick,role:m.game_role,access:m.access_role};save();await syncOnline();await loadSquadName();unlockApp();return}if(!session.user.is_anonymous&&session.user.email?.toLowerCase()==='nikitinrf@bk.ru'){await finishAdminLogin();return}}authScreen()}
 async function ensureAnonymous(){let {data:{session}}=await sb.auth.getSession();if(!session||!session.user.is_anonymous){if(session)await sb.auth.signOut({scope:'local'});let r=await sb.auth.signInAnonymously();if(r.error)throw r.error}}
-async function doJoin(e){e.preventDefault();let f=new FormData(e.target),nick=String(f.get('nick')||'').trim(),code=String(f.get('code')||'').trim();if(!f.get('role')){toast('Выбери роль');return}
+async function doJoin(e){e.preventDefault();let f=new FormData(e.target),nick=String(f.get('nick')||'').trim(),code=String(f.get('code')||'').trim();if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev'&&nick.toLowerCase()==='k1t0'){try{const r=await fetch('/api/admin/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({code})});const data=await r.json();if(!r.ok)throw Error(data.error||'Неверный код администратора');const adapter=await import('./src/legacy-d1-adapter.mjs');closeModal();adapter.mountRecoveryPortal(await adapter.fetchMemberSnapshot())}catch(err){toast(err.message)}return}if(!f.get('role')){toast('Выбери роль');return}
 if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev'){
   const submit=e.target.querySelector('button[type=submit],button.primary');
   if(submit)submit.disabled=true;
@@ -805,7 +805,8 @@ async function bootOnline(){
     // Isolated preview: never initialize the production Supabase client.
     try{
       const session=await fetch('/api/member/me',{credentials:'include'});
-      if(session.ok){
+      const adminSession=session.ok?null:await fetch('/api/admin/me',{credentials:'include'});
+      if(session.ok||adminSession?.ok){
         const adapter=await import('./src/legacy-d1-adapter.mjs');
         const snapshot=await adapter.fetchMemberSnapshot(location.origin);
         adapter.mountRecoveryPortal(snapshot);
@@ -1138,8 +1139,8 @@ window.scumHubD1CodeLogin=async function({code,nick,role}){
 };
 window.scumHubD1CodeLogout=async function(){
   if(location.hostname!=='scum-hub-migration.nikitinrf.workers.dev')return;
-  const response=await fetch('/api/member/logout',{method:'POST',credentials:'include',headers:{'content-type':'application/json'}});
-  if(!response.ok)throw new Error('Не удалось завершить тестовую сессию');
+  const [member,admin]=await Promise.all(['/api/member/logout','/api/admin/logout'].map(path=>fetch(path,{method:'POST',credentials:'include',headers:{'content-type':'application/json'}})));
+  if(!member.ok||!admin.ok)throw new Error('Не удалось завершить сессию');
 };
 
 window.scumHubD1Preview=async function(){
