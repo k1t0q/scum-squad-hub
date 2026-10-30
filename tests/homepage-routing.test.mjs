@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import worker from '../src/migration-worker.mjs';
 const env={ASSETS:{fetch:async request=>new Response(new URL(request.url).pathname)}};
 test('root displays landing and hub displays original app without redirect loop',async()=>{
- assert.equal(await (await worker.fetch(new Request('https://scum-hub.ru/'),env)).text(),'/landing-preview.html');
+ assert.equal(await (await worker.fetch(new Request('https://scum-hub.ru/'),env)).text(),'/landing-preview');
  assert.equal(await (await worker.fetch(new Request('https://scum-hub.ru/hub'),env)).text(),'/');
 });
 test('existing Discord deep links retain section and parameters',async()=>{
