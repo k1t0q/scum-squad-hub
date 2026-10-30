@@ -1027,10 +1027,8 @@ async function loadDiscordAdminList(){
   target.innerHTML=data?.length?data.map(x=>
    '<div class="fury-discord-admin-member"><div class="fury-admin-member-name"><b>'+esc(x.nick)+'</b>'+
    '<span class="'+(x.discord_linked?'fury-admin-linked':'fury-admin-unlinked')+'">Discord: '+(x.discord_linked?'привязан':'не привязан')+'</span>'+
-   '<span class="'+(x.push_enabled?'fury-admin-linked':'fury-admin-unlinked')+'">Сайт: '+(x.push_enabled?'уведомления включены':'уведомления выключены')+'</span></div>'+
    '<div class="fury-admin-member-actions">'+
    (x.discord_linked?'<button class="danger" type="button" onclick="adminRevokeMemberChannel(\''+x.member_id+'\',\'discord\',\''+encodeURIComponent(x.nick)+'\')">Отвязать Discord</button>':'')+
-   (x.push_enabled?'<button class="danger" type="button" onclick="adminRevokeMemberChannel(\''+x.member_id+'\',\'push\',\''+encodeURIComponent(x.nick)+'\')">Отключить уведомления</button>':'')+
    '</div></div>').join(''):'В отряде пока нет участников';
  }catch(e){console.error('loadDiscordAdminList',e);if(target.isConnected)target.textContent='Не удалось загрузить список'}
 }
