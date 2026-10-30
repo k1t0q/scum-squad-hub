@@ -2,8 +2,8 @@
 'use strict';
 const host=document.querySelector('.sh-motion');if(!host)return;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-const key='sh-particles-cinematic-v3',duration=7.8,hold=1.8;
-let finished=reduced.matches;try{finished=finished||sessionStorage.getItem(key)==='1'}catch{}
+const duration=6.1,hold=2.2;
+let finished=reduced.matches;
 const mask=document.createElement('canvas');mask.width=mask.height=480;
 const m=mask.getContext('2d');if(!m)return;
 m.fillStyle='#fff';m.beginPath();m.roundRect(44,44,392,392,32);m.fill();
@@ -19,12 +19,7 @@ const screen=document.createElement('canvas');screen.className='sh-screen-partic
 const ctx=screen.getContext('2d');if(!ctx){localCanvas.remove();return}document.body.appendChild(screen);
 let width=0,height=0,frame=0,visible=false,last=null,time=0,localSize=0;
 const clamp=t=>Math.max(0,Math.min(1,t)),smooth=t=>{t=clamp(t);return t*t*t*(t*(t*6-15)+10)};
-function amount(t,delay){
-if(t<=hold)return 0;
-if(t<4)return smooth((t-hold-delay)/1.65);
-if(t<4.5)return 1;
-return 1-smooth((t-4.5-delay)/2.9);
-}
+function amount(t,delay){return smooth((t-hold-delay)/3.4)}
 function drawLocal(){
 const size=host.getBoundingClientRect().width,dpr=Math.min(devicePixelRatio||1,3);
 if(!size)return;localSize=size;
@@ -34,18 +29,25 @@ local.fillStyle='#f05255';
 for(let group=0;group<3;group++){local.globalAlpha=.88+group*.05;local.beginPath();for(const p of points){if(p.group!==group)continue;local.moveTo(p.x+1.05,p.y);local.arc(p.x,p.y,1.05,0,Math.PI*2)}local.fill()}
 host.classList.add('sh-canvas-ready');document.documentElement.classList.remove('sh-assembly-pending');
 }
-function finish(){finished=true;cancelAnimationFrame(frame);frame=0;screen.style.display='none';localCanvas.style.visibility='visible';try{sessionStorage.setItem(key,'1')}catch{}}
+function finish(){finished=true;cancelAnimationFrame(frame);frame=0;screen.style.display='none';localCanvas.style.visibility='visible';}
 function draw(){
-if(finished||time<=hold){localCanvas.style.visibility='visible';screen.style.display='none';return}
+if(finished){localCanvas.style.visibility='visible';screen.style.display='none';return}
 localCanvas.style.visibility='hidden';screen.style.display='block';
 const box=host.getBoundingClientRect(),scale=box.width/480;
-ctx.clearRect(0,0,width,height);ctx.fillStyle='#f05255';
+ctx.clearRect(0,0,width,height);
 for(let group=0;group<3;group++){
-ctx.globalAlpha=.88+group*.05;ctx.beginPath();
+const colorProgress=amount(time,group*.12);
+const red=Math.round(244+(240-244)*colorProgress),green=Math.round(246+(82-246)*colorProgress),blue=Math.round(249+(85-249)*colorProgress);
+ctx.fillStyle='rgb('+red+','+green+','+blue+')';
+ctx.globalAlpha=(.28+group*.07)*(1-colorProgress)+(.88+group*.05)*colorProgress;ctx.beginPath();
 for(const p of points){if(p.group!==group)continue;
-const a=amount(time,p.delay),flow=Math.sin(a*Math.PI),r=1.05*scale;
-const x=box.left+p.x*scale+p.dx*width*.68*a+Math.sin(p.y*.012+a*2)*p.curve*flow;
-const y=box.top+p.y*scale+p.dy*height*.56*a+Math.cos(p.x*.012+a*2)*p.curve*flow;
+const progress=amount(time,p.delay),air=1-progress;
+const tx=box.left+p.x*scale,ty=box.top+p.y*scale;
+const sx=(p.dx*.5+.5)*width+Math.sin(time*.6+p.y*.035)*6;
+const sy=(p.dy*.5+.5)*height+Math.cos(time*.5+p.x*.035)*5;
+const bend=Math.sin(progress*Math.PI)*p.curve*.35;
+const x=sx*air+tx*progress+bend,y=sy*air+ty*progress+bend*.5;
+const r=(.75+group*.16)*air+1.05*scale*progress;
 ctx.moveTo(x+r,y);ctx.arc(x,y,r,0,Math.PI*2)}
 ctx.fill()}ctx.globalAlpha=1;
 }
@@ -62,7 +64,7 @@ screen.width=Math.round(width*dpr);screen.height=Math.round(height*dpr);ctx.setT
 drawLocal();if(finished)finish();else{draw();schedule()}
 }
 resize();
-const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;last=null;if(visible)schedule();else{cancelAnimationFrame(frame);frame=0;screen.style.display='none';localCanvas.style.visibility='visible'}},{threshold:.05});observer.observe(host);
+const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;last=null;if(visible)schedule();else{cancelAnimationFrame(frame);frame=0;screen.style.display='none';localCanvas.style.visibility=finished?'visible':'hidden'}},{threshold:.05});observer.observe(host);
 new ResizeObserver(()=>{if(Math.abs(host.getBoundingClientRect().width-localSize)>.5)resize()}).observe(host);
 addEventListener('resize',resize,{passive:true});
 addEventListener('scroll',()=>{if(!finished&&visible)draw()},{passive:true});
