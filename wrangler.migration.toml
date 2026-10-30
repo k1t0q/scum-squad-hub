@@ -2,7 +2,8 @@ name = "scum-hub-migration"
 main = "src/migration-worker.mjs"
 compatibility_date = "2026-10-27"
 workers_dev = true
-routes = [{ pattern = "scum-hub.ru/*", zone_id = "85d3af3589c8c5e687665b06e38de1b5" }]
+# Production scum-hub.ru/* route is managed separately via the zone API.
+# CI credentials deploy Worker code without modifying zone routes.
 
 [vars]
 PUBLIC_ORIGIN = "https://scum-hub.ru"
