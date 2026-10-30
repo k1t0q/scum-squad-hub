@@ -51,7 +51,7 @@ ctx.fill()}ctx.globalAlpha=1;
 }
 function tick(now){
 frame=0;if(!visible||document.hidden){last=null;return}
-if(last!==null)time+=Math.min((now-last)/1000,.05);last=now;
+if(last!==null)time+=Math.max(0,(now-last)/1000);last=now;
 if(time>=duration){finish();return}draw();frame=requestAnimationFrame(tick);
 }
 function schedule(){if(!finished&&visible&&!frame)frame=requestAnimationFrame(tick)}
