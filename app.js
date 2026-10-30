@@ -98,7 +98,8 @@ function renderOriginalD1Recovery(){
  if(page==='Метка'||page==='Базы'){
   const posts=(snap.posts||[]).filter(p=>page==='Метка'?p.kind==='stash':p.kind==='base');
   const photos=p=>{let images=Array.isArray(p.images)?p.images:[];return images.filter(u=>{try{return new URL(u).protocol==='https:'}catch{return false}}).map(u=>'<a href="'+escD(u)+'" target="_blank" rel="noopener noreferrer"><img src="'+escD(u)+'" loading="lazy" style="width:125px;height:95px;object-fit:cover;border-radius:7px"></a>').join('')};
-  $('#view').innerHTML='<div class="card"><h2>'+(page==='Метка'?'Схроны':'Базы')+'</h2>'+posts.map(p=>'<div class="item"><b>'+escD(p.map_marker_name||p.kind)+'</b><p>'+escD(p.comment||'')+'</p><div style="display:flex;flex-wrap:wrap;gap:8px">'+photos(p)+'</div></div>').join('')+'</div>';return;
+  $('#view').innerHTML='<div class="card"><h2>'+(page==='Метка'?'Схроны':'Базы')+'</h2>'+posts.map(p=>'<div class="item"><b>'+escD(p.map_marker_name||p.kind)+'</b><p>'+escD(p.comment||'')+'</p>'+(p.kind==='stash'?'<p class="muted">Проверен: '+escD(p.stash_checked_at||p.created_at||'—')+'</p><button class="ghost" data-d1-stash="'+escD(p.id)+'">Обновить схрон на 14 дней</button>':'')+'<div style="display:flex;flex-wrap:wrap;gap:8px">'+photos(p)+'</div></div>').join('')+'</div>';
+  $('#view').querySelectorAll('[data-d1-stash]').forEach(b=>b.onclick=()=>checkD1Stash(b.dataset.d1Stash));return;
  }
  if(page==='Взрыв'){$('#view').innerHTML='<div class="card"><h2>Взрыв · склад отряда</h2>'+rows(snap.explosives||[],['item',x=>'Количество: '+x.quantity])+'</div>';return}
  $('#view').innerHTML='<div class="card"><h2>'+escD(page)+'</h2><p class="muted">Данные этого раздела ещё подключаются к D1.</p></div>';
