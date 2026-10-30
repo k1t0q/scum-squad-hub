@@ -4,6 +4,9 @@ on:
     branches:
       - scum-hub-migration
   workflow_dispatch:
+concurrency:
+  group: scum-hub-migration-deploy
+  cancel-in-progress: true
 jobs:
   deploy:
     if: github.ref == 'refs/heads/scum-hub-migration'
