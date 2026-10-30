@@ -46,7 +46,7 @@ export async function legacyApi(body,env,m){
  if(!tables[t].length)fail('read_only');if(t==='explosives_inventory'&&!admin)fail('forbidden');if(t==='explosives_inventory'&&body.values?.quantity!==undefined&&(!Number.isSafeInteger(body.values.quantity)||body.values.quantity<0||body.values.quantity>300))fail('invalid_quantity');if(['squads','squad_member_duties'].includes(t)&&!admin)fail('forbidden');
  if(['update','delete'].includes(action)){
  if(!(body.filters||[]).length)fail('filter_required');const records=await all('SELECT * FROM '+t+' WHERE '+where,args);
- for(const r of records){if(t==='members'&&r.id!==m.id)fail('forbidden');if(['tasks','raids','squad_place_posts'].includes(t)&&!admin&&r.creator_id!==m.id&&r.created_by!==m.id)fail('forbidden');if(['presence_history','raid_participants','task_contributions'].includes(t)&&r.member_id!==m.id&&!admin)fail('forbidden');if(t==='protect_updates'&&!admin&&r.member_id!==m.id)fail('forbidden')}
+ for(const r of records){if(t==='squad_map_markers'&&r.locked&&!admin)fail('forbidden');if(t==='members'&&r.id!==m.id)fail('forbidden');if(['tasks','raids','squad_place_posts'].includes(t)&&!admin&&r.creator_id!==m.id&&r.created_by!==m.id)fail('forbidden');if(['presence_history','raid_participants','task_contributions'].includes(t)&&r.member_id!==m.id&&!admin)fail('forbidden');if(t==='protect_updates'&&!admin&&r.member_id!==m.id)fail('forbidden')}
  if(action==='delete'){await run('DELETE FROM '+t+' WHERE '+where,args);return records.map(decode)}
  const v=Object.fromEntries(Object.entries(body.values||{}).filter(([k])=>tables[t].includes(k)));if(!Object.keys(v).length)fail('empty_update');if(v.assignee_id)await member(v.assignee_id);if(v.member_id)await member(v.member_id);await run('UPDATE '+t+' SET '+Object.keys(v).map(k=>'"'+k+'"=?').join(',')+' WHERE '+where,[...Object.values(v).map(encode),...args]);return (await all('SELECT * FROM '+t+' WHERE '+where,args)).map(decode);
  }
@@ -58,7 +58,7 @@ export async function legacyApi(body,env,m){
  if(cols.includes('created_at'))v.created_at=now;if(cols.includes('updated_at'))v.updated_at=now;if(cols.includes('updated_by'))v.updated_by=m.id;
  if(cols.includes('id')&&!['members','squads','squad_map_markers'].includes(t))v.id=Date.now()*1000+crypto.getRandomValues(new Uint16Array(1))[0]%1000;
  if(t==='squad_map_markers'&&(!Number.isFinite(Number(v.x))||!Number.isFinite(Number(v.y))||v.x<0||v.x>1||v.y<0||v.y>1))fail('invalid_coordinates');
- if(t==='squad_map_markers'){v.id=String(input.id||crypto.randomUUID());const existing=await all('SELECT squad_id FROM squad_map_markers WHERE id=?',[v.id]);if(existing.length&&existing[0].squad_id!==m.squad_id)fail('forbidden')}
+ if(t==='squad_map_markers'){v.id=String(input.id||crypto.randomUUID());const existing=await all('SELECT squad_id,locked FROM squad_map_markers WHERE id=?',[v.id]);if(existing.length&&(existing[0].squad_id!==m.squad_id||(existing[0].locked&&!admin)))fail('forbidden')}
  if(t==='presence_history'&&action==='upsert'){const old=(await all('SELECT id FROM presence_history WHERE member_id=? AND day=? AND squad_id=?',[m.id,v.day,m.squad_id]))[0];if(old)v.id=old.id}
  if(t==='explosives_inventory'&&(!Number.isFinite(Number(v.quantity))||v.quantity<0||v.quantity>300))fail('invalid_quantity');
  const keys=Object.keys(v),pk=info.filter(x=>x.pk).map(x=>x.name);const conflict=action==='upsert'?' ON CONFLICT ('+pk.map(k=>'"'+k+'"').join(',')+') DO UPDATE SET '+keys.filter(k=>!pk.includes(k)).map(k=>'"'+k+'"=excluded."'+k+'"').join(','):'';

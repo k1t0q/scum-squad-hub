@@ -966,6 +966,7 @@ function furyNoticeToggle(k,on){localStorage.setItem('fury_notice_'+k,on?'on':'o
 const FURY_VAPID_PUBLIC='BMqTv-h0JU-rtMtn4VdaQpe7CBuOeyoW2EQAc8pdu439DqZs8A6pa_Og1mF8vOKy-WzThR9iHsz3Naw0fxrZe4k';
 function furyPushKey(base64){const p='='.repeat((4-base64.length%4)%4);const raw=atob((base64+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(raw,c=>c.charCodeAt(0))}
 async function furyPushRequest(body){
+ if(location.hostname==='scum-hub-migration.nikitinrf.workers.dev')throw Error('Push-рассылка ещё не перенесена на Cloudflare');
  if(!sb||!onlineMember)throw Error('Сначала войдите в отряд');
  const {data:{session}}=await sb.auth.getSession();
  if(!session?.access_token)throw Error('Нет активной сессии');
