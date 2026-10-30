@@ -5,6 +5,7 @@ window.addEventListener('message',async e=>{
   e.stopImmediatePropagation();
   const markers=(d1RecoverySnapshot?.markers||[]).map(m=>({...m,show_label:!!m.show_label,locked:!!m.locked}));
   e.source.postMessage({kind:'scumMapSharedMarkers',markers},e.origin);
+  const status=document.getElementById('d1-map-status');if(status)status.textContent='D1: '+markers.length+' меток · отправлены на карту';
  }
 },true);
 document.documentElement.classList.add('auth-lock');
@@ -87,6 +88,8 @@ function renderOriginalD1Recovery(){
  if(page==='Карта'){
   if(mapSharedRefreshTimer)clearInterval(mapSharedRefreshTimer);
   squadMapPage();
+  const markerCount=(d1RecoverySnapshot?.markers||[]).length;
+  const mapCard=document.querySelector('#view .card');if(mapCard){const status=document.createElement('div');status.id='d1-map-status';status.className='muted';status.style.cssText='padding:8px 0;font-size:13px';status.textContent='D1: '+markerCount+' меток загружено · передача на карту…';mapCard.querySelector('.toolbar')?.after(status)}
   const push=()=>{const frame=document.getElementById('squadMapFrame');if(!frame)return;const markers=(d1RecoverySnapshot?.markers||[]).map(m=>({...m,showLabel:!!m.show_label,enemyNicks:(()=>{try{return JSON.parse(m.enemy_nicks||'[]')}catch{return []}})()}));frame.contentWindow?.postMessage({kind:'scumMapSharedMarkers',markers},'https://k1t0q.github.io')};
   const frame=document.getElementById('squadMapFrame');if(frame)frame.addEventListener('load',()=>{let n=0;const id=setInterval(()=>{if(page!=='Карта'||n++>8){clearInterval(id);return}push()},900)});
   return;
