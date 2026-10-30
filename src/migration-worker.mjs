@@ -113,7 +113,7 @@ export default {
     }
     if (request.method === 'POST' && url.pathname === '/api/admin/logout'){
       if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
-      return new Response(JSON.stringify({ok:true}),{headers:{...headers,'set-cookie':clearAdminCookie}});
+      const h=new Headers(headers);h.append('set-cookie',clearAdminCookie);h.append('set-cookie',clearSteamCookie);return new Response(JSON.stringify({ok:true}),{headers:h});
     }
     if (request.method === 'POST' && url.pathname === '/api/member/login') {
       if(typeof env.MEMBER_SESSION_KEY!=='string'||env.MEMBER_SESSION_KEY.length<32)return new Response(JSON.stringify({error:'session_not_configured'}),{status:503,headers});
@@ -129,7 +129,7 @@ export default {
     }
     if (request.method === 'POST' && url.pathname === '/api/member/logout') {
       if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
-      return new Response(JSON.stringify({ok:true}),{status:200,headers:{...headers,'set-cookie':clearMemberCookie}});
+      const h=new Headers(headers);h.append('set-cookie',clearMemberCookie);h.append('set-cookie',clearSteamCookie);return new Response(JSON.stringify({ok:true}),{status:200,headers:h});
     }
     // Member-code writes are scoped to the active member's signed cookie.
     // No client-provided squad_id or member_id is trusted.
