@@ -29,7 +29,7 @@ jobs:
         run: |
           mkdir -p migration-public/src
           find . -maxdepth 1 -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.svg' -o -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' -o -name '*.ico' -o -name '*.webmanifest' \) -exec cp {} migration-public/ \;
-          cp src/legacy-d1-adapter.mjs migration-public/src/legacy-d1-adapter.mjs
+          cp src/legacy-d1-adapter.mjs src/d1-client.mjs migration-public/src/
           test -s migration-public/index.html
           test -s migration-public/app.js
       - name: Deploy migration Worker only
@@ -38,12 +38,17 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx --yes wrangler@4 deploy --config wrangler.migration.toml
 
-      - name: Configure Steam session secret
+      - name: Configure ImageKit upload secret for migration Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          SCUM_SESSION_HMAC_KEY: ${{ secrets.SCUM_SESSION_HMAC_KEY }}
+          SCUM_IMAGEKIT_PRIVATE_KEY: ${{ secrets.SCUM_IMAGEKIT_PRIVATE_KEY }}
         run: |
-          test -n "$SCUM_SESSION_HMAC_KEY" || { echo "Missing SCUM_SESSION_HMAC_KEY"; exit 1; }
-          test "${#SCUM_SESSION_HMAC_KEY}" -ge 32 || { echo "Session key too short"; exit 1; }
-          printf '%s' "$SCUM_SESSION_HMAC_KEY" | npx --yes wrangler@4 secret put SESSION_HMAC_KEY --config wrangler.migration.toml
+          test -n "$SCUM_IMAGEKIT_PRIVATE_KEY" || { echo "Missing ImageKit private key"; exit 1; }
+          printf '%s' "$SCUM_IMAGEKIT_PRIVATE_KEY" | npx --yes wrangler@4 secret put IMAGEKIT_PRIVATE_KEY --config wrangler.migration.toml
+      - name: Relink verified existing ImageKit photos in migration D1 only
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SCUM_IMAGEKIT_PRIVATE_KEY: ${{ secrets.SCUM_IMAGEKIT_PRIVATE_KEY }}
+        run: node scripts/relink-imagekit.mjs

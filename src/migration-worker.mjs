@@ -1,3 +1,4 @@
+import {legacyApi} from './legacy-api.mjs';
 import { adminLogin, verifyAdminSession, clearAdminCookie } from './admin-code-login.mjs';
 import { verifySquadCode } from './code-login-verification.mjs';
 import { createMemberSession, verifyMemberSession, memberCookie, clearMemberCookie } from './member-session.mjs';
@@ -20,6 +21,25 @@ export default {
     const url = new URL(request.url);
     const headers = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
     const origin = env.PUBLIC_ORIGIN;
+    if (request.method === 'POST' && ['/api/legacy','/api/photos'].includes(url.pathname)) {
+      if(request.headers.get('origin')!==url.origin)return Response.json({error:'invalid_origin'},{status:403,headers});
+      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env);
+      if(!member)return Response.json({error:'unauthorized'},{status:401,headers});
+      try {
+        if(url.pathname==='/api/photos'){
+          if(!env.IMAGEKIT_PRIVATE_KEY)return Response.json({error:'imagekit_not_configured'},{status:503,headers});
+          const input=await request.formData(),file=input.get('file');
+          if(!file||!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)||file.size>10*1024*1024)return Response.json({error:'invalid_image'},{status:400,headers});
+          const form=new FormData();form.set('file',file);form.set('fileName',crypto.randomUUID()+'.'+file.type.split('/')[1]);form.set('folder','/scum-hub/uploads/'+member.squad_id);
+          const r=await fetch('https://upload.imagekit.io/api/v1/files/upload',{method:'POST',headers:{Authorization:'Basic '+btoa(env.IMAGEKIT_PRIVATE_KEY+':')},body:form});
+          if(!r.ok)return Response.json({error:'imagekit_upload_failed'},{status:502,headers});
+          const data=await r.json();return Response.json({url:data.url},{headers});
+        }
+        if(Number(request.headers.get('content-length')||0)>200000)return Response.json({error:'payload_too_large'},{status:413,headers});
+        const data=await legacyApi(await request.json(),env,member);
+        return Response.json({data,error:null},{headers});
+      } catch(e){console.error('legacy_api',e.message);return Response.json({error:e.message.startsWith('D1_')?'database_error':e.message},{status:e.message==='forbidden'?403:400,headers})}
+    }
     if (request.method === 'GET' && url.pathname === '/auth/steam/start') {
       if (!origin || new URL(origin).origin !== url.origin) return new Response(JSON.stringify({error:'origin_not_configured'}),{status:503,headers});
       if (typeof env.SESSION_HMAC_KEY !== 'string' || env.SESSION_HMAC_KEY.length < 32) return new Response(JSON.stringify({error:'session_key_not_configured'}),{status:503,headers});
