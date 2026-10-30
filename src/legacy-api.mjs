@@ -31,7 +31,21 @@ export async function legacyApi(body,env,m){
  await db.batch(statements);
  return true
 }if(p.p_action==='save'){const r=p.p_marker||{};const previous=(await all('SELECT locked FROM squad_map_markers WHERE id=? AND squad_id=?',[String(r.id||''),m.squad_id]))[0];if(previous?.locked&&!admin)fail('forbidden');const result=await legacyApi({table:'squad_map_markers',action:'upsert',values:{...r,show_label:r.showLabel===false?0:1,enemy_nicks:r.enemyNicks||[]}},env,m);const match=String(r.id).match(/^(stash|base|other)-post-(\d+)$/);if(match){const post=await own('squad_place_posts',Number(match[2]));const coords=String(post.comment||'').split('\n').filter(x=>/^(Координаты:|Источник:)/.test(x));await run('UPDATE squad_place_posts SET map_marker_name=?,comment=? WHERE id=? AND squad_id=?',[r.name||post.map_marker_name||'',r.note===undefined?post.comment:[String(r.note||''),...coords].filter(Boolean).join('\n'),post.id,m.squad_id])}return result}break;
- case 'convert_map_marker_to_stash':{const r=p.p_marker||{};if(!Number.isFinite(Number(r.x))||!Number.isFinite(Number(r.y))||r.x<0||r.x>1||r.y<0||r.y>1)fail('invalid_coordinates');const [post]=await legacyApi({table:'squad_place_posts',action:'insert',values:{kind:'stash',images:[],map_marker_name:r.name||'Схрон',comment:r.note||''}},env,m);const id='stash-post-'+post.id;await legacyApi({table:'squad_map_markers',action:'insert',values:{...r,id,type:'stash',show_label:1}},env,m);if(r.id)await run('DELETE FROM squad_map_markers WHERE id=? AND squad_id=?',[String(r.id),m.squad_id]);return {id:post.id,marker_id:id}}
+ case 'convert_map_marker_to_stash':{const r=p.p_marker||{};if(!Number.isFinite(Number(r.x))||!Number.isFinite(Number(r.y))||r.x<0||r.x>1||r.y<0||r.y>1)fail('invalid_coordinates');const sourceMatch=/^(base|other)-post-([0-9]+)$/.exec(String(r.id||''));
+ if(sourceMatch){
+  const source=await own('squad_place_posts',Number(sourceMatch[2]));
+  const previous=(await all('SELECT locked FROM squad_map_markers WHERE id=? AND squad_id=?',[String(r.id),m.squad_id]))[0];
+  if(previous?.locked&&!admin)fail('forbidden');
+  const id='stash-post-'+source.id;
+  await legacyApi({table:'squad_map_markers',action:'upsert',values:{...r,id,type:'stash',show_label:1}},env,m);
+  const metadata=String(source.comment||'').split('\n').filter(x=>/^(Координаты:|Источник:)/.test(x));
+  await db.batch([
+   db.prepare('UPDATE squad_place_posts SET kind=?,map_marker_name=?,comment=?,stash_checked_at=?,stash_checked_by=? WHERE id=? AND squad_id=?').bind('stash',r.name||'Схрон',[String(r.note||''),...metadata].filter(Boolean).join('\n'),now,m.id,source.id,m.squad_id),
+   db.prepare('DELETE FROM squad_map_markers WHERE id=? AND squad_id=?').bind(String(r.id),m.squad_id)
+  ]);
+  return {id:source.id,marker_id:id}
+ }
+ const [post]=await legacyApi({table:'squad_place_posts',action:'insert',values:{kind:'stash',images:[],map_marker_name:r.name||'Схрон',comment:r.note||''}},env,m);const id='stash-post-'+post.id;await legacyApi({table:'squad_map_markers',action:'insert',values:{...r,id,type:'stash',show_label:1}},env,m);if(r.id)await run('DELETE FROM squad_map_markers WHERE id=? AND squad_id=?',[String(r.id),m.squad_id]);return {id:post.id,marker_id:id}}
  case 'refresh_stash':await own('squad_place_posts',p.p_post_id);await run('UPDATE squad_place_posts SET stash_checked_at=?,stash_checked_by=? WHERE id=? AND squad_id=?',[now,m.id,p.p_post_id,m.squad_id]);return true;
  case 'claim_task':await own('tasks',p.p_task_id);await run('UPDATE tasks SET assignee_id=? WHERE id=? AND squad_id=?',[m.id,p.p_task_id,m.squad_id]);return true;
  case 'set_task_status':{const t=await own('tasks',p.p_task_id);if(!admin&&t.creator_id!==m.id&&t.assignee_id!==m.id)fail('forbidden');if(!['В процессе','Выполнено'].includes(p.p_status))fail('invalid_status');await run('UPDATE tasks SET status=? WHERE id=? AND squad_id=?',[p.p_status,p.p_task_id,m.squad_id]);await event('tasks',p.p_status==='Выполнено'?'ЗАДАЧА ВЫПОЛНЕНА':'Задача возвращена в работу',t.title,'task-status:'+t.id+':'+now);return true}
