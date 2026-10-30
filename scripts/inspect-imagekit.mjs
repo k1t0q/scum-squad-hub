@@ -31,3 +31,7 @@ for(const [name,want] of Object.entries(expected)){
 }
 console.log('Total files:',total);
 if(total!==125)process.exitCode=1;
+
+const {createHmac}=await import('node:crypto');
+async function sample(path){for(const f of await list(path)){if(f.type!=='folder')return f;const v=await sample(path+'/'+f.name);if(v)return v}}
+const f=await sample('/scum-hub');if(f){const u=new URL(f.url);console.log('Delivery path:',u.pathname,'File path:',f.filePath);const expiry=Math.floor(Date.now()/1000)+600;const candidates=[u.pathname.split('/').slice(2).join('/'),f.filePath.replace(/^\//,''),f.filePath,u.pathname,u.href];for(let i=0;i<candidates.length;i++){const url=new URL(f.url);url.search='';url.searchParams.set('ik-t',String(expiry));url.searchParams.set('ik-s',createHmac('sha1',process.env.SCUM_IMAGEKIT_PRIVATE_KEY.trim()).update(candidates[i]+expiry).digest('hex'));const r=await fetch(url);console.log('Signature candidate',i,'status',r.status,r.ok?'OK':(await r.text()).slice(0,100));if(r.ok)break}}
