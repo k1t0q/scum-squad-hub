@@ -1,3 +1,4 @@
+import {signImageValues,canonicalImageValues,signImageUrl} from './imagekit-delivery.mjs';
 import {legacyApi} from './legacy-api.mjs';
 import { adminLogin, verifyAdminSession, clearAdminCookie } from './admin-code-login.mjs';
 import { verifySquadCode } from './code-login-verification.mjs';
@@ -33,11 +34,11 @@ export default {
           const form=new FormData();form.set('file',file);form.set('fileName',crypto.randomUUID()+'.'+file.type.split('/')[1]);form.set('folder','/scum-hub/uploads/'+member.squad_id);
           const r=await fetch('https://upload.imagekit.io/api/v1/files/upload',{method:'POST',headers:{Authorization:'Basic '+btoa(env.IMAGEKIT_PRIVATE_KEY+':')},body:form});
           if(!r.ok)return Response.json({error:'imagekit_upload_failed'},{status:502,headers});
-          const data=await r.json();return Response.json({url:data.url},{headers});
+          const data=await r.json();return Response.json({url:await signImageUrl(data.url,env.IMAGEKIT_PRIVATE_KEY)},{headers});
         }
         if(Number(request.headers.get('content-length')||0)>200000)return Response.json({error:'payload_too_large'},{status:413,headers});
-        const data=await legacyApi(await request.json(),env,member);
-        return Response.json({data,error:null},{headers});
+        const data=await legacyApi(canonicalImageValues(await request.json()),env,member);
+        return Response.json({data:await signImageValues(data,env.IMAGEKIT_PRIVATE_KEY),error:null},{headers});
       } catch(e){console.error('legacy_api',e.message);return Response.json({error:e.message.startsWith('D1_')?'database_error':e.message},{status:e.message==='forbidden'?403:400,headers})}
     }
     if (request.method === 'GET' && url.pathname === '/auth/steam/start') {
