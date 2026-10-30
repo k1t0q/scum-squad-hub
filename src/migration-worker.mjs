@@ -380,7 +380,7 @@ export default {
           const destination=new URL(request.url);destination.pathname='/hub';
           return Response.redirect(destination.href,302);
         }
-        const asset=new URL(request.url);asset.pathname='/landing-preview.html';
+        const asset=new URL(request.url);asset.pathname='/landing-preview';
         return env.ASSETS.fetch(new Request(asset,request));
       }
       if(url.pathname==='/hub'){
