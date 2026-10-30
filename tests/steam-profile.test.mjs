@@ -30,3 +30,11 @@ test('Steam logout rejects cross-origin and clears all login cookies',async()=>{
  const ok=await worker.fetch(new Request('https://scum-hub.ru/api/steam/logout',{method:'POST',headers:{origin:'https://scum-hub.ru'}}),env);
  assert.equal(ok.status,200);for(const name of ['scum_steam_session','scum_member_session','scum_admin_session'])assert.match(ok.headers.get('set-cookie'),new RegExp(name+'='));
 });
+
+test('new Steam player sees their identity without another squad or hub access',async()=>{
+ const {env,sql}=setup();sql.exec('DELETE FROM scum_verified_steam_links');
+ const profile=await worker.fetch(await request(env),env);
+ assert.equal(profile.status,200);
+ const data=await profile.json();assert.equal(data.steam_id,'76561198000000000');assert.equal(data.member,null);assert.equal(data.squad,null);
+ const hub=await worker.fetch(await request(env,'/api/member/me'),env);assert.equal(hub.status,401);
+});
