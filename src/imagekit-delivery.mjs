@@ -7,7 +7,7 @@ export async function signImageUrl(value,key,now=Math.floor(Date.now()/1000)){
  const src=canonicalImageUrl(value);if(src===value&&!String(src).startsWith('https://ik.imagekit.io/'))return value;if(!key)return src;
  const u=new URL(src),expiry=now+7200;
  const path=u.pathname.split('/').slice(2).join('/')+(u.search||'');
- const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(key),{name:'HMAC',hash:'SHA-1'},false,['sign']);
+ const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(key.trim()),{name:'HMAC',hash:'SHA-1'},false,['sign']);
  const sig=Array.from(new Uint8Array(await crypto.subtle.sign('HMAC',k,new TextEncoder().encode(path+expiry)))).map(x=>x.toString(16).padStart(2,'0')).join('');
  u.searchParams.set('ik-t',String(expiry));u.searchParams.set('ik-s',sig);return u.href;
 }
