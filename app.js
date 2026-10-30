@@ -69,7 +69,7 @@ function renderOriginalD1Recovery(){
  if(page==='Задачи'){tasks();return}
  if(page==='Состав'){members();return}
  if(page==='План на рейд'||page==='Рейд'){ops();return}
- if(page==='Настройки'){settingsPage();return}
+ if(page==='Настройки'){$('#view').innerHTML='<div class="card"><h2>Настройки</h2><p class="muted">Профиль: '+esc(db.profile.nick)+' · '+esc(db.profile.role)+'</p><p class="muted">Административные изменения временно отключены до переноса в D1.</p></div>';return}
  const escD=s=>esc(String(s??''));
  const rows=(arr,cols)=>'<div class="list">'+arr.map(x=>'<div class="item"><div class="itemtop"><div>'+cols.map(k=>'<span style="display:block">'+escD(typeof k==='function'?k(x):x[k])+'</span>').join('')+'</div></div></div>').join('')+'</div>';
  if(page==='Карта'){
