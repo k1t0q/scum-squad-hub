@@ -1,0 +1,56 @@
+name: Seal Discord migration credentials
+on:
+  push:
+    branches: [scum-hub-migration]
+    paths: ['.github/workflows/seal-discord-config.yml']
+jobs:
+  seal:
+    runs-on: ubuntu-latest
+    environment: scum-hub-migration
+    steps:
+      - name: Encrypt configuration for the bot server
+        env:
+          D1_TOKEN: ${{ secrets.SCUM_CLOUDFLARE_API_TOKEN }}
+          IMAGEKIT_KEY: ${{ secrets.SCUM_IMAGEKIT_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          TASK_TEMP=$(mktemp -d)
+          trap 'rm -rf "$TASK_TEMP"' EXIT
+          export TASK_TEMP
+          cat > "$TASK_TEMP/server.crt" <<'CERT'
+          -----BEGIN CERTIFICATE-----
+          MIIEGzCCAoOgAwIBAgIUAL9QuI63c7CFbRpqAyOxftZR5+4wDQYJKoZIhvcNAQEL
+          BQAwHTEbMBkGA1UEAwwSc2N1bS1odWItbWlncmF0aW9uMB4XDTI2MTAzMDA2MDQx
+          MVoXDTM2MTAyNzA2MDQxMVowHTEbMBkGA1UEAwwSc2N1bS1odWItbWlncmF0aW9u
+          MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEArQ6D4jaAW+43OfXdN3qI
+          266eWTaVCA239o6iCzF59HC+LdgXrUk4Wqu2/U7CeES9XQAv7fM+gv36MwKe7Hhv
+          Y6B9sIgT2R8wA095I7eXEePJTcX1Zs/ymfHLPIP/dMuWDPE9LqKsGLG4ir5484ER
+          bPvtc1Rz9u61na3VpWSVqnfw5hydVy8ONtNJrAYEz2wiKaHGomJDBqzqloWsjcT6
+          7PRzFud0XICGEC0HnE5vjHX/B5JYYm03DguyTWhXhS8T5hpLetERNbov/g+JMeL8
+          0a52eyrixQgMKbEFOS8xlQxIwiaFXAS/b0toA1hZn3hlYeiFojx1BARfweDLO1eR
+          KTNAPoqHhmwT3gH2479xNMxZj+hdHpuGpeeyYBsdihf4AU79VKKPxgFscqYYLkfD
+          i7RTRSeQM7YdcyWCn28BsG46jEUxHvjYVSYPTaFFXtpwv6NyJb3FMhhdaOc08Jkp
+          l5DZ0yqgBVoLRDWIDfF0ZHnamSXyF6efEtSRvV2XCfFrAgMBAAGjUzBRMB0GA1Ud
+          DgQWBBTMlhTk2QZF1rRHE4z42oHzgS3kozAfBgNVHSMEGDAWgBTMlhTk2QZF1rRH
+          E4z42oHzgS3kozAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBgQCZ
+          troElcC9ES+rUliI0NICtJt5kceiZYcqwWztRm/iAHY7m70hlIDKmkKXnWPDVsDJ
+          aNgoZZVP+mWp1O4S1eiXz+kQew/Ba/ppDkbs+0C8AeaK1nRv+TFyyhFN+Dw1k0rk
+          j08DXOVWp51UDvUB6LE/1Z61T7TOpy3ukosu/OTFtGCEXDaFA7NDiCGN1lVb8dLI
+          UWHs7k6uZvYQZtc3Httk/q98UgCMgT4TSLK1U/u1ljowSLZcHyvFlRCYya0EugAt
+          Mvz0roTwVZ7+CI0Ty3h1Jcd+B7Jh2KWg4FdUYMp3mJaryFjFEmjZ0rnkzgEFiWtQ
+          VSeqx//ka59PjBdua2ifeJKZJLYt97JEVB9ipd8bGoQs4j7+CrzaQjy2G9mkVOGf
+          Ta74D3ORvhhWpdW/A8nbZ7s7gyv8fAq91hjRtwZV14dvaGOQyNZ4Zemptnwg4rK+
+          jkabg7ccuQSi33YAMZIozfk2X9Y28ne25l8dRSSVQjsGfT3fddP5FTYDOyUPHvQ=
+          -----END CERTIFICATE-----
+          CERT
+          python3 - <<'PY'
+          import os,json
+          values={'CF_ACCOUNT_ID':'e38dfd3ec24a0cfed267d1272a461174','CF_D1_DATABASE_ID':'924cdc85-bd75-462a-87f6-a9a739054905','CF_D1_API_TOKEN':os.environ['D1_TOKEN'].strip(),'IMAGEKIT_PRIVATE_KEY':os.environ['IMAGEKIT_KEY'].strip(),'FURYHUB_URL':'https://scum-hub-migration.nikitinrf.workers.dev/'}
+          assert all(values.values()), 'Required migration credential missing'
+          with open(os.environ['TASK_TEMP']+'/config.json','w') as f: json.dump(values,f)
+          PY
+          openssl cms -encrypt -aes-256-cbc -binary -in "$TASK_TEMP/config.json" -outform DER -out "$TASK_TEMP/sealed.bin" "$TASK_TEMP/server.crt"
+          printf 'SEALED_CONFIG='
+          base64 -w 0 "$TASK_TEMP/sealed.bin"
+          printf '\n'
