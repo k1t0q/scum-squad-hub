@@ -48,7 +48,7 @@ jobs:
           printf '%s' "$SCUM_IMAGEKIT_PRIVATE_KEY" | npx --yes wrangler@4 secret put IMAGEKIT_PRIVATE_KEY --config wrangler.migration.toml
       - name: Relink verified existing ImageKit photos in migration D1 only
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.SCUM_CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           SCUM_IMAGEKIT_PRIVATE_KEY: ${{ secrets.SCUM_IMAGEKIT_PRIVATE_KEY }}
         run: node scripts/relink-imagekit.mjs
