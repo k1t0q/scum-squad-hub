@@ -74,7 +74,10 @@ function renderOriginalD1Recovery(){
  const sc=$('#squadCount');if(sc)sc.textContent=db.members.length+' УЧАСТНИКОВ';
  const snap=d1RecoverySnapshot||{};
  if(page==='Главная'){today();return}
- if(page==='Задачи'){tasks();return}
+ if(page==='Задачи'){
+  $('#view').innerHTML='<div class="card"><h2>Задачи отряда</h2><div class="list">'+(snap.tasks||[]).map(t=>'<div class="item"><div class="itemtop"><div><h3>'+esc(t.title||'')+'</h3><span class="muted">'+esc(t.quantity||0)+' '+esc(t.unit||'шт.')+' · '+esc(t.status||'В процессе')+'</span></div><button class="ghost" data-d1-task="'+esc(t.id)+'">'+(t.status==='Выполнено'?'Вернуть в работу':'Выполнено')+'</button></div></div>').join('')+'</div></div>';
+  $('#view').querySelectorAll('[data-d1-task]').forEach(b=>b.onclick=()=>updateD1Task(b.dataset.d1Task,(snap.tasks||[]).find(t=>String(t.id)===b.dataset.d1Task)?.status==='Выполнено'?'В процессе':'Выполнено'));return;
+ }
  if(page==='Состав'){members();return}
  if(page==='План на рейд'||page==='Рейд'){ops();return}
  if(page==='Настройки'){$('#view').innerHTML='<div class="card"><h2>Настройки</h2><p class="muted">Профиль: '+esc(db.profile.nick)+' · '+esc(db.profile.role)+'</p><p class="muted">Административные изменения временно отключены до переноса в D1.</p></div>';return}
@@ -721,6 +724,8 @@ function removePlaceEditPhoto(i){if(!placeEdit)return;placeEdit.comment=$('#plac
 async function uploadPlaceEditFiles(files){if(!placeEdit)return;placeEdit.comment=$('#placeEditComment')?.value??placeEdit.comment;files=[...(files||[])].filter(f=>f?.type?.startsWith('image/')).slice(0,5-placeEdit.images.length);for(let file of files){if(file.size>10*1024*1024){toast('Фото больше 10 МБ пропущено');continue}let ext=(file.name?.split('.').pop()||file.type.split('/')[1]||'png').replace(/[^a-zA-Z0-9]/g,'').toLowerCase(),path=onlineMember.squad_id+'/'+placeEdit.kind+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;let up=await sb.storage.from('squad-photos').upload(path,file,{contentType:file.type,upsert:false});if(up.error){toast('Не удалось загрузить фото');continue}placeEdit.images.push(sb.storage.from('squad-photos').getPublicUrl(path).data.publicUrl)}openPlaceEditModal()}
 async function savePlaceEdit(){if(!placeEdit)return;placeEdit.comment=$('#placeEditComment')?.value.trim()||'';let {error}=await sb.from('squad_place_posts').update({images:placeEdit.images.slice(0,5),comment:placeEdit.comment}).eq('id',placeEdit.id);if(error){toast('Не удалось сохранить');return}let kind=placeEdit.kind;placeEdit=null;closeModal();toast('Публикация обновлена');refreshPlaceKind(kind)}
 async function deletePlacePost(id,kind){if(!confirm('Удалить публикацию?'))return;let {error}=await sb.from('squad_place_posts').delete().eq('id',id);if(error){toast('Не удалось удалить');return}if(['stash','base','other'].includes(kind)){const r=await sb.rpc('squad_map_sync',{p_action:'delete',p_id:(kind==='base'?'base-post-':kind==='other'?'other-post-':'stash-post-')+id});if(r.error)console.warn('Stash map cleanup',r.error)}refreshPlaceKind(kind==='base'||kind==='other'?'stash':kind)}
+async function updateD1Task(id,status){try{const a=await import('./src/legacy-d1-adapter.mjs');await a.updateTaskStatusD1(Number(id),status);await refreshOriginalD1Hub();toast('Задача сохранена')}catch(e){toast('Ошибка сохранения задачи')}}
+async function checkD1Stash(id){try{const a=await import('./src/legacy-d1-adapter.mjs');await a.checkStashD1(Number(id));await refreshOriginalD1Hub();toast('Схрон обновлён')}catch(e){toast('Ошибка обновления схрона')}}
 // Cloudflare recovery keeps the original SCUM HUB navigation and layout.
 let d1RecoverySnapshot=null;
 async function mountOriginalD1Hub(snapshot){
