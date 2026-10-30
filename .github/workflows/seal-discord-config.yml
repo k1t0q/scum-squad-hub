@@ -46,7 +46,7 @@ jobs:
           CERT
           python3 - <<'PY'
           import os,json
-          values={'CF_ACCOUNT_ID':'e38dfd3ec24a0cfed267d1272a461174','CF_D1_DATABASE_ID':'924cdc85-bd75-462a-87f6-a9a739054905','CF_D1_API_TOKEN':os.environ['D1_TOKEN'].strip(),'IMAGEKIT_PRIVATE_KEY':os.environ['IMAGEKIT_KEY'].strip(),'FURYHUB_URL':'https://scum-hub-migration.nikitinrf.workers.dev/'}
+          values={'CF_ACCOUNT_ID':'e38dfd3ec24a0cfed267d1272a461174','CF_D1_DATABASE_ID':'924cdc85-bd75-462a-87f6-a9a739054905','CF_D1_API_TOKEN':os.environ['D1_TOKEN'].strip(),'IMAGEKIT_PRIVATE_KEY':os.environ['IMAGEKIT_KEY'].strip(),'FURYHUB_URL':'https://scum-hub.ru/'}
           assert all(values.values()), 'Required migration credential missing'
           with open(os.environ['TASK_TEMP']+'/config.json','w') as f: json.dump(values,f)
           PY
