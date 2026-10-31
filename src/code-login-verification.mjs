@@ -17,7 +17,7 @@ export async function verifySquadCode(request,env){
   } catch { return json({error:'rate_limit_unavailable'},503); }
   let body;try{body=await request.json()}catch{return json({error:'invalid_json'},400)}
   const nick=String(body?.nick||'').trim(),code=String(body?.code||''),role=String(body?.role||'');
-  if(!/^[^<>\u0000-\u001f]{2,32}$/.test(nick)||code.length<4||code.length>128||!['Rifler','Sniper','Bomber','Locker','Builder','Helper'].includes(role))return json({error:'invalid_credentials'},400);
+  if(!/^[^<>\u0000-\u001f]{2,32}$/.test(nick)||code.length<4||code.length>128||(role!==''&&!['Rifler','Sniper','Bomber','Locker','Builder','Helper'].includes(role)))return json({error:'invalid_credentials'},400);
   // Verify the existing legacy squad code against its own squad. This preserves
   // current squad codes without requiring users to re-register or use Steam.
   // The imported legacy invite_code column must later be migrated to a salted hash.
@@ -26,7 +26,7 @@ export async function verifySquadCode(request,env){
   const matches=[];
   for(const record of member.results||[]){
     const expected=await digest(String(record.invite_code||''));
-    if(constantEqual(expected,supplied)&&record.game_role===role)matches.push(record);
+    if(constantEqual(expected,supplied)&&(role===''||record.game_role===role))matches.push(record);
   }
   if(matches.length!==1)return json({error:'invalid_credentials'},401);
   const record=matches[0];
