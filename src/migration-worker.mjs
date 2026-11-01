@@ -1,3 +1,4 @@
+export {MinimapRoom} from './minimap-room.mjs';
 import {verifiedSteamMember,clearSteamCookie} from './steam-hub-member.mjs';
 import {signImageValues,canonicalImageValues,signImageUrl} from './imagekit-delivery.mjs';
 import {legacyApi} from './legacy-api.mjs';
@@ -23,6 +24,16 @@ export default {
     const url = new URL(request.url);
     const headers = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
     const origin = env.PUBLIC_ORIGIN;
+    if(url.pathname==='/api/minimap/live'){
+      if(request.method!=='GET'||request.headers.get('Upgrade')?.toLowerCase()!=='websocket')return new Response('WebSocket required',{status:426});
+      if(request.headers.get('Origin')!==url.origin)return new Response('Forbidden',{status:403});
+      const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env)||await verifiedSteamMember(request,env);
+      if(!member)return new Response('Unauthorized',{status:401});
+      if(!env.MINIMAP_ROOMS)return new Response('Unavailable',{status:503});
+      const h=new Headers({'Upgrade':'websocket','x-minimap-member':String(member.id),'x-minimap-squad':String(member.squad_id),'x-minimap-nick':encodeURIComponent(member.nick)});
+      return env.MINIMAP_ROOMS.getByName(String(member.squad_id)).fetch(new Request('https://minimap.internal/live',{headers:h}));
+    }
+
     if (request.method === 'POST' && ['/api/legacy','/api/photos'].includes(url.pathname)) {
       if(request.headers.get('origin')!==url.origin)return Response.json({error:'invalid_origin'},{status:403,headers});
       const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env)||await verifiedSteamMember(request,env);
