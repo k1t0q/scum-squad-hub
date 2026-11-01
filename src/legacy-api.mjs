@@ -3,6 +3,7 @@ const tables={squads:['name','appearance'],members:['nick','game_role'],presence
 const jsonFields=new Set(['appearance','images','target_images','enemy_nicks','strokes','categories']);
 const encode=v=>typeof v==='boolean'?(v?1:0):typeof v==='object'&&v!==null?JSON.stringify(v):v===undefined?null:v;
 const decode=r=>Object.fromEntries(Object.entries(r).map(([k,v])=>{if(jsonFields.has(k)&&typeof v==='string'){try{v=JSON.parse(v)}catch{}}if(k==='is_active')v=!!v;return [k,v]}));
+const mapMarker=r=>({...decode(r),showLabel:!!r.show_label,enemyNicks:decode(r).enemy_nicks||[]});
 function scope(t,m){if(t==='squads')return ['id=?',[m.squad_id]];if(t==='task_contributions')return ['task_id IN (SELECT id FROM tasks WHERE squad_id=?)',[m.squad_id]];if(t==='raid_participants')return ['raid_id IN (SELECT id FROM raids WHERE squad_id=?)',[m.squad_id]];return ['squad_id=?',[m.squad_id]]}
 function fail(s){throw Error(s)}
 export async function legacyApi(body,env,m){
@@ -15,10 +16,18 @@ export async function legacyApi(body,env,m){
  if(body.rpc){const p=body.args||{};
  switch(body.rpc){
  case 'current_member': case 'claim_admin_account':return {...m,is_active:true};
+ case 'get_squad_map_snapshot':{
+ const [markerResult,postResult]=await db.batch([
+  db.prepare('SELECT * FROM squad_map_markers WHERE squad_id=?').bind(m.squad_id),
+  db.prepare("SELECT p.*,m.nick AS author_nick,m.nick AS nick FROM squad_place_posts p LEFT JOIN members m ON m.id=p.created_by WHERE p.squad_id=? AND p.kind IN ('stash','base','other') ORDER BY p.created_at DESC").bind(m.squad_id)
+ ]);
+ const posts=(postResult.results||[]).map(decode);
+ return {markers:(markerResult.results||[]).map(mapMarker),posts:posts.filter(p=>p.kind==='stash'),basePosts:posts.filter(p=>p.kind==='base'),otherPosts:posts.filter(p=>p.kind==='other')};
+ }
  case 'get_squad_place_posts':return (await all('SELECT p.*,m.nick AS author_nick,m.nick AS nick FROM squad_place_posts p LEFT JOIN members m ON m.id=p.created_by WHERE p.squad_id=? AND p.kind=? ORDER BY p.created_at DESC',[m.squad_id,p.p_kind])).map(decode);
  case 'get_squad_map_posts':return (await all("SELECT p.*,m.nick AS author_nick FROM squad_place_posts p LEFT JOIN members m ON m.id=p.created_by WHERE p.squad_id=? AND kind IN ('stash','base','other')",[m.squad_id])).map(decode);
  case 'get_squad_recent_events':return await all('SELECT e.*,m.nick AS actor_nick FROM squad_notification_events e LEFT JOIN members m ON m.id=e.actor_id WHERE e.squad_id=? ORDER BY e.created_at DESC LIMIT ?',[m.squad_id,Math.min(50,Number(p.p_limit)||9)]);
- case 'squad_map_sync':if(p.p_action==='list')return (await all('SELECT * FROM squad_map_markers WHERE squad_id=?',[m.squad_id])).map(r=>({...decode(r),showLabel:!!r.show_label,enemyNicks:decode(r).enemy_nicks||[]}));if(p.p_action==='delete'){
+ case 'squad_map_sync':if(p.p_action==='list')return (await all('SELECT * FROM squad_map_markers WHERE squad_id=?',[m.squad_id])).map(mapMarker);if(p.p_action==='delete'){
  const id=String(p.p_id||'');
  if(!id)fail('invalid_marker_id');
  const r=(await all('SELECT * FROM squad_map_markers WHERE id=? AND squad_id=?',[id,m.squad_id]))[0];
@@ -102,3 +111,4 @@ export async function legacyApi(body,env,m){
  }
  return result;
 }
+

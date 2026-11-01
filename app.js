@@ -156,14 +156,19 @@ async function refreshSharedMapMarkers(){
  if(!frame||!sb||!onlineMember||mapSharedBusy)return;
  mapSharedBusy=true;
  try{
-  const {data,error}=await sb.rpc('squad_map_sync',{p_action:'list'});
-  if(error)throw error;
-  const {data:posts,error:postError}=await sb.rpc('get_squad_place_posts',{p_kind:'stash'});
-  if(postError)throw postError;
-  const {data:basePosts,error:baseError}=await sb.rpc('get_squad_place_posts',{p_kind:'base'});
-  if(baseError)throw baseError;
-  const {data:otherPosts,error:otherError}=await sb.rpc('get_squad_place_posts',{p_kind:'other'});
-  if(otherError)throw otherError;
+  let data,posts,basePosts,otherPosts;
+  if(isD1HubHost()){
+   const result=await sb.rpc('get_squad_map_snapshot');
+   if(result.error)throw result.error;
+   const snapshot=result.data;
+   if(!snapshot||!['markers','posts','basePosts','otherPosts'].every(key=>Array.isArray(snapshot[key])))throw Error('Incomplete map snapshot');
+   ({markers:data,posts,basePosts,otherPosts}=snapshot);
+  }else{
+   const markersResult=await sb.rpc('squad_map_sync',{p_action:'list'});if(markersResult.error)throw markersResult.error;data=markersResult.data;
+   const stashResult=await sb.rpc('get_squad_place_posts',{p_kind:'stash'});if(stashResult.error)throw stashResult.error;posts=stashResult.data;
+   const baseResult=await sb.rpc('get_squad_place_posts',{p_kind:'base'});if(baseResult.error)throw baseResult.error;basePosts=baseResult.data;
+   const otherResult=await sb.rpc('get_squad_place_posts',{p_kind:'other'});if(otherResult.error)throw otherResult.error;otherPosts=otherResult.data;
+  }
   const othersById=new Map((otherPosts||[]).map(p=>[String(p.id),p]));
   const byId=new Map((posts||[]).map(p=>[String(p.id),p]));
   const basesById=new Map((basePosts||[]).map(p=>[String(p.id),p]));
@@ -1253,4 +1258,5 @@ window.scumHubD1Preview=async function(){
   const snapshot=await adapter.fetchSquadSnapshot(api,onlineMember.squad_id);
   return adapter.adaptD1Snapshot(snapshot);
 };
+
 
