@@ -1,3 +1,4 @@
+import {SESSION_SECONDS} from './session-duration.mjs';
 const enc=new TextEncoder();
 const b64=bytes=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const unb64=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),x=>x.charCodeAt(0));
@@ -25,11 +26,11 @@ export async function adminLogin(request,env){
 }
 export async function createAdminSession(admin,env,now=Math.floor(Date.now()/1000)){
  if(!admin?.id||!admin?.squad_id||admin.access_role!=='admin'||admin.nick?.toLowerCase()!=='k1t0')throw Error('invalid_admin');
- const payload=b64(enc.encode(JSON.stringify({v:1,mid:admin.id,sid:admin.squad_id,iat:now,exp:now+3600,scope:'admin'})));
+ const payload=b64(enc.encode(JSON.stringify({v:1,mid:admin.id,sid:admin.squad_id,iat:now,exp:now+SESSION_SECONDS,scope:'admin'})));
  const sig=b64(await crypto.subtle.sign('HMAC',await hmac(env,'sign'),enc.encode(payload)));
  return payload+'.'+sig;
 }
-export const adminCookie=token=>'scum_admin_session='+token+'; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=3600';
+export const adminCookie=token=>'scum_admin_session='+token+'; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age='+SESSION_SECONDS;
 
 export async function verifyAdminSession(request,env){
  const raw=(request.headers.get('cookie')||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('scum_admin_session='));
@@ -39,10 +40,11 @@ export async function verifyAdminSession(request,env){
  if(parts.length!==2||!parts.every(x=>/^[A-Za-z0-9_-]+$/.test(x)))return null;
  if(!await crypto.subtle.verify('HMAC',await hmac(env,'verify'),unb64(parts[1]),enc.encode(parts[0])))return null;
  const data=JSON.parse(new TextDecoder().decode(unb64(parts[0]))),now=Math.floor(Date.now()/1000);
- if(data.v!==1||data.scope!=='admin'||!Number.isSafeInteger(data.iat)||!Number.isSafeInteger(data.exp)||data.exp<=now||data.exp>now+3600||data.exp-data.iat!==3600)return null;
+ if(data.v!==1||data.scope!=='admin'||!Number.isSafeInteger(data.iat)||!Number.isSafeInteger(data.exp)||data.exp<=now||data.exp>now+SESSION_SECONDS||![3600,SESSION_SECONDS].includes(data.exp-data.iat))return null;
  const member=await env.DB.prepare("SELECT id,squad_id,nick,game_role,access_role FROM members WHERE id=? AND squad_id=? AND access_role='admin' AND is_active=1 LIMIT 1").bind(data.mid,data.sid).first();
  return member?.nick?.toLowerCase()==='k1t0'?member:null;
  }catch{return null}
 }
 export const clearAdminCookie='scum_admin_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0';
+
 

@@ -1,0 +1,9 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import worker from '../src/migration-worker.mjs';
+import {createMemberSession,memberCookie} from '../src/member-session.mjs';
+const member={id:'member-a',squad_id:'squad-a',nick:'Player',access_role:'member'};
+function fixture(current=member){return {MEMBER_SESSION_KEY:'m'.repeat(32),DB:{prepare(){return {bind(){return {first:async()=>current}}}}},ASSETS:{fetch:async req=>new Response(new URL(req.url).pathname)}};}
+test('returning member opens the existing hub directly and renews remembered login',async()=>{const env=fixture();const token=await createMemberSession(member,env,Math.floor(Date.now()/1000)-29*86400);const r=await worker.fetch(new Request('https://scum-hub.ru/',{headers:{cookie:memberCookie(token)}}),env);assert.equal(r.status,302);assert.equal(r.headers.get('location'),'/hub');assert.equal(r.headers.get('cache-control'),'no-store');assert.match(r.headers.get('set-cookie'),/Max-Age=2592000/);});
+test('logged out and removed members get the landing page without hub data',async()=>{const env=fixture();const r=await worker.fetch(new Request('https://scum-hub.ru/'),env);assert.equal(r.status,200);assert.equal(await r.text(),'/landing-preview');const token=await createMemberSession(member,env);const removed=await worker.fetch(new Request('https://scum-hub.ru/',{headers:{cookie:memberCookie(token)}}),fixture(null));assert.equal(removed.status,200);assert.equal(await removed.text(),'/landing-preview');assert.equal(removed.headers.get('set-cookie'),null);});
+test('login older than 30 inactive days cannot enter or renew',async()=>{const env=fixture();const token=await createMemberSession(member,env,Math.floor(Date.now()/1000)-31*86400);const r=await worker.fetch(new Request('https://scum-hub.ru/',{headers:{cookie:memberCookie(token)}}),env);assert.equal(r.status,200);assert.equal(await r.text(),'/landing-preview');assert.equal(r.headers.get('set-cookie'),null);});

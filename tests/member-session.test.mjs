@@ -8,7 +8,8 @@ const env={MEMBER_SESSION_KEY:'0123456789abcdef0123456789abcdef',DB:{prepare(){r
 const req=token=>new Request('https://scum-hub.example/api/member/me',{headers:{cookie:memberCookie(token)}});
 test('signed cookie authenticates active member',async()=>{const token=await createMemberSession(member,env);assert.deepEqual(await verifyMemberSession(req(token),env),member)});
 test('tampered signature is rejected',async()=>{const token=await createMemberSession(member,env);const [payload,signature]=token.split('.');const changed=signature[0]==='A'?'B':'A';assert.equal(await verifyMemberSession(req(payload+'.'+changed+signature.slice(1)),env),null)});
-test('expired token is rejected',async()=>{const token=await createMemberSession(member,env,Math.floor(Date.now()/1000)-7200);assert.equal(await verifyMemberSession(req(token),env),null)});
+test('expired token is rejected',async()=>{const token=await createMemberSession(member,env,Math.floor(Date.now()/1000)-31*86400);assert.equal(await verifyMemberSession(req(token),env),null)});
 test('removed member cannot use existing cookie',async()=>{const token=await createMemberSession(member,env);const disabled={...env,DB:{prepare(){return {bind(){return {async first(){return null}}}}}}};assert.equal(await verifyMemberSession(req(token),disabled),null)});
 test('admin account is not accepted as member session',async()=>{const token=await createMemberSession(member,env);const admin={...env,DB:{prepare(){return {bind(){return {async first(){return {...member,access_role:'admin'}}}}}}}};assert.equal(await verifyMemberSession(req(token),admin),null)});
 test('cookie has httpOnly secure and sameSite attributes',()=>{assert.match(memberCookie('abc'),/HttpOnly; Secure; SameSite=Lax/);assert.match(clearMemberCookie,/Max-Age=0/)});
+

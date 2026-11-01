@@ -1,3 +1,4 @@
+import {SESSION_SECONDS} from './session-duration.mjs';
 // Tokens are verified server-side; issuance is disabled until Steam identity is validated.
 const encoder=new TextEncoder();
 function decodeBase64Url(value){
@@ -16,8 +17,9 @@ export async function verifySession(request,env){
     const claims=JSON.parse(new TextDecoder().decode(decodeBase64Url(match[1])));
     const now=Math.floor(Date.now()/1000);
     if(claims.v!==1||typeof claims.sub!=='string'||!/^\d{17}$/.test(claims.sub))return null;
-    if(!Number.isSafeInteger(claims.exp)||claims.exp<=now||claims.exp>now+86400)return null;
-    if(!Number.isSafeInteger(claims.iat)||claims.iat>now+60||claims.iat>claims.exp)return null;
+    if(!Number.isSafeInteger(claims.exp)||claims.exp<=now||claims.exp>now+SESSION_SECONDS)return null;
+    if(!Number.isSafeInteger(claims.iat)||claims.iat>now+60||claims.iat>claims.exp||claims.exp-claims.iat>SESSION_SECONDS)return null;
     return {steamId:claims.sub};
   }catch{return null;}
 }
+

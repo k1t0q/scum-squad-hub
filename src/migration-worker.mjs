@@ -1,4 +1,5 @@
-import {refreshMemberSession} from './refresh-session.mjs';
+import {refreshMemberSession,rollingSessionHeaders} from './refresh-session.mjs';
+import {steamCookie} from './session-duration.mjs';
 export {MinimapRoom} from './minimap-room.mjs';
 import {verifiedSteamMember,clearSteamCookie} from './steam-hub-member.mjs';
 import {signImageValues,canonicalImageValues,signImageUrl} from './imagekit-delivery.mjs';
@@ -52,7 +53,7 @@ export default {
         }
         if(Number(request.headers.get('content-length')||0)>200000)return Response.json({error:'payload_too_large'},{status:413,headers});
         const data=await legacyApi(canonicalImageValues(await request.json()),env,member);
-        return Response.json({data:await signImageValues(data,env.IMAGEKIT_PRIVATE_KEY),error:null},{headers});
+        return Response.json({data:await signImageValues(data,env.IMAGEKIT_PRIVATE_KEY),error:null},{headers:await rollingSessionHeaders(request,env,headers)});
       } catch(e){console.error('legacy_api',e.message);return Response.json({error:e.message.startsWith('D1_')?'database_error':e.message},{status:e.message==='forbidden'?403:400,headers})}
     }
     if (request.method === 'GET' && url.pathname === '/auth/steam/start') {
@@ -75,7 +76,7 @@ export default {
       const responseHeaders=new Headers(headers);
       responseHeaders.set('location','/steam-profile.html');
       responseHeaders.append('set-cookie','steam_state=; Path=/auth/steam; HttpOnly; Secure; SameSite=Lax; Max-Age=0');
-      responseHeaders.append('set-cookie','scum_steam_session='+token+'; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=3600');
+      responseHeaders.append('set-cookie',steamCookie(token));
       return new Response(null,{status:303,headers:responseHeaders});
     }
     if(request.method==='GET'&&url.pathname==='/api/steam/profile'){
@@ -83,7 +84,7 @@ export default {
       if(!identity)return Response.json({error:'unauthorized'},{status:401,headers});
       const member=await verifiedSteamMember(request,env);
       const squad=member?await env.DB.prepare('SELECT id,name FROM squads WHERE id=?').bind(member.squad_id).first():null;
-      return Response.json({steam_id:identity.steamId,member,squad},{headers});
+      return Response.json({steam_id:identity.steamId,member,squad},{headers:await rollingSessionHeaders(request,env,headers)});
     }
     if(request.method==='POST'&&url.pathname==='/api/steam/logout'){
       if(request.headers.get('origin')!==url.origin)return Response.json({error:'invalid_origin'},{status:403,headers});
@@ -122,7 +123,7 @@ export default {
     if (request.method === 'POST' && url.pathname === '/api/admin/login')return adminLogin(request,env);
     if (request.method === 'GET' && url.pathname === '/api/admin/me'){
       const admin=await verifyAdminSession(request,env);
-      return new Response(JSON.stringify(admin?{authenticated:true,member:admin}:{authenticated:false}),{status:admin?200:401,headers});
+      return new Response(JSON.stringify(admin?{authenticated:true,member:admin}:{authenticated:false}),{status:admin?200:401,headers:admin?await rollingSessionHeaders(request,env,headers):headers});
     }
     if (request.method === 'POST' && url.pathname === '/api/admin/logout'){
       if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
@@ -138,7 +139,7 @@ export default {
     }
     if (request.method === 'GET' && url.pathname === '/api/member/me') {
       const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env)||await verifiedSteamMember(request,env);
-      return new Response(JSON.stringify(member?{authenticated:true,member}:{authenticated:false}),{status:member?200:401,headers});
+      return new Response(JSON.stringify(member?{authenticated:true,member}:{authenticated:false}),{status:member?200:401,headers:member?await rollingSessionHeaders(request,env,headers):headers});
     }
     if (request.method === 'POST' && url.pathname === '/api/member/logout') {
       if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
@@ -393,6 +394,8 @@ export default {
           const destination=new URL(request.url);destination.pathname='/hub';
           return Response.redirect(destination.href,302);
         }
+        const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env)||await verifiedSteamMember(request,env);
+        if(member){const h=await rollingSessionHeaders(request,env,{'location':'/hub','cache-control':'no-store'});return new Response(null,{status:302,headers:h});}
         const asset=new URL(request.url);asset.pathname='/landing-preview';
         return env.ASSETS.fetch(new Request(asset,request));
       }
@@ -407,4 +410,5 @@ export default {
     return new Response(JSON.stringify({ error: 'not_found' }), { status: 404, headers });
   }
 };
+
 
