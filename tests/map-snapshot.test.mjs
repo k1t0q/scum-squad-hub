@@ -31,7 +31,7 @@ test('map deletion and creation appear in the next snapshot; query failure rejec
 });
 function client(d1,snapshot,error){
  const app=readFileSync(new URL('../app.js',import.meta.url),'utf8');const from=app.indexOf('async function refreshSharedMapMarkers()'),to=app.indexOf("window.addEventListener('message'",from);const sent=[],requests=[];
- const context={console:{error(){}},document:{getElementById:()=>({contentWindow:{postMessage:m=>sent.push(JSON.parse(JSON.stringify(m)))}})},onlineMember:{squad_id:'s'},isD1HubHost:()=>d1,mapSharedBusy:false,mapPendingDeletes:new Set(['deleted']),mapPendingSaves:new Map([['custom',{id:'custom',name:'Local pending edit'}]]),stashCoords:()=>({x:.2,y:.3}),stashMapTitle:p=>p.map_marker_name,sb:{rpc:async(name,args)=>{requests.push({name,args});if(error)return {error};if(name==='get_squad_map_snapshot')return {data:snapshot};return {data:name==='squad_map_sync'?snapshot.markers:snapshot[args.p_kind==='stash'?'posts':args.p_kind==='base'?'basePosts':'otherPosts']}}}};
+ const context={console:{error(){}},document:{visibilityState:'visible',getElementById:()=>({contentWindow:{postMessage:m=>sent.push(JSON.parse(JSON.stringify(m)))}})},onlineMember:{squad_id:'s'},isD1HubHost:()=>d1,mapSharedBusy:false,mapPendingDeletes:new Set(['deleted']),mapPendingSaves:new Map([['custom',{id:'custom',name:'Local pending edit'}]]),stashCoords:()=>({x:.2,y:.3}),stashMapTitle:p=>p.map_marker_name,sb:{rpc:async(name,args)=>{requests.push({name,args});if(error)return {error};if(name==='get_squad_map_snapshot')return {data:snapshot};return {data:name==='squad_map_sync'?snapshot.markers:snapshot[args.p_kind==='stash'?'posts':args.p_kind==='base'?'basePosts':'otherPosts']}}}};
  vm.createContext(context);vm.runInContext(app.slice(from,to),context);return {context,sent,requests};
 }
 test('client sends identical map payload with one RPC instead of four and retains pending edits',async()=>{
@@ -41,3 +41,4 @@ test('client sends identical map payload with one RPC instead of four and retain
 test('malformed or failed snapshot leaves displayed map untouched and unlocks next refresh',async()=>{
  for(const [snapshot,error] of [[{markers:[]},null],[null,{message:'offline'}]]){const c=client(true,snapshot,error);await c.context.refreshSharedMapMarkers();assert.equal(c.sent.length,0);assert.equal(c.context.mapSharedBusy,false);}
 });
+

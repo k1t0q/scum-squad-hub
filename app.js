@@ -112,7 +112,7 @@ function renderOriginalD1Recovery(){
 // SCUM MAP embedded as a section of the authenticated SCUM HUB interface.
 function squadMapPage(){
   if(mapSharedRefreshTimer)clearInterval(mapSharedRefreshTimer);
-  mapSharedRefreshTimer=setInterval(()=>{if(page==='Карта')refreshSharedMapMarkers();else{clearInterval(mapSharedRefreshTimer);mapSharedRefreshTimer=null}},5000);
+  mapSharedRefreshTimer=setInterval(()=>{if(page==='Карта'){if(document.visibilityState==='visible')void refreshSharedMapMarkers()}else{clearInterval(mapSharedRefreshTimer);mapSharedRefreshTimer=null}},5000);
   $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261026-responsive-camera" style="display:block;width:100%;height:calc(100dvh - 180px);min-height:580px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen id="squadMapFrame" onload="initMapFrame()"></iframe></div>';
 }
 function stashMapTitle(p){
@@ -153,7 +153,7 @@ const mapPendingDeletes=new Set();
 let mapSharedReady=false;
 async function refreshSharedMapMarkers(){
  const frame=document.getElementById('squadMapFrame');
- if(!frame||!sb||!onlineMember||mapSharedBusy)return;
+ if(!frame||!sb||!onlineMember||mapSharedBusy||document.visibilityState!=='visible')return;
  mapSharedBusy=true;
  try{
   let data,posts,basePosts,otherPosts;
@@ -656,6 +656,23 @@ async function changeExplosive(item,delta){
 }
 
 // Read-only activity feed. Uses the squad's existing notification events.
+let homeEventsRead=null,homeEventsUpdated=null;
+function homeEventsScope(entry){return !!entry&&entry.client===sb&&entry.member===onlineMember?.id&&entry.squad===onlineMember?.squad_id}
+function homeEventsFresh(){return homeEventsScope(homeEventsUpdated)&&Date.now()-homeEventsUpdated.at<30000}
+function readHomeEvents(){
+ if(homeEventsScope(homeEventsRead))return homeEventsRead.promise;
+ const entry={client:sb,member:onlineMember.id,squad:onlineMember.squad_id};homeEventsRead=entry;
+ entry.promise=(async()=>{
+  let timeout;
+  try{
+   const result=await Promise.race([entry.client.rpc('get_squad_recent_events',{p_limit:9}),new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error('timeout')),9000)})]);
+   if(!result.error&&homeEventsScope(entry))homeEventsUpdated={client:entry.client,member:entry.member,squad:entry.squad,at:Date.now()};
+   return result;
+  }catch(error){return {error}}
+  finally{clearTimeout(timeout);if(homeEventsRead===entry)homeEventsRead=null}
+ })();
+ return entry.promise;
+}
 async function renderHomeEvents(){
  const body=$('#homeEventsBody');
  if(!body)return;
@@ -663,14 +680,9 @@ async function renderHomeEvents(){
   body.innerHTML='<div class="empty">Подключаем журнал отряда…</div>';
   return;
  }
- let result;
- try{
-  result=await Promise.race([
-   sb.rpc('get_squad_recent_events',{p_limit:9}),
-   new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),9000))
-  ]);
- }catch(err){result={error:err}}
- if(!document.contains(body))return;
+ const client=sb,member=onlineMember.id,squad=onlineMember.squad_id;
+ const result=await readHomeEvents();
+ if(!document.contains(body)||sb!==client||onlineMember?.id!==member||onlineMember?.squad_id!==squad)return;
  if(result.error){
   body.innerHTML='<div class="empty">Не удалось загрузить события <button class="ref-event-retry" onclick="renderHomeEvents()">Повторить</button></div>';
   return;
@@ -710,7 +722,13 @@ async function renderHomeEvents(){
  }).join('')+'</div>';
 }
 // Refresh recent events while the home screen is open, without reloading the page.
-setInterval(()=>{if((page==='Главная'||page==='Сегодня')&&document.getElementById('homeEventsBody')&&onlineMember)renderHomeEvents()},60000);
+setInterval(()=>{if(document.visibilityState==='visible'&&(page==='Главная'||page==='Сегодня')&&document.getElementById('homeEventsBody')&&onlineMember&&!homeEventsFresh())void renderHomeEvents()},60000);
+// Resume the visible section immediately; preserve the existing polling intervals.
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState!=='visible'||!sb||!onlineMember)return;
+ if(page==='Карта')void refreshSharedMapMarkers();
+ else if(page==='Главная'||page==='Сегодня')void renderHomeEvents();
+});
 async function renderHomePlace(){
  const body=$('#homePlaceBody');if(!body||!sb||!onlineMember)return;
  let r;try{r=await sb.rpc('get_squad_place_posts',{p_kind:'home'})}catch(e){r={error:e}}
@@ -1258,5 +1276,6 @@ window.scumHubD1Preview=async function(){
   const snapshot=await adapter.fetchSquadSnapshot(api,onlineMember.squad_id);
   return adapter.adaptD1Snapshot(snapshot);
 };
+
 
 
