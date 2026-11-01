@@ -21,7 +21,7 @@ export class MinimapRoom {
   if(!validPosition(p)||now-a.last<90)return;
   if(now-a.checked>30000){const member=await this.env.DB.prepare('SELECT id FROM members WHERE id=? AND squad_id=? AND is_active=1').bind(a.id,a.squad).first();if(!member){ws.close(4003,'Membership revoked');return;}a.checked=now;}
   a.last=now;a.position={x:p.x,y:p.y,z:p.z,heading:p.heading,at:now-p.age};ws.serializeAttachment(a);this.departed.delete(a.id);
-  if(now-this.lastBroadcast>=100){this.lastBroadcast=now;for(const peer of this.ctx.getWebSockets())this.send(peer);}
+  if(now-this.lastBroadcast>=100){this.lastBroadcast=now;for(const peer of this.ctx.getWebSockets())this.send(peer);}else if(!this.pendingBroadcast){this.pendingBroadcast=true;this.ctx.waitUntil(new Promise(resolve=>setTimeout(()=>{this.pendingBroadcast=false;this.lastBroadcast=Date.now();for(const peer of this.ctx.getWebSockets())this.send(peer);resolve();},Math.max(1,100-(now-this.lastBroadcast)))));}
  }
  async webSocketClose(ws){const a=ws.deserializeAttachment();if(a?.position){const newer=this.ctx.getWebSockets().some(other=>other!==ws&&other.deserializeAttachment()?.id===a.id);if(!newer){this.departed.set(a.id,{id:a.id,nick:a.nick,...a.position});await this.ctx.storage.put('departed',this.positions());}}}
  webSocketError(ws){ws.close(1011,'Transport error');}
