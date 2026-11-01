@@ -20,11 +20,17 @@ export async function adminLogin(request,env){
  if(diff!==0)return fail('invalid_credentials',401);
  const rows=await env.DB.prepare("SELECT id,squad_id,nick,game_role,access_role FROM members WHERE lower(nick)='k1t0' AND access_role='admin' AND is_active=1 LIMIT 2").all();
  if(rows.results?.length!==1)return fail('admin_account_not_found',503);
- const admin=rows.results[0],now=Math.floor(Date.now()/1000);
+ const admin=rows.results[0];
+ return new Response(JSON.stringify({member:admin}),{headers:{'content-type':'application/json','cache-control':'no-store','set-cookie':adminCookie(await createAdminSession(admin,env))}});
+}
+export async function createAdminSession(admin,env,now=Math.floor(Date.now()/1000)){
+ if(!admin?.id||!admin?.squad_id||admin.access_role!=='admin'||admin.nick?.toLowerCase()!=='k1t0')throw Error('invalid_admin');
  const payload=b64(enc.encode(JSON.stringify({v:1,mid:admin.id,sid:admin.squad_id,iat:now,exp:now+3600,scope:'admin'})));
  const sig=b64(await crypto.subtle.sign('HMAC',await hmac(env,'sign'),enc.encode(payload)));
- return new Response(JSON.stringify({member:admin}),{headers:{'content-type':'application/json','cache-control':'no-store','set-cookie':'scum_admin_session='+payload+'.'+sig+'; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=3600'}});
+ return payload+'.'+sig;
 }
+export const adminCookie=token=>'scum_admin_session='+token+'; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=3600';
+
 export async function verifyAdminSession(request,env){
  const raw=(request.headers.get('cookie')||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('scum_admin_session='));
  if(!raw)return null;
@@ -39,3 +45,4 @@ export async function verifyAdminSession(request,env){
  }catch{return null}
 }
 export const clearAdminCookie='scum_admin_session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0';
+

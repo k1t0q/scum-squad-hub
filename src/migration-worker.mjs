@@ -1,3 +1,4 @@
+import {refreshMemberSession} from './refresh-session.mjs';
 export {MinimapRoom} from './minimap-room.mjs';
 import {verifiedSteamMember,clearSteamCookie} from './steam-hub-member.mjs';
 import {signImageValues,canonicalImageValues,signImageUrl} from './imagekit-delivery.mjs';
@@ -24,6 +25,7 @@ export default {
     const url = new URL(request.url);
     const headers = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
     const origin = env.PUBLIC_ORIGIN;
+    if(url.pathname==='/api/member/refresh')return refreshMemberSession(request,env);
     if(url.pathname==='/api/minimap/live'){
       if(request.method!=='GET'||request.headers.get('Upgrade')?.toLowerCase()!=='websocket')return new Response('WebSocket required',{status:426});
       if(request.headers.get('Origin')!==url.origin)return new Response('Forbidden',{status:403});
@@ -405,3 +407,4 @@ export default {
     return new Response(JSON.stringify({ error: 'not_found' }), { status: 404, headers });
   }
 };
+
