@@ -53,5 +53,10 @@ jobs:
         with:
           node-version: '22'
       - run: node --test tests/*.test.mjs
+      - name: Prepare assets for Worker bundle validation
+        run: |
+          mkdir -p migration-public/src
+          find . -maxdepth 1 -type f \\( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.svg' -o -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.webp' -o -name '*.ico' -o -name '*.webmanifest' \\) -exec cp {} migration-public/ \\;
+          cp src/legacy-d1-adapter.mjs src/d1-client.mjs migration-public/src/
       - name: Validate Cloudflare Worker bundle without deployment
         run: npx --yes wrangler@4 deploy --dry-run --outdir /tmp/scum-hub-migration-bundle --config wrangler.migration.toml
