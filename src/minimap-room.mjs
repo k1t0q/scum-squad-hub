@@ -4,6 +4,7 @@ export class MinimapRoom {
  constructor(ctx,env){this.ctx=ctx;this.env=env;this.lastBroadcast=0;this.departed=new Map();ctx.blockConcurrencyWhile(async()=>{const saved=await ctx.storage.get('departed');for(const p of saved||[])if(Date.now()-p.at<3600000)this.departed.set(p.id,p);});}
  async fetch(request){
   const id=request.headers.get('x-minimap-member'),squad=request.headers.get('x-minimap-squad'),nick=request.headers.get('x-minimap-nick');
+  if(new URL(request.url).pathname==='/diagnostics'&&id&&squad&&nick){const now=Date.now();return Response.json({now,connections:this.ctx.getWebSockets().map(ws=>{const a=ws.deserializeAttachment();return {nick:a.nick,active:now<a.expires,received:a.received||0,rejected:a.rejected||0,lastPacketAge:a.packetAt?now-a.packetAt:null,positionAge:a.position?now-a.position.at:null,reason:a.reason||null};})},{headers:{'cache-control':'no-store'}});}
   if(!id||!squad||!nick||request.headers.get('Upgrade')?.toLowerCase()!=='websocket')return new Response('Forbidden',{status:403});
   if(this.ctx.getWebSockets().length>=50)return new Response('Room full',{status:429});
   for(const ws of this.ctx.getWebSockets()){const a=ws.deserializeAttachment();if(a.id===id)ws.close(4001,'New connection');}

@@ -27,6 +27,13 @@ export default {
     const headers = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
     const origin = env.PUBLIC_ORIGIN;
     if(url.pathname==='/api/member/refresh')return refreshMemberSession(request,env);
+    if(url.pathname==='/api/minimap/diagnostics'){
+      if(request.method!=='GET'||request.headers.get('Origin')!==url.origin)return new Response('Forbidden',{status:403});
+      const member=await verifyAdminSession(request,env);
+      if(!member)return new Response('Unauthorized',{status:401});
+      if(!env.MINIMAP_ROOMS)return new Response('Unavailable',{status:503});
+      return env.MINIMAP_ROOMS.getByName(String(member.squad_id)).fetch(new Request('https://minimap.internal/diagnostics',{headers:{'x-minimap-member':String(member.id),'x-minimap-squad':String(member.squad_id),'x-minimap-nick':encodeURIComponent(member.nick)}}));
+    }
     if(url.pathname==='/api/minimap/live'){
       if(request.method!=='GET'||request.headers.get('Upgrade')?.toLowerCase()!=='websocket')return new Response('WebSocket required',{status:426});
       if(request.headers.get('Origin')!==url.origin)return new Response('Forbidden',{status:403});
