@@ -19,6 +19,7 @@ export class MinimapRoom {
   const a=ws.deserializeAttachment(),now=Date.now();if(!a||now>a.expires){ws.close(4003,'Reauthenticate');return;}
   if(typeof message!=='string'||message.length>1024){ws.close(1009,'Invalid packet');return;}
   let p;try{p=JSON.parse(message);}catch{return;}
+  if(p?.ping===true){this.send(ws);return;}
   if(p?.diagnostic===true){this.diagnose(ws);return;}
   a.received=(a.received||0)+1;a.packetAt=now;
   if(p.off===true){a.position=null;ws.serializeAttachment(a);this.departed.delete(a.id);await this.ctx.storage.put('departed',[...this.departed.values()]);for(const peer of this.ctx.getWebSockets())this.send(peer);return;}
