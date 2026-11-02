@@ -10,6 +10,7 @@ export function sessionNeedsRenewal(request,now=Math.floor(Date.now()/1000)){
   if(!['scum_member_session','scum_admin_session','scum_steam_session'].includes(cookie.slice(0,separator).trim()))continue;
   try{const payload=cookie.slice(separator+1).split('.')[0];
    const claims=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(payload.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0))));
+   if(claims.fixed===true)continue;
    if(Number.isSafeInteger(claims.iat)&&Number.isSafeInteger(claims.exp)&&(claims.exp-claims.iat!==SESSION_SECONDS||now-claims.iat>=RENEW_AFTER_SECONDS))return true;
   }catch{}
  }

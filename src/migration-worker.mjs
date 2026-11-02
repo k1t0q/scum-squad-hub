@@ -134,8 +134,9 @@ export default {
       const checked=await verifySquadCode(request,env);
       if(!checked.ok)return checked;
       const result=await checked.json();
-      const token=await createMemberSession(result.member,env);
-      return new Response(JSON.stringify({member:result.member}),{status:200,headers:{...headers,'set-cookie':memberCookie(token)}});
+      const fixed=request.headers.get('x-scum-session')==='fixed-12h';
+      const token=await createMemberSession(result.member,env,undefined,fixed);
+      return new Response(JSON.stringify({member:result.member}),{status:200,headers:{...headers,'set-cookie':memberCookie(token,fixed)}});
     }
     if (request.method === 'GET' && url.pathname === '/api/member/me') {
       const member=await verifyMemberSession(request,env)||await verifyAdminSession(request,env)||await verifiedSteamMember(request,env);
