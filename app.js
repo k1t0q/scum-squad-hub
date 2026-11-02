@@ -126,14 +126,14 @@ async function refreshSharedMapMarkers(){
    if(mapPendingDeletes.has(id))continue;
    if(rawMarkers.some(m=>String(m.id)===id))continue;
    const pos=stashCoords(p.comment);
-   if(pos)rawMarkers.push({id,...pos,type:'base',icon:'🏠',size:30,showLabel:true});
+   if(pos)rawMarkers.push({id,...pos,type:'base',icon:/^Вражеская база:/i.test(String(p.comment||''))?'🏴':'🏠',size:30,showLabel:true});
   }
   for(const p of otherPosts||[]){
    const id='other-post-'+p.id;
    if(mapPendingDeletes.has(id))continue;
    if(rawMarkers.some(m=>String(m.id)===id))continue;
    const pos=stashCoords(p.comment);
-   if(pos)rawMarkers.push({id,...pos,type:'base',icon:'📍',size:30,showLabel:true});
+   if(pos)rawMarkers.push({id,...pos,type:'base',icon:/^Машина:/i.test(String(p.comment||''))?'🚗':'📍',size:30,showLabel:true});
   }
   // Keep local edits visible until their server save finishes. Background refreshes must not roll them back.
   for(const [id,item] of mapPendingSaves){
@@ -147,11 +147,11 @@ async function refreshSharedMapMarkers(){
     const rawNote=typeof m.note==='string'?m.note.trim():'';
     const cleanNote=['undefined','null'].includes(rawNote.toLowerCase())?'':rawNote;
     const desc=String(p?.comment||'').split(/\r?\n/).map(t=>t.trim()).filter(t=>t&&!['undefined','null'].includes(t.toLowerCase())&&!/^(Координаты:|Источник:)/i.test(t)).join('\n');
-    return {...m,type:m.type||'base',icon:m.icon||'📍',name:m.name||stashMapTitle(p).replace(/^Схрон /,'Метка '),note:cleanNote,stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e5aa30'};
+    return {...m,type:m.type||'base',icon:/^Машина:/i.test(String(p?.comment||''))?'🚗':(m.icon||'📍'),name:m.name||stashMapTitle(p).replace(/^Схрон /,'Метка '),note:cleanNote,stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e5aa30'};
    }
    if(String(m.id).startsWith('base-post-')){
     const p=basesById.get(String(m.id).slice(10));
-    return {...m,type:m.type||'base',icon:m.icon||'🏠',name:m.name||stashMapTitle(p).replace(/^Схрон /,'База '),stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e05252'};
+    return {...m,type:m.type||'base',icon:/^Вражеская база:/i.test(String(p?.comment||''))?'🏴':(m.icon||'🏠'),name:m.name||stashMapTitle(p).replace(/^Схрон /,'База '),stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e05252'};
    }
    if(!String(m.id).startsWith('stash-post-')){
     if(m.type!=='stash')return m;
