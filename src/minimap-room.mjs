@@ -10,7 +10,7 @@ export class MinimapRoom {
   if(this.ctx.getWebSockets().filter(ws=>!(ws.readyState>=2)&&ws.deserializeAttachment()?.expires>Date.now()).length>=50)return new Response('Room full',{status:429});
   for(const ws of this.ctx.getWebSockets()){const a=ws.deserializeAttachment();if(a.id===id&&!(ws.readyState>=2))ws.close(4001,'New connection');}
   const pair=new WebSocketPair(),[client,server]=Object.values(pair);this.ctx.acceptWebSocket(server);
-  server.serializeAttachment({id,squad,nick:decodeURIComponent(nick).slice(0,32),expires:Date.now()+300000,checked:Date.now(),last:0,position:null});
+  server.serializeAttachment({id,squad,nick:decodeURIComponent(nick).slice(0,32),expires:Date.now()+300000,checked:Date.now(),last:0,position:null,observer:request.headers.get('x-minimap-observer')==='1'});
   this.send(server);return new Response(null,{status:101,webSocket:client});
  }
  positions(){const peers=new Map(this.departed),now=Date.now();for(const ws of this.ctx.getWebSockets()){if(ws.readyState>=2)continue;const a=ws.deserializeAttachment();if(a?.position&&a.expires>=now){const previous=peers.get(a.id);if(!previous||a.position.at>previous.at)peers.set(a.id,{id:a.id,nick:a.nick,...a.position});}}return [...peers.values()].filter(p=>now-p.at<3600000);}
@@ -23,6 +23,7 @@ export class MinimapRoom {
   const client=safeClientTiming(p?.client);if(client){a.client=client;ws.serializeAttachment(a);}
   if(p?.ping===true){this.send(ws);return;}
   if(p?.diagnostic===true){this.diagnose(ws);return;}
+  if(a.observer)return;
   a.received=(a.received||0)+1;a.packetAt=now;
   if(p.off===true){a.position=null;ws.serializeAttachment(a);this.departed.delete(a.id);await this.ctx.storage.put('departed',[...this.departed.values()]);for(const peer of this.ctx.getWebSockets())this.send(peer);return;}
   if(!validPosition(p)){a.rejected=(a.rejected||0)+1;a.reason=['x','y','z','age','heading'].filter(k=>k==='heading'?!(p?.heading===null||(Number.isFinite(p?.heading)&&p.heading>=0&&p.heading<360)):!(Number.isFinite(p?.[k])&&(k==='age'?p[k]>=0&&p[k]<=86400000:Math.abs(p[k])<=2000000))).join(',');ws.serializeAttachment(a);return;}if(now-a.last<90){ws.serializeAttachment(a);return;}

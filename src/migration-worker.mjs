@@ -41,6 +41,7 @@ export default {
       if(!member)return new Response('Unauthorized',{status:401});
       if(!env.MINIMAP_ROOMS)return new Response('Unavailable',{status:503});
       const h=new Headers({'Upgrade':'websocket','x-minimap-member':String(member.id),'x-minimap-squad':String(member.squad_id),'x-minimap-nick':encodeURIComponent(member.nick)});
+      if(url.searchParams.get('observe')==='1'){if(!await verifyAdminSession(request,env))return new Response('Forbidden',{status:403});h.set('x-minimap-observer','1');h.set('x-minimap-member',String(member.id)+':observer:'+crypto.randomUUID());}
       return env.MINIMAP_ROOMS.getByName('live-v2:'+String(member.squad_id)).fetch(new Request('https://minimap.internal/live',{headers:h}));
     }
 
