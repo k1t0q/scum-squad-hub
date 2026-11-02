@@ -32,7 +32,7 @@ export default {
       const member=await verifyAdminSession(request,env);
       if(!member)return new Response('Unauthorized',{status:401});
       if(!env.MINIMAP_ROOMS)return new Response('Unavailable',{status:503});
-      return env.MINIMAP_ROOMS.getByName(String(member.squad_id)).fetch(new Request('https://minimap.internal/diagnostics',{headers:{'x-minimap-member':String(member.id),'x-minimap-squad':String(member.squad_id),'x-minimap-nick':encodeURIComponent(member.nick)}}));
+      return env.MINIMAP_ROOMS.getByName('live-v2:'+String(member.squad_id)).fetch(new Request('https://minimap.internal/diagnostics',{headers:{'x-minimap-member':String(member.id),'x-minimap-squad':String(member.squad_id),'x-minimap-nick':encodeURIComponent(member.nick)}}));
     }
     if(url.pathname==='/api/minimap/live'){
       if(request.method!=='GET'||request.headers.get('Upgrade')?.toLowerCase()!=='websocket')return new Response('WebSocket required',{status:426});
@@ -41,7 +41,7 @@ export default {
       if(!member)return new Response('Unauthorized',{status:401});
       if(!env.MINIMAP_ROOMS)return new Response('Unavailable',{status:503});
       const h=new Headers({'Upgrade':'websocket','x-minimap-member':String(member.id),'x-minimap-squad':String(member.squad_id),'x-minimap-nick':encodeURIComponent(member.nick)});
-      return env.MINIMAP_ROOMS.getByName(String(member.squad_id)).fetch(new Request('https://minimap.internal/live',{headers:h}));
+      return env.MINIMAP_ROOMS.getByName('live-v2:'+String(member.squad_id)).fetch(new Request('https://minimap.internal/live',{headers:h}));
     }
 
     if (request.method === 'POST' && ['/api/legacy','/api/photos'].includes(url.pathname)) {
