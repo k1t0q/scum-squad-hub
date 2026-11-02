@@ -192,7 +192,7 @@ async function refreshSharedMapMarkers(){
    if(mapPendingDeletes.has(id))continue;
    if(rawMarkers.some(m=>String(m.id)===id))continue;
    const pos=stashCoords(p.comment);
-   if(pos)rawMarkers.push({id,...pos,type:'base',icon:'📍',size:30,showLabel:true});
+   if(pos)rawMarkers.push({id,...pos,type:'other',icon:/^Машина:/i.test(String(p.comment||''))?'🚗':'📍',size:30,showLabel:true});
   }
   // Keep local edits visible until their server save finishes. Background refreshes must not roll them back.
   for(const [id,item] of mapPendingSaves){
@@ -206,7 +206,8 @@ async function refreshSharedMapMarkers(){
     const rawNote=typeof m.note==='string'?m.note.trim():'';
     const cleanNote=['undefined','null'].includes(rawNote.toLowerCase())?'':rawNote;
     const desc=String(p?.comment||'').split(/\r?\n/).map(t=>t.trim()).filter(t=>t&&!['undefined','null'].includes(t.toLowerCase())&&!/^(Координаты:|Источник:)/i.test(t)).join('\n');
-    return {...m,type:m.type||'base',icon:m.icon||'📍',name:m.name||stashMapTitle(p).replace(/^Схрон /,'Метка '),note:cleanNote,stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e5aa30'};
+    const isCar=/^Машина:/i.test(String(p?.comment||''));
+    return {...m,type:'other',icon:isCar?'🚗':'📍',name:isCar?String(p.comment).split(/\r?\n/)[0]:m.name||stashMapTitle(p).replace(/^Схрон /,'Метка '),note:cleanNote,stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e5aa30'};
    }
    if(String(m.id).startsWith('base-post-')){
     const p=basesById.get(String(m.id).slice(10));
@@ -252,7 +253,7 @@ window.addEventListener('message',async e=>{
    }
    if(!p)throw Error('Публикация не найдена: '+id);
    const markerKind=actualKind;
-   const marker={id:markerKind+'-post-'+id,x,y,type:markerKind==='stash'?'stash':'base',icon:markerKind==='stash'?'📦':markerKind==='base'?'🏠':'📍',color:markerKind==='stash'?'#45bf73':'#e5a74b',size:30,showLabel:true,name:stashMapTitle(p),note:'',stashPostId:id,updatedAt:Date.now()};
+   const marker={id:markerKind+'-post-'+id,x,y,type:markerKind,icon:markerKind==='stash'?'📦':markerKind==='base'?'🏠':/^Машина:/i.test(String(p.comment||''))?'🚗':'📍',color:markerKind==='stash'?'#45bf73':'#e5a74b',size:30,showLabel:true,name:stashMapTitle(p),note:'',stashPostId:id,updatedAt:Date.now()};
    const {error}=await sb.rpc('squad_map_sync',{p_action:'save',p_marker:marker});
    if(error)throw error;
    toast('Положение метки сохранено');
