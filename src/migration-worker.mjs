@@ -1,3 +1,4 @@
+import {layeroRequest} from './layero-origin.mjs';
 import {refreshMemberSession,rollingSessionHeaders} from './refresh-session.mjs';
 import {steamCookie} from './session-duration.mjs';
 export {MinimapRoom} from './minimap-room.mjs';
@@ -23,9 +24,11 @@ import { verifySession } from './session-auth.mjs';
 // Isolated SCUM HUB migration Worker. Never expose squad records without verified sessions.
 export default {
   async fetch(request, env) {
+    let forwardedOrigin=null;
+    try{const routed=layeroRequest(request);request=routed.request;forwardedOrigin=routed.origin;}catch{return new Response('Forbidden public origin',{status:403});}
     const url = new URL(request.url);
     const headers = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' };
-    const origin = env.PUBLIC_ORIGIN;
+    const origin = forwardedOrigin||env.PUBLIC_ORIGIN;
     if(url.pathname==='/api/member/refresh')return refreshMemberSession(request,env);
     if(url.pathname==='/api/minimap/diagnostics'){
       if(request.method!=='GET'||request.headers.get('Origin')!==url.origin)return new Response('Forbidden',{status:403});

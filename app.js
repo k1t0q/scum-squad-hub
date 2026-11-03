@@ -1,4 +1,4 @@
-function isD1HubHost(){return ['scum-hub.ru','www.scum-hub.ru','scum-hub-migration.nikitinrf.workers.dev'].includes(location.hostname)}
+function isD1HubHost(){return ['scum-hub.ru','www.scum-hub.ru','scum-hub-migration.nikitinrf.workers.dev','scumhub.layero.app','scumhub.layero.dev'].includes(location.hostname)}
 window.addEventListener('message',async e=>{
  if(e.origin!=='https://k1t0q.github.io'||e.source!==document.getElementById('squadMapFrame')?.contentWindow)return;
  if(!window.scumHubD1Recovery)return;
