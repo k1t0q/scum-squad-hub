@@ -8,3 +8,19 @@ test('original UI creates tasks and contributions, reads progress, changes statu
 test('cross-squad reads, updates, contribution injection are isolated',async()=>{const {sql,env}=setup();sql.exec("INSERT INTO tasks(id,squad_id,creator_id,title) VALUES(42,'b','v','Private')");assert.deepEqual(await legacyApi({table:'tasks',filters:[['squad_id','b']]},env,m),[]);await legacyApi({table:'tasks',action:'update',values:{title:'hacked'},filters:[['id',42]]},env,m);assert.equal(sql.prepare('SELECT title FROM tasks').get().title,'Private');await assert.rejects(legacyApi({table:'task_contributions',action:'insert',values:{task_id:42,amount:1}},env,m),/record_not_found/)});
 test('presence upsert updates one row and forces authenticated identity',async()=>{const {env}=setup();const q={table:'presence_history',action:'upsert',values:{day:'2026-10-30',status:'Буду',member_id:'v'}};await legacyApi(q,env,m);q.values.status='Не буду';await legacyApi(q,env,m);const rs=await legacyApi({table:'presence_history'},env,m);assert.equal(rs.length,1);assert.equal(rs[0].member_id,'u');assert.equal(rs[0].status,'Не буду')});
 test('unknown tables, SQL identifiers, unfiltered writes and role escalation rejected',async()=>{const {env}=setup();await assert.rejects(legacyApi({table:'discord_link_codes'},env,m));await assert.rejects(legacyApi({table:'members',filters:[['id OR 1=1','x']]},env,m));await assert.rejects(legacyApi({table:'members',action:'update',values:{nick:'x'}},env,m));await assert.rejects(legacyApi({table:'members',action:'update',filters:[['id','u']],values:{access_role:'admin'}},env,m));});
+
+function inventorySetup(){const ctx=setup();ctx.sql.exec("CREATE TABLE explosives_inventory(squad_id TEXT,item TEXT,quantity INTEGER,updated_at TEXT,updated_by TEXT,PRIMARY KEY(squad_id,item));INSERT INTO explosives_inventory VALUES('a','С4',5,NULL,NULL),('b','С4',99,NULL,NULL)");return ctx}
+test('ordinary member saves inventory using the exact HUB UI payload and reads it back',async()=>{
+ const {sql,env}=inventorySetup();
+ const result=await legacyApi({table:'explosives_inventory',action:'update',values:{quantity:12,updated_at:new Date().toISOString(),updated_by:'u'},filters:[['squad_id','a'],['item','С4']]},env,m);
+ assert.equal(result[0].quantity,12);
+ assert.equal((await legacyApi({table:'explosives_inventory',columns:'item,quantity,updated_at',filters:[['squad_id','a']]},env,m))[0].quantity,12);
+ assert.equal(sql.prepare("SELECT quantity FROM explosives_inventory WHERE squad_id='b'").get().quantity,99);
+});
+test('ordinary inventory edits cannot target another squad or delete stock rows',async()=>{
+ const {sql,env}=inventorySetup();
+ await legacyApi({table:'explosives_inventory',action:'update',values:{quantity:0},filters:[['squad_id','b'],['item','С4']]},env,m);
+ assert.equal(sql.prepare("SELECT quantity FROM explosives_inventory WHERE squad_id='b'").get().quantity,99);
+ await assert.rejects(legacyApi({table:'explosives_inventory',action:'delete',filters:[['item','С4']]},env,m),/forbidden/);
+ for(const quantity of [-1,1.5,301,'12'])await assert.rejects(legacyApi({table:'explosives_inventory',action:'update',values:{quantity},filters:[['item','С4']]},env,m),/invalid_quantity/);
+});
