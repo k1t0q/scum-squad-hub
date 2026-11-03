@@ -1,6 +1,6 @@
 export async function updateExplosives(request, env, membership, squadId, headers) {
-  if (!['admin', 'owner'].includes(membership.role)) {
-    return new Response(JSON.stringify({error:'insufficient_role'}), {status:403,headers});
+  if (!membership?.memberId) {
+    return new Response(JSON.stringify({error:'forbidden'}), {status:403,headers});
   }
   let data;
   try { data = await request.json(); }
