@@ -42,3 +42,17 @@ test('malformed or failed snapshot leaves displayed map untouched and unlocks ne
  for(const [snapshot,error] of [[{markers:[]},null],[null,{message:'offline'}]]){const c=client(true,snapshot,error);await c.context.refreshSharedMapMarkers();assert.equal(c.sent.length,0);assert.equal(c.context.mapSharedBusy,false);}
 });
 
+
+test('Discord publication marker retains edited type, icon, title and details on every refresh',async()=>{
+ for(const type of ['base','vehicle','marker','other']){
+  const fixture={markers:[{id:'other-post-7',type,icon:'custom-icon',name:'Тима',note:'Изменённое описание',color:'#e05252',enemyNicks:['Rival'],x:.1,y:.2}],posts:[],basePosts:[],otherPosts:[{id:7,kind:'other',comment:'Машина: Старое название\\nКоординаты: X=123 Y=456\\nИсточник: Discord',map_marker_name:'Старое название',author_nick:'Author',images:['photo.jpg']}]};
+  for(const d1 of [true,false]){
+   const c=client(d1,fixture);await c.context.refreshSharedMapMarkers();await c.context.refreshSharedMapMarkers();
+   for(const message of c.sent){const marker=message.markers.find(m=>m.id==='other-post-7');assert.equal(marker.type,type);assert.equal(marker.icon,'custom-icon');assert.equal(marker.name,'Тима');assert.equal(marker.note,'Изменённое описание');assert.equal(marker.color,'#e05252');assert.deepEqual(marker.enemyNicks,['Rival']);assert.deepEqual(marker.stashImages,['photo.jpg']);}
+  }
+ }
+});
+test('publication without a saved marker still receives its default type and icon',async()=>{
+ const fixture={markers:[],posts:[],basePosts:[],otherPosts:[{id:7,kind:'other',comment:'Details',map_marker_name:'Тима',author_nick:'Author',images:[]}]};
+ const c=client(true,fixture);await c.context.refreshSharedMapMarkers();const marker=c.sent[0].markers.find(m=>m.id==='other-post-7');assert.equal(marker.type,'other');assert.equal(marker.icon,'📍');assert.equal(marker.name,'Тима');
+});

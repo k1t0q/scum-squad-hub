@@ -207,7 +207,7 @@ async function refreshSharedMapMarkers(){
     const cleanNote=['undefined','null'].includes(rawNote.toLowerCase())?'':rawNote;
     const desc=String(p?.comment||'').split(/\r?\n/).map(t=>t.trim()).filter(t=>t&&!['undefined','null'].includes(t.toLowerCase())&&!/^(Координаты:|Источник:)/i.test(t)).join('\n');
     const isCar=/^Машина:/i.test(String(p?.comment||''));
-    return {...m,type:'other',icon:isCar?'🚗':'📍',name:isCar?String(p.comment).split(/\r?\n/)[0]:m.name||stashMapTitle(p).replace(/^Схрон /,'Метка '),note:cleanNote,stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e5aa30'};
+    return {...m,type:m.type||'other',icon:m.icon||(isCar?'🚗':'📍'),name:m.name||(isCar?String(p.comment).split(/\r?\n/)[0]:stashMapTitle(p).replace(/^Схрон /,'Метка ')),note:cleanNote,stashOwner:p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||'#e5aa30'};
    }
    if(String(m.id).startsWith('base-post-')){
     const p=basesById.get(String(m.id).slice(10));
