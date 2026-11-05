@@ -116,6 +116,7 @@ function squadMapPage(){
   $('#view').innerHTML='<div class="card" style="padding:14px;min-height:65vh"><div class="toolbar"><div><h2>КАРТА SCUM</h2><span class="muted">Тактическая карта отряда · масштабирование и игровая сетка</span></div></div><iframe title="SCUM MAP k1t0" loading="lazy" referrerpolicy="no-referrer" src="https://k1t0q.github.io/scum-map-k1t0/?hub=1&v=20261026-responsive-camera" style="display:block;width:100%;height:calc(100dvh - 180px);min-height:580px;border:1px solid var(--line);border-radius:8px;background:#111;" allow="fullscreen" allowfullscreen id="squadMapFrame" onload="initMapFrame()"></iframe></div>';
 }
 function stashMapTitle(p){
+ if(String(p.map_marker_name||'').trim())return String(p.map_marker_name).trim().slice(0,70);
  const first=String(p.comment||'').split(/\r?\n/).map(x=>x.trim()).find(Boolean);
  return (first||'Схрон '+(p.author_nick||'отряда')).slice(0,70);
 }
@@ -225,7 +226,7 @@ async function refreshSharedMapMarkers(){
    const left=Math.max(0,Math.ceil((checked+14*86400000-Date.now())/86400000));
    const oldTitle=String(m.name||'').trim();
    const title=(!oldTitle||/^Схрон\s*#\s*\d+$/i.test(oldTitle))?stashMapTitle(p):oldTitle;
-   return {...m,name:title,icon:m.icon||'📦',stashOwner:p.author_nick||'Участник',stashDays:left,stashCheckedBy:p.stash_checked_by_nick||p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:m.color||(left===0?'#888888':left<=1?'#e05252':left<=5?'#e5aa30':'#34a853')};
+   return {...m,name:title,icon:m.icon||'📦',stashOwner:p.author_nick||'Участник',stashDays:left,stashCheckedBy:p.stash_checked_by_nick||p.author_nick||'Участник',stashImages:Array.isArray(p.images)?p.images.slice(0,5):[],color:(left===0?'#888888':left<=1?'#e05252':left<=5?'#e5aa30':'#34a853')};
   });
   frame.contentWindow?.postMessage({kind:'scumMapSharedMarkers',markers},'https://k1t0q.github.io');
  }catch(e){console.error('Shared markers fetch',e)}
@@ -698,6 +699,7 @@ async function renderHomeEvents(){
   raids:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"7\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2v4M12 18v4M2 12h4M18 12h4M17 7l4-4\"/></svg>",label:"Рейды",page:"План на рейд"},
   stash:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 8l9-5 9 5v10l-9 4-9-4zM3 8l9 5 9-5M12 13v9M8 5.2l9 5v4\"/></svg>",label:"Схроны",page:"Метка"},
   base:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 21V9l8-6 8 6v12H4zM9 21v-7h6v7M7 10h2M15 10h2M3 9l9-7 9 7\"/></svg>",label:"Метки",page:"Метка"},
+  transport:{icon:'🚗',label:'Транспорт',page:'Карта'},
   other:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 10c0 5-7 12-7 12S5 15 5 10a7 7 0 1 1 14 0z\"/><circle cx=\"12\" cy=\"10\" r=\"2.5\"/></svg>",label:"Метки",page:"Метка"},
   protect:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 2l8 3v6c0 5-8 11-8 11S4 16 4 11V5zM8 11l3 3 5-6\"/></svg>",label:"Протект",page:""},
   protect_updated:{icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 2l8 3v6c0 5-8 11-8 11S4 16 4 11V5zM8 11l3 3 5-6\"/></svg>",label:"Протект",page:""},

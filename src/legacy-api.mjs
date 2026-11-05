@@ -1,3 +1,4 @@
+import {publishStashMarker} from './stash-marker-publication.mjs';
 // Explicit table/column allowlists. Every query is scoped to verified membership.
 const tables={squads:['name','appearance'],members:['nick','game_role'],presence_history:['status','join_time','day'],tasks:['title','quantity','unit','place','priority','deadline','comment','status','assignee_id'],task_contributions:['task_id','amount'],raids:['title','raid_time','note','raid_date','sector','walls','loadout','transport','rally_point','target_images'],raid_participants:['raid_id'],explosives_inventory:['item','quantity'],protect_updates:['member_id','effective_at'],squad_place_posts:['kind','images','comment','map_marker_name'],protect_update_edits:[],squad_member_duties:['member_id','raid','def','counter'],squad_map_markers:['id','x','y','type','name','note','icon','color','size','show_label','locked','enemy_nicks'],squad_photo_annotations:['photo_url','strokes'],squad_notification_events:[]};
 const jsonFields=new Set(['appearance','images','target_images','enemy_nicks','strokes','categories']);
@@ -40,9 +41,9 @@ export async function legacyApi(body,env,m){
  await db.batch(statements);
  return true
 }if(p.p_action==='save'){const r=p.p_marker||{};const previous=(await all('SELECT locked FROM squad_map_markers WHERE id=? AND squad_id=?',[String(r.id||''),m.squad_id]))[0];if(previous?.locked&&!admin)fail('forbidden');const result=await legacyApi({table:'squad_map_markers',action:'upsert',values:{...r,show_label:r.showLabel===false?0:1,enemy_nicks:r.enemyNicks||[]}},env,m);const match=String(r.id).match(/^(stash|base|other)-post-(\d+)$/);if(match){const post=await own('squad_place_posts',Number(match[2]));const coords=String(post.comment||'').split('\n').filter(x=>/^(Координаты:|Источник:)/.test(x));await run('UPDATE squad_place_posts SET map_marker_name=?,comment=? WHERE id=? AND squad_id=?',[r.name||post.map_marker_name||'',r.note===undefined?post.comment:[String(r.note||''),...coords].filter(Boolean).join('\n'),post.id,m.squad_id])}return result}break;
- case 'convert_map_marker_to_stash':{const r=p.p_marker||{};const current=(await all('SELECT * FROM squad_map_markers WHERE id=? AND squad_id=?',[String(r.id||''),m.squad_id]))[0];if(current?.type==='stash'){await legacyApi({rpc:'squad_map_sync',args:{p_action:'save',p_marker:r}},env,m);return {marker_id:String(r.id),existing:true}}if(!Number.isFinite(Number(r.x))||!Number.isFinite(Number(r.y))||r.x<0||r.x>1||r.y<0||r.y>1)fail('invalid_coordinates');const sourceMatch=/^(base|other)-post-([0-9]+)$/.exec(String(r.id||''));
+ case 'convert_map_marker_to_stash':{const r=p.p_marker||{};if(!Number.isFinite(Number(r.x))||!Number.isFinite(Number(r.y))||r.x<0||r.x>1||r.y<0||r.y>1)fail('invalid_coordinates');const sourceMatch=/^(base|other)-post-([0-9]+)$/.exec(String(r.id||''));
  if(sourceMatch){
-  const source=await own('squad_place_posts',Number(sourceMatch[2]));
+  const source=await own('squad_place_posts',Number(sourceMatch[2]));if(source.kind==='stash'){const canonical={...r,id:'stash-post-'+source.id,type:'stash'};await legacyApi({rpc:'squad_map_sync',args:{p_action:'save',p_marker:canonical}},env,m);return {id:source.id,marker_id:canonical.id,existing:true}}
   const previous=(await all('SELECT locked FROM squad_map_markers WHERE id=? AND squad_id=?',[String(r.id),m.squad_id]))[0];
   if(previous?.locked&&!admin)fail('forbidden');
   const id='stash-post-'+source.id;
@@ -54,7 +55,8 @@ export async function legacyApi(body,env,m){
   ]);
   return {id:source.id,marker_id:id}
  }
- const [post]=await legacyApi({table:'squad_place_posts',action:'insert',values:{kind:'stash',images:[],map_marker_name:r.name||'Схрон',comment:r.note||''}},env,m);const id='stash-post-'+post.id;await legacyApi({table:'squad_map_markers',action:'insert',values:{...r,id,type:'stash',show_label:1}},env,m);if(r.id)await run('DELETE FROM squad_map_markers WHERE id=? AND squad_id=?',[String(r.id),m.squad_id]);return {id:post.id,marker_id:id}}
+ return publishStashMarker(env,m,r)}
+
  case 'refresh_stash':await own('squad_place_posts',p.p_post_id);await run('UPDATE squad_place_posts SET stash_checked_at=?,stash_checked_by=? WHERE id=? AND squad_id=?',[now,m.id,p.p_post_id,m.squad_id]);return true;
  case 'claim_task':await own('tasks',p.p_task_id);await run('UPDATE tasks SET assignee_id=? WHERE id=? AND squad_id=?',[m.id,p.p_task_id,m.squad_id]);return true;
  case 'set_task_status':{const t=await own('tasks',p.p_task_id);if(!admin&&t.creator_id!==m.id&&t.assignee_id!==m.id)fail('forbidden');if(!['В процессе','Выполнено'].includes(p.p_status))fail('invalid_status');await run('UPDATE tasks SET status=? WHERE id=? AND squad_id=?',[p.p_status,p.p_task_id,m.squad_id]);await event('tasks',p.p_status==='Выполнено'?'ЗАДАЧА ВЫПОЛНЕНА':'Задача возвращена в работу',t.title,'task-status:'+t.id+':'+now);return true}
@@ -96,18 +98,19 @@ export async function legacyApi(body,env,m){
  }
  if(['members','squads'].includes(t))fail('insert_not_allowed');
  const values=Array.isArray(body.values)?body.values:[body.values];if(values.length>20)fail('too_many_rows');const result=[];
- for(const input of values){if(!input||typeof input!=='object')fail('invalid_values');const v=Object.fromEntries(Object.entries(input).filter(([k])=>tables[t].includes(k)&&input[k]!==undefined));if(cols.includes('squad_id'))v.squad_id=m.squad_id;if(cols.includes('created_by'))v.created_by=m.id;if(cols.includes('creator_id'))v.creator_id=m.id;if(cols.includes('member_id'))v.member_id=t==='squad_member_duties'?input.member_id:m.id;
+ for(const input of values){if(!input||typeof input!=='object')fail('invalid_values');if(t==='squad_map_markers'&&input.type==='stash'&&!/^(stash|base|other)-post-/.test(String(input.id||''))){const linked=await publishStashMarker(env,m,{...input,id:String(input.id||crypto.randomUUID())});result.push({ ...input,id:linked.marker_id });continue;}const v=Object.fromEntries(Object.entries(input).filter(([k])=>tables[t].includes(k)&&input[k]!==undefined));if(cols.includes('squad_id'))v.squad_id=m.squad_id;if(cols.includes('created_by'))v.created_by=m.id;if(cols.includes('creator_id'))v.creator_id=m.id;if(cols.includes('member_id'))v.member_id=t==='squad_member_duties'?input.member_id:m.id;
  if(v.member_id)await member(v.member_id);if(v.assignee_id)await member(v.assignee_id);if(t==='task_contributions')await own('tasks',v.task_id);if(t==='raid_participants')await own('raids',v.raid_id);
  if(t==='protect_updates'){v.member_id=input.member_id||m.id;await member(v.member_id);v.effective_at=v.effective_at||now}
  if(cols.includes('created_at'))v.created_at=now;if(cols.includes('updated_at'))v.updated_at=now;if(cols.includes('updated_by'))v.updated_by=m.id;
  if(cols.includes('id')&&!['members','squads','squad_map_markers'].includes(t))v.id=Date.now()*1000+crypto.getRandomValues(new Uint16Array(1))[0]%1000;
  if(t==='squad_map_markers'&&(!Number.isFinite(Number(v.x))||!Number.isFinite(Number(v.y))||v.x<0||v.x>1||v.y<0||v.y>1))fail('invalid_coordinates');
- if(t==='squad_map_markers'){v.id=String(input.id||crypto.randomUUID());const existing=await all('SELECT * FROM squad_map_markers WHERE id=?',[v.id]);if(existing.length&&(existing[0].squad_id!==m.squad_id||(existing[0].locked&&!admin)))fail('forbidden');if(existing[0]?.type==='stash'&&v.type==='stash'){v.updated_at=existing[0].updated_at;if(cols.includes('created_by'))v.created_by=existing[0].created_by}}
+ let newVehicle=false;if(t==='squad_map_markers'){v.id=String(input.id||crypto.randomUUID());const existing=await all('SELECT * FROM squad_map_markers WHERE id=?',[v.id]);if(existing.length&&(existing[0].squad_id!==m.squad_id||(existing[0].locked&&!admin)))fail('forbidden');newVehicle=!existing.length&&['vehicle','car','transport'].includes(v.type);if(existing[0]?.type==='stash'&&v.type==='stash'){v.updated_at=existing[0].updated_at;if(cols.includes('created_by'))v.created_by=existing[0].created_by}}
  if(t==='presence_history'&&action==='upsert'){const old=(await all('SELECT id FROM presence_history WHERE member_id=? AND day=? AND squad_id=?',[m.id,v.day,m.squad_id]))[0];if(old)v.id=old.id}
  if(t==='explosives_inventory'&&(!Number.isFinite(Number(v.quantity))||v.quantity<0||v.quantity>300))fail('invalid_quantity');
  const keys=Object.keys(v),pk=info.filter(x=>x.pk).map(x=>x.name);const conflict=action==='upsert'?' ON CONFLICT ('+pk.map(k=>'"'+k+'"').join(',')+') DO UPDATE SET '+keys.filter(k=>!pk.includes(k)).map(k=>'"'+k+'"=excluded."'+k+'"').join(','):'';
- await run('INSERT INTO '+t+' ('+keys.map(k=>'"'+k+'"').join(',')+') VALUES ('+keys.map(()=>'?').join(',')+')'+conflict,Object.values(v).map(encode));result.push(decode(v));
- if(['tasks','raids','protect_updates','squad_place_posts'].includes(t))await event(t==='tasks'?'tasks':t==='raids'?'raids':t==='protect_updates'?'protect_updated':v.kind==='base'||v.kind==='other'?'base':'stash',t==='tasks'?'Новая задача':t==='raids'?'План на рейд':t==='protect_updates'?'ПРОТЕКТ ОБНОВЛЕН':v.kind==='stash'?'Новый схрон':'Новая база',v.title||v.map_marker_name||v.comment||'',(t==='protect_updates'?'protect-updated:':t==='squad_place_posts'?'squad-place:':t+':')+v.id);
+ await run('INSERT INTO '+t+' ('+keys.map(k=>'"'+k+'"').join(',')+') VALUES ('+keys.map(()=>'?').join(',')+')'+conflict,Object.values(v).map(encode));result.push(decode(v));if(newVehicle)await event('transport','Добавлен транспорт',v.name||'Транспорт','map-transport:'+v.id);
+ const transport=t==='squad_place_posts'&&/^Машина:/i.test(String(v.comment||''));
+ if(['tasks','raids','protect_updates','squad_place_posts'].includes(t))await event(t==='tasks'?'tasks':t==='raids'?'raids':t==='protect_updates'?'protect_updated':transport?'transport':v.kind==='base'||v.kind==='other'?'base':'stash',t==='tasks'?'Новая задача':t==='raids'?'План на рейд':t==='protect_updates'?'ПРОТЕКТ ОБНОВЛЕН':transport?'Добавлен транспорт':v.kind==='stash'?'Новый схрон':'Новая база',v.title||v.map_marker_name||v.comment||'',(t==='protect_updates'?'protect-updated:':t==='squad_place_posts'?'squad-place:':t+':')+v.id);
  }
  return result;
 }
