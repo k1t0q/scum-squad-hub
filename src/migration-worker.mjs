@@ -9,7 +9,6 @@ import { adminLogin, verifyAdminSession, clearAdminCookie } from './admin-code-l
 import { verifySquadCode } from './code-login-verification.mjs';
 import { createMemberSession, verifyMemberSession, memberCookie, clearMemberCookie } from './member-session.mjs';
 import { steamLinkStatus } from './steam-link-status.mjs';
-import { linkLegacyAccount } from './legacy-account-link.mjs';
 import { deleteMapMarker } from './map-marker-delete.mjs';
 import { createMapMarker } from './map-marker-create.mjs';
 import { updateMapMarker } from './map-marker-update.mjs';
@@ -107,7 +106,7 @@ export default {
       const identity=await verifySession(request,env);
       if(!identity)return Response.redirect(url.origin+'/auth/steam/start',302);
       const {linkPage}=await import('./migration-link-page.mjs');
-      return new Response(linkPage,{headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store','content-security-policy':"default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'self' https://zicapopwsssopyxphhpo.supabase.co; form-action 'none'; base-uri 'none'; frame-ancestors 'none'",'referrer-policy':'no-referrer'}});
+      return new Response(linkPage,{headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store','content-security-policy':"default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'self'; form-action 'none'; base-uri 'none'; frame-ancestors 'none'",'referrer-policy':'no-referrer'}});
     }
     if (request.method === 'GET' && url.pathname === '/migration-link.js') {
       const {linkScript}=await import('./migration-link-script.mjs');
@@ -204,7 +203,7 @@ export default {
       if (request.method === 'GET' && url.pathname === '/api/link-status') return steamLinkStatus(env,identity.steamId,headers);
       if (request.method === 'POST' && url.pathname === '/api/link-legacy-account') {
         if(request.headers.get('origin')!==url.origin)return new Response(JSON.stringify({error:'invalid_origin'}),{status:403,headers});
-        return linkLegacyAccount(request,env,identity.steamId,headers);
+        return Response.json({error:'legacy_link_retired',message:'Вход через старый аккаунт отключён. Используйте Steam.'},{status:410,headers});
       }
       if (request.method === 'GET' && url.pathname === '/api/squad-access') {
         const squadId = url.searchParams.get('squad_id');
