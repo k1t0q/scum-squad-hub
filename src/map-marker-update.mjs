@@ -8,7 +8,7 @@ export async function updateMapMarker(request,env,membership,squadId,headers){
    return json({error:'invalid_marker_update'},400,headers);
  try{
   const result=await env.DB.prepare(
-   'UPDATE squad_map_markers SET name = ?, note = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND squad_id = ? AND locked = 0'
+   "UPDATE squad_map_markers SET name = ?, note = ?, updated_at = CASE WHEN type = 'stash' THEN updated_at ELSE CURRENT_TIMESTAMP END WHERE id = ? AND squad_id = ? AND locked = 0"
   ).bind(body.name,body.note,body.id,squadId).run();
   if(result?.meta?.changes!==1)return json({error:'marker_not_found_or_locked'},404,headers);
   return json({id:body.id,name:body.name,note:body.note},200,headers);

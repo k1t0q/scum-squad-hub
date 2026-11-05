@@ -319,7 +319,7 @@ window.addEventListener('message',async e=>{
    if(msg.action==='save'&&msg.marker?.type==='stash'&&!/^stash-post-\d+$/.test(id)&&!id.startsWith('stash-post-')){
     const {data:converted,error:conversionError}=await sb.rpc('convert_map_marker_to_stash',{p_marker:msg.marker});
     if(conversionError)throw conversionError;
-    toast('Схрон добавлен во вкладку «Метка» · срок 14 дней');
+    if(!converted?.existing)toast('Схрон добавлен во вкладку «Метка» · срок 14 дней');
    }else{
     const params=msg.action==='save'?{p_action:'save',p_marker:msg.marker}:{p_action:'delete',p_id:msg.id};
     const {error}=await sb.rpc('squad_map_sync',params);
