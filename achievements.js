@@ -27,7 +27,7 @@ function renderAchievements(){
  $('#view').querySelectorAll('[data-achievement]').forEach(card=>{
   const front=card.querySelector('.ach-flip-front'),back=card.querySelector('.ach-card-back'),inner=card.querySelector('.ach-flip-inner');
   if(matchMedia('(hover:hover) and (prefers-reduced-motion:no-preference)').matches){
-   front.onpointermove=e=>{const r=front.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;front.style.setProperty('--rx',(0.5-y)*11+'deg');front.style.setProperty('--ry',(x-0.5)*11+'deg');front.style.setProperty('--gx',x*100+'%');front.style.setProperty('--gy',y*100+'%')};
+   front.onpointermove=e=>{const r=front.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;front.style.setProperty('--rx',(0.5-y)*20+'deg');front.style.setProperty('--ry',(x-0.5)*20+'deg');front.style.setProperty('--gx',x*100+'%');front.style.setProperty('--gy',y*100+'%')};
    front.onpointerleave=()=>{front.style.setProperty('--rx','0deg');front.style.setProperty('--ry','0deg')};
   }
   let turning=false;

@@ -57,5 +57,6 @@ test('achievement hover restores the original cursor tilt without lifting the ca
  assert.match(css,/\.ach-flip-front\{[^\n]*rotateX\(var\(--rx,0deg\)\) rotateY\(var\(--ry,0deg\)\)/);
  assert.doesNotMatch(css,/\.ach-flip:not\(\.is-flipped\):hover\{transform:translateY/);
  assert.match(js,/front\.onpointermove=e=>/);
+ assert.match(js,/\(0\.5-y\)\*20\+'deg'/);
  assert.match(js,/front\.onpointerleave=\(\)=>/);
 });
