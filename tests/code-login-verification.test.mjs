@@ -7,7 +7,7 @@ const encoder=new TextEncoder();
 async function hash(s){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(s)))].map(x=>x.toString(16).padStart(2,'0')).join('')}
 async function fixture(member={id:'m1',squad_id:'s1',nick:'Player',game_role:'Rifler',access_role:'member'}){
  const pepper='test-pepper',code='sample-secret-code';
- const env={CODE_LOGIN_LIMITER:{async limit(){return {success:true}}},DB:{prepare(){return {bind(){return {async all(){return {results:[{...member,invite_code:code}]}}}}}}}};
+ const env={CODE_LOGIN_LIMITER:{async limit(){return {success:true}}},DB:{prepare(sql){return {bind(){return this},async all(){return {results:sql.includes('FROM squads')?[]:[{...member,invite_code:code}]}}}}}};
  const request=(body,origin='https://scum-hub.example')=>new Request('https://scum-hub.example/api/code-login',{method:'POST',headers:{origin,'content-type':'application/json','cf-connecting-ip':'203.0.113.12'},body:JSON.stringify(body)});
  return {env,request,code};
 }
@@ -58,10 +58,28 @@ test('same nickname in different squads uses the matching squad code',async()=>{
  assert.equal(r.status,200);
  assert.equal((await r.json()).member.squad_id,'s2');
 });
-test('unknown nickname never grants a session',async()=>{
+test('unknown nickname with invalid code never grants a session',async()=>{
  const {env,request,code}=await fixture();
- env.DB.prepare=()=>({bind:()=>({all:async()=>({results:[]})})});
- const r=await verifySquadCode(request({nick:'Unknown',code,role:'Rifler'}),env);
+ env.DB.prepare=()=>({bind(){return this},all:async()=>({results:[]})});
+ const r=await verifySquadCode(request({nick:'Unknown',code:'wrong-code',role:'Rifler'}),env);
  assert.equal(r.status,401);
  assert.equal(r.headers.get('set-cookie'),null);
+});
+test('valid code registers a new nickname with the chosen role',async()=>{
+ const {env,request,code}=await fixture();let inserted;
+ env.DB.prepare=sql=>({bind(...args){this.args=args;return this},
+  async all(){return {results:sql.includes('FROM members m')?[]:[{id:'s1',invite_code:code}]}},
+  async first(){return null},async run(){inserted=this.args;return {meta:{changes:1}}}});
+ const response=await verifySquadCode(request({nick:'NewPlayer',code,role:'Builder'}),env);
+ assert.equal(response.status,200);
+ const data=await response.json();
+ assert.equal(data.member.nick,'NewPlayer');assert.equal(data.member.game_role,'Builder');
+ assert.equal(data.member.squad_id,'s1');assert.equal(inserted[3],'Builder');
+ assert.equal(inserted[4],'member');assert.equal(response.headers.get('set-cookie'),null);
+});
+test('registration requires role and does not overwrite existing nickname',async()=>{
+ const {env,request,code}=await fixture();
+ env.DB.prepare=sql=>({bind(){return this},async all(){return {results:sql.includes('FROM members m')?[]:[{id:'s1',invite_code:code}]}},async first(){return {id:'inactive-member'}}});
+ assert.equal((await verifySquadCode(request({nick:'NewPlayer',code}),env)).status,400);
+ assert.equal((await verifySquadCode(request({nick:'NewPlayer',code,role:'Helper'}),env)).status,409);
 });

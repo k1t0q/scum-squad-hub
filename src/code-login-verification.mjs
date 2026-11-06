@@ -26,7 +26,27 @@ export async function verifySquadCode(request,env){
   const matches=[];
   for(const record of member.results||[]){
     const expected=await digest(String(record.invite_code||''));
-    if(constantEqual(expected,supplied)&&(role===''||record.game_role===role))matches.push(record);
+    if(constantEqual(expected,supplied))matches.push(record);
+  }
+  if(matches.length===0){
+    // A new nickname can join only a squad with a valid, unique invite code.
+    // Existing nicknames (including inactive ones) must not be silently replaced.
+    const squads=await env.DB.prepare('SELECT id,invite_code FROM squads WHERE invite_code IS NOT NULL AND length(invite_code)>=4 LIMIT 100').all();
+    const valid=[];
+    for(const squad of squads.results||[]){
+      if(constantEqual(await digest(String(squad.invite_code)),supplied))valid.push(squad);
+    }
+    if(valid.length!==1)return json({error:'invalid_credentials'},401);
+    if(!role)return json({error:'role_required'},400);
+    const squad=valid[0];
+    const occupied=await env.DB.prepare('SELECT id FROM members WHERE squad_id=? AND lower(nick)=lower(?) LIMIT 1').bind(squad.id,nick).first();
+    if(occupied)return json({error:'nickname_taken'},409);
+    const id=crypto.randomUUID();
+    try{
+      await env.DB.prepare('INSERT INTO members (id,squad_id,nick,game_role,access_role,joined_at,is_active) VALUES (?,?,?,?,?,?,1)')
+        .bind(id,squad.id,nick,role,'member',new Date().toISOString()).run();
+    }catch{return json({error:'registration_failed'},503)}
+    return json({verified:true,member:{id,squad_id:squad.id,nick,game_role:role}});
   }
   if(matches.length!==1)return json({error:'invalid_credentials'},401);
   const record=matches[0];

@@ -808,9 +808,9 @@ async function exitOriginalD1Hub(){
  authScreen();
 }
 function authScreen(){modal('<h2>Вход в SCUM HUB</h2><div id="authForm"></div>','fury-role-dialog');showMemberLogin()}
-function showMemberLogin(){let a=$('#authForm');if(!a)return;a.innerHTML='<form class="form" onsubmit="doJoin(event)"><input name="code" required placeholder="Код состава"><input name="nick" required value="" autocomplete="off" placeholder="Ник">'+(isD1HubHost()?'':furySelectPicker('role',['Rifler','Bomber','Locker','Builder','Helper','Sniper'],'','Выбрать роль'))+'<button type="submit" class="primary">ВОЙТИ В СОСТАВ</button><div id="hubLoginStatus" role="alert" aria-live="polite" style="color:#ff817a;min-height:18px"></div></form>'}
-function hubLoginError(error){const message=String(error?.message||error||'');return ({invalid_credentials:'Неверный ник или код состава. Введи ник, указанный в составе отряда.',admin_requires_separate_login:'Для администратора нужен личный код входа.',too_many_attempts:'Слишком много попыток. Подожди минуту и повтори.',rate_limit_unavailable:'Вход временно недоступен. Попробуй чуть позже.',session_not_configured:'Вход временно недоступен. Сообщи администратору.'})[message]||((error?.name==='AbortError'||error?.name==='TimeoutError'||message==='Failed to fetch')?'Не удалось связаться с хабом. Повтори попытку.':message||'Не удалось войти в хаб. Повтори попытку.')}
-async function loginExistingHubMember(form,nick,code){
+function showMemberLogin(){let a=$('#authForm');if(!a)return;a.innerHTML='<form class="form" onsubmit="doJoin(event)"><input name="code" required placeholder="Код состава"><input name="nick" required value="" autocomplete="off" placeholder="Ник">'+furySelectPicker('role',['Rifler','Bomber','Locker','Builder','Helper','Sniper'],'','Роль (для нового игрока)')+'<button type="submit" class="primary">ВОЙТИ В СОСТАВ</button><div id="hubLoginStatus" role="alert" aria-live="polite" style="color:#ff817a;min-height:18px"></div></form>'}
+function hubLoginError(error){const message=String(error?.message||error||'');return ({invalid_credentials:'Неверный код состава или ник.',role_required:'Для регистрации нового игрока выбери роль.',nickname_taken:'Этот ник уже зарегистрирован. Обратись к администратору.',registration_failed:'Не удалось зарегистрировать игрока. Повтори попытку.',admin_requires_separate_login:'Для администратора нужен личный код входа.',too_many_attempts:'Слишком много попыток. Подожди минуту и повтори.',rate_limit_unavailable:'Вход временно недоступен. Попробуй чуть позже.',session_not_configured:'Вход временно недоступен. Сообщи администратору.'})[message]||((error?.name==='AbortError'||error?.name==='TimeoutError'||message==='Failed to fetch')?'Не удалось связаться с хабом. Повтори попытку.':message||'Не удалось войти в хаб. Повтори попытку.')}
+async function loginExistingHubMember(form,nick,code,role){
  const submit=form.querySelector('button[type=submit],button.primary'),status=form.querySelector('#hubLoginStatus');
  if(submit){submit.disabled=true;submit.textContent='ПОДКЛЮЧАЮСЬ…'}if(status)status.textContent='';
  try{
@@ -819,7 +819,7 @@ async function loginExistingHubMember(form,nick,code){
    const r=await fetch('/api/admin/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({code}),signal:AbortSignal.timeout(15000)});
    const data=await r.json();if(!r.ok)throw Error(data.error||'Неверный код администратора');
    const adapter=await import('./src/legacy-d1-adapter.mjs');snapshot=await adapter.fetchMemberSnapshot();
-  }else{const result=await window.scumHubD1CodeLogin({code,nick});snapshot=result.raw;}
+  }else{const result=await window.scumHubD1CodeLogin({code,nick,role});snapshot=result.raw;}
   await mountOriginalD1Hub(snapshot);
  }catch(error){if(status)status.textContent=hubLoginError(error);else toast(hubLoginError(error));}
  finally{if(submit){submit.disabled=false;submit.textContent='ВОЙТИ В СОСТАВ'}}
@@ -832,7 +832,7 @@ async function finishAdminLogin(){let r=await sb.rpc('claim_admin_account');if(r
 async function joinOnline(){if(!sb)return;let {data:{session}}=await sb.auth.getSession();if(session){let {data:m}=await sb.rpc('current_member');if(m){onlineMember=m;db.profile={nick:m.nick,role:m.game_role,access:m.access_role};save();await syncOnline();await loadSquadName();unlockApp();return}if(!session.user.is_anonymous&&session.user.email?.toLowerCase()==='nikitinrf@bk.ru'){await finishAdminLogin();return}}authScreen()}
 async function ensureAnonymous(){let {data:{session}}=await sb.auth.getSession();if(!session||!session.user.is_anonymous){if(session)await sb.auth.signOut({scope:'local'});let r=await sb.auth.signInAnonymously();if(r.error)throw r.error}}
 async function doJoin(e){e.preventDefault();let f=new FormData(e.target),nick=String(f.get('nick')||'').trim(),code=String(f.get('code')||'').trim();
-if(isD1HubHost()){await loginExistingHubMember(e.target,nick,code);return;}
+if(isD1HubHost()){await loginExistingHubMember(e.target,nick,code,String(f.get('role')||''));return;}
 if(!f.get('role')){toast('Выбери роль');return;}
 try{await ensureAnonymous()}catch(x){toast('Не удалось создать сессию');return}if(nick.toLowerCase()==='k1t0'){let r=await sb.rpc('join_admin_device',{p_code:code,p_nick:nick});if(r.error){toast('Неверный код администратора');return}onlineMember=r.data;db.profile={nick:r.data.nick,role:r.data.game_role,access:'admin'};save();closeModal();await syncOnline();await loadSquadName();unlockApp();toast('Вход администратора выполнен');return}let {data,error}=await sb.rpc('join_squad',{p_code:code,p_nick:nick,p_role:f.get('role')});if(error){toast(error.message.includes('duplicate')?'Ник уже занят':'Неверный код или ошибка входа');return}onlineMember=data;db.profile={nick:data.nick,role:data.game_role,access:data.access_role};save();closeModal();await syncOnline();await loadSquadName();unlockApp();toast('Добро пожаловать в FURY')}
 
