@@ -54,9 +54,10 @@ test('squad name column overrides the legacy last-child right alignment',()=>{
 test('achievement hover restores the original cursor tilt without lifting the card',()=>{
  const css=readFileSync(new URL('../achievements.css',import.meta.url),'utf8');
  const js=readFileSync(new URL('../achievements.js',import.meta.url),'utf8');
- assert.match(css,/\.ach-flip-front\{[^\n]*rotateX\(var\(--rx,0deg\)\) rotateY\(var\(--ry,0deg\)\)/);
+ assert.match(css,/\.ach-flip\{[^\n]*rotateX\(var\(--rx,0deg\)\) rotateY\(var\(--ry,0deg\)\)/);
+ assert.match(css,/\.ach-flip-front\{[^\n]*transform:none!important/);
  assert.doesNotMatch(css,/\.ach-flip:not\(\.is-flipped\):hover\{transform:translateY/);
  assert.match(js,/front\.onpointermove=e=>/);
- assert.match(js,/\(0\.5-y\)\*20\+'deg'/);
+ assert.match(js,/card\.style\.setProperty\('--rx',\(0\.5-y\)\*11\+'deg'\)/);
  assert.match(js,/front\.onpointerleave=\(\)=>/);
 });

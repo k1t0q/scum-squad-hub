@@ -18,9 +18,10 @@ html,body,body *{scrollbar-color:var(--hub-scroll-thumb) var(--hub-scroll-track)
 .ach-top-row>.ach-place{margin-right:5px}
 
 /* Two real card faces: the front retains its layout, while the back scrolls independently. */
-.ach-flip{min-width:0;perspective:1200px;position:relative}
+.ach-flip{min-width:0;perspective:1200px;position:relative;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .18s ease-out}
 .ach-flip-inner{height:100%;position:relative;transform:rotateY(0deg);transform-style:flat}
-.ach-flip-front{width:100%;height:100%;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))!important}
+.ach-flip-front{width:100%;height:100%;transform:none!important}
+@media(prefers-reduced-motion:reduce){.ach-flip{transform:none!important;transition:none!important}}
 .ach-flip.is-flipped .ach-flip-front{pointer-events:none;visibility:hidden}
 .ach-card-back{position:absolute;inset:0;display:flex;flex-direction:column;min-height:0;overflow:hidden;border:1px solid color-mix(in srgb,var(--ach-color) 55%,#28312d);border-radius:14px;background:linear-gradient(165deg,#1b2924,#0b1210 72%);box-shadow:0 10px 35px #0006;visibility:hidden;color:#e1e8e4}
 .ach-flip.is-flipped .ach-card-back{visibility:visible}
