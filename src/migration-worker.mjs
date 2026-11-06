@@ -1,3 +1,4 @@
+import {refreshCompletedLeaderboards} from './leaderboard-snapshots.mjs';
 import {layeroRequest} from './layero-origin.mjs';
 import {refreshMemberSession,rollingSessionHeaders} from './refresh-session.mjs';
 import {steamCookie} from './session-duration.mjs';
@@ -22,6 +23,10 @@ import { issueSession } from './issue-session.mjs';
 import { verifySession } from './session-auth.mjs';
 // Isolated SCUM HUB migration Worker. Never expose squad records without verified sessions.
 export default {
+  async scheduled(controller,env){
+    const result=await refreshCompletedLeaderboards(env.DB,new Date(controller.scheduledTime));
+    console.log(JSON.stringify({event:'leaderboard_snapshots',...result}));
+  },
   async fetch(request, env) {
     let forwardedOrigin=null;
     try{const routed=layeroRequest(request);request=routed.request;forwardedOrigin=routed.origin;}catch{return new Response('Forbidden public origin',{status:403});}

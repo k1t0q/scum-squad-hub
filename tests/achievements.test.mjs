@@ -14,7 +14,7 @@ function setup(seed=''){
  CREATE TABLE squad_map_markers(id TEXT PRIMARY KEY,squad_id TEXT,type TEXT,created_by TEXT,updated_at TEXT,x NUMERIC,y NUMERIC,name TEXT,note TEXT,locked INTEGER,icon TEXT,color TEXT,size NUMERIC,show_label INTEGER,enemy_nicks TEXT);
  CREATE TABLE protect_updates(id INTEGER PRIMARY KEY,squad_id TEXT,member_id TEXT,updated_at TEXT);
  CREATE TABLE tasks(id INTEGER PRIMARY KEY,squad_id TEXT,assignee_id TEXT,status TEXT,created_at TEXT);
- ${seed}`);sql.exec(migration);
+ ${seed}`);sql.exec(migration);sql.exec(readFileSync(new URL('../migrations/20261106_leaderboard_snapshots.sql',import.meta.url),'utf8'));
  const DB={prepare(q){let args=[];return {bind(...a){args=a;return this},async all(){return {results:sql.prepare(q).all(...args)}},async run(){return {meta:sql.prepare(q).run(...args)}}}},async batch(statements){return statements.map(s=>s.all()).reduce(async(p,r)=>[...await p,await r],Promise.resolve([]))}};
  return {sql,DB,count:(metric)=>sql.prepare('SELECT COUNT(*) AS n FROM hub_achievement_events WHERE metric=?').get(metric).n};
 }
@@ -35,15 +35,15 @@ test('protect ignores repeated presses within a full nine-hour cycle',()=>{
  const {sql,count}=setup();sql.exec("INSERT INTO protect_updates VALUES(1,'a','u','2026-11-06T00:00:00Z'),(2,'a','u','2026-11-06T08:59:59Z'),(3,'a','u','2026-11-06T09:00:00Z')");assert.equal(count('protect'),2);
 });
 test('historical seed is idempotent and credits known actors only',()=>{
- const {sql,count}=setup("INSERT INTO squad_place_posts(id,squad_id,kind,created_by) VALUES(1,'a','stash','u'),(2,'a','stash','x');INSERT INTO tasks VALUES(1,'a','u','Выполнено','2026-01-01');");sql.exec(migration);assert.equal(count('stash'),1);assert.equal(count('task'),1);assert.equal(sql.prepare("SELECT occurred_at FROM hub_achievement_events WHERE metric='task'").get().occurred_at,'0000-unknown');
+ const {sql,count}=setup("INSERT INTO squad_place_posts(id,squad_id,kind,created_by) VALUES(1,'a','stash','u'),(2,'a','stash','x');INSERT INTO tasks VALUES(1,'a','u','Выполнено','2026-01-01');");sql.exec(migration);sql.exec(readFileSync(new URL('../migrations/20261106_leaderboard_snapshots.sql',import.meta.url),'utf8'));assert.equal(count('stash'),1);assert.equal(count('task'),1);assert.equal(sql.prepare("SELECT occurred_at FROM hub_achievement_events WHERE metric='task'").get().occurred_at,'0000-unknown');
 });
 test('best streak and five levels survive a later missed day; collection excludes itself',()=>{
  const events=Array.from({length:15},(_,i)=>{const day=new Date(Date.UTC(2026,0,i<14?i+1:20)).toISOString().slice(0,10);return {member_id:'u',metric:'presence',event_key:day,occurred_at:day+'T12:00:00Z'}});
  const p=buildAchievements([{id:'u',nick:'Player'}],events).members[0].items;assert.equal(p.steady.value,14);assert.equal(p.steady.level,2);assert.equal(p.connected.level,1);assert.equal(p.collector.value,0);
 });
-test('rankings use current Moscow day, Monday and month boundaries, and isolate squads',async()=>{
+test('rankings use the 03:00 Moscow boundary and isolate squads',async()=>{
  const {sql,DB}=setup();sql.exec("INSERT INTO presence_history VALUES(1,'a','u','2026-11-06','Буду','2026-11-05T21:00:00Z'),(2,'b','x','2026-11-06','Буду','2026-11-05T21:01:00Z');INSERT INTO tasks VALUES(1,'a','u','В процессе','2026-11-05');UPDATE tasks SET status='Выполнено';UPDATE hub_achievement_events SET occurred_at='2026-11-06T12:00:00Z' WHERE metric='task';");
- const snapshot=await getSquadAchievements(DB,'a',new Date('2026-11-06T20:00:00Z'));assert.equal(snapshot.members.length,2);assert.equal(snapshot.leaderboard.find(x=>x.id==='u').day,22);assert.equal(snapshot.leaderboard.some(x=>x.id==='x'),false);assert.deepEqual(leaderboardBoundaries(new Date('2026-11-01T22:00:00Z')),{day:'2026-11-01T21:00:00.000Z',week:'2026-11-01T21:00:00.000Z',month:'2026-10-31T21:00:00.000Z'});
+ const snapshot=await getSquadAchievements(DB,'a',new Date('2026-11-06T20:00:00Z'));assert.equal(snapshot.members.length,2);assert.equal(snapshot.leaderboard.find(x=>x.id==='u').day,2);assert.equal(snapshot.leaderboard.some(x=>x.id==='x'),false);assert.deepEqual(leaderboardBoundaries(new Date('2026-11-01T22:00:00Z')),{day:'2026-11-01T00:00:00.000Z',week:'2026-10-26T00:00:00.000Z',month:'2026-11-01T00:00:00.000Z'});
  const rpc=await legacyApi({rpc:'get_squad_achievements',args:{squad_id:'b'}},{DB},{squad_id:'a',id:'u'});assert.equal(rpc.members.some(x=>x.id==='x'),false);
 });
 test('four added cards derive Moscow days, Monday weeks, distinct activities and weighted points',()=>{
@@ -57,4 +57,22 @@ test('four added cards derive Moscow days, Monday weeks, distinct activities and
  const data=buildAchievements([{id:'u',nick:'Player'}],rows),p=data.members[0].items;
  assert.equal(data.definitions.length,15);assert.equal(data.definitions.at(-1).id,'collector');assert.equal(p.collector.max,14);
  assert.equal(p.regular.value,2);assert.equal(p.rhythm.value,2);assert.equal(p.versatile.value,8);assert.equal(p.versatile.level,5);assert.equal(p.contributor.value,70);
+});
+
+test('daily, weekly and monthly periods roll exactly at 03:00 Moscow, without another reset at 05:00',()=>{
+ assert.deepEqual(leaderboardBoundaries(new Date('2026-11-01T23:59:59.999Z')),{day:'2026-11-01T00:00:00.000Z',week:'2026-10-26T00:00:00.000Z',month:'2026-11-01T00:00:00.000Z'});
+ const monday=leaderboardBoundaries(new Date('2026-11-02T00:00:00Z'));
+ assert.deepEqual(monday,{day:'2026-11-02T00:00:00.000Z',week:'2026-11-02T00:00:00.000Z',month:'2026-11-01T00:00:00.000Z'});
+ assert.deepEqual(leaderboardBoundaries(new Date('2026-11-02T02:00:00Z')),monday);
+ assert.equal(leaderboardBoundaries(new Date('2026-11-30T23:59:59.999Z')).month,'2026-11-01T00:00:00.000Z');
+ assert.equal(leaderboardBoundaries(new Date('2026-12-01T00:00:00Z')).month,'2026-12-01T00:00:00.000Z');
+ assert.equal(leaderboardBoundaries(new Date('2027-01-01T00:00:00Z')).month,'2027-01-01T00:00:00.000Z');
+});
+test('new-day points accumulate for the next completed snapshot without changing published results',async()=>{
+ const {sql,DB}=setup();sql.exec("INSERT INTO hub_achievement_events VALUES('a','u','presence','2026-11-01','2026-11-01T23:59:59Z'),('a','u','presence','2026-11-02','2026-11-02T00:00:00Z')");
+ const before=await getSquadAchievements(DB,'a',new Date('2026-11-01T23:59:59Z'));
+ assert.equal(before.leaderboard.find(x=>x.id==='u').day,0);
+ const after=await getSquadAchievements(DB,'a',new Date('2026-11-02T00:00:01Z'));
+ const p=after.leaderboard.find(x=>x.id==='u');assert.equal(p.day,2);assert.equal(p.week,2);assert.equal(p.month,0);assert.equal(p.total,2);
+ assert.equal(after.members.find(x=>x.id==='u').items.rhythm.value,before.members.find(x=>x.id==='u').items.rhythm.value);
 });

@@ -38,3 +38,7 @@ class_name = "MinimapRoom"
 [[migrations]]
 tag = "minimap-v1"
 new_sqlite_classes = ["MinimapRoom"]
+
+# Daily at 03:00 Moscow (00:00 UTC). Weekly/monthly snapshots are reused until due.
+[triggers]
+crons = ["0 0 * * *"]

@@ -1,3 +1,7 @@
+import {achievementPoints} from './achievement-scoring.mjs';
+import {leaderboardBoundaries} from './leaderboard-periods.mjs';
+import {getCompletedLeaderboards} from './leaderboard-snapshots.mjs';
+export {achievementPoints,leaderboardBoundaries};
 // Each card has five milestones; the final goal assumes roughly one active year.
 export const achievementDefinitions = [
  ['connected','На связи','Отметить «Буду», «Под вопросом» или «Не буду» в разные дни','presence',[12,30,90,180,365],'radio','#69c5d0','1 отметка в день'],
@@ -16,7 +20,6 @@ export const achievementDefinitions = [
  ['contributor','Опора отряда','Очки за отметки участия, новые метки и схроны, проверки схронов, протект и выполненные задачи','points',[100,500,2000,5000,10000],'beacon','#8fc4a1','Около 200 очков в неделю'],
  ['collector','Полный комплект','Довести другие карточки до 5 уровня','collection',[2,5,8,11,14],'medal','#edc776','Все 14 карточек за год'],
 ].map(([id,name,description,metric,levels,art,color,pace])=>({id,name,description,metric,levels,art,color,pace}));
-export const achievementPoints={presence:2,marker:5,stash:10,refresh:3,protect:10,task:20};
 function itemProgress(def,value,dates){
  const level=def.levels.filter(n=>value>=n).length;
  return {value,level,target:def.levels[Math.min(level,4)],max:def.levels[4],earnedAt:level?dates[level-1]:null,completed:level===5};
@@ -45,7 +48,7 @@ export function buildAchievements(members,events){
    const stamp=Date.parse(e.occurred_at);
    if(Number.isFinite(stamp)){
     const day=new Date(stamp+3*3600000).toISOString().slice(0,10);
-    const week=leaderboardBoundaries(new Date(stamp)).week;
+    const week=leaderboardBoundaries(new Date(stamp),0).week;
     if(!days.has(day)){days.add(day);derived.active_days.push(e.occurred_at);}
     if(!weeks.has(week)){weeks.add(week);derived.active_weeks.push(e.occurred_at);}
    }
@@ -66,17 +69,14 @@ export function buildAchievements(members,events){
  });
  return {definitions:achievementDefinitions,members:progress};
 }
-export function leaderboardBoundaries(now=new Date()){
- const shifted=new Date(now.getTime()+3*3600000),day=Date.UTC(shifted.getUTCFullYear(),shifted.getUTCMonth(),shifted.getUTCDate())-3*3600000;
- return {day:new Date(day).toISOString(),week:new Date(day-((shifted.getUTCDay()+6)%7)*86400000).toISOString(),month:new Date(Date.UTC(shifted.getUTCFullYear(),shifted.getUTCMonth(),1)-3*3600000).toISOString()};
-}
 export async function getSquadAchievements(db,squadId,now=new Date()){
- const b=leaderboardBoundaries(now);
- const weight="CASE e.metric WHEN 'presence' THEN 2 WHEN 'marker' THEN 5 WHEN 'stash' THEN 10 WHEN 'refresh' THEN 3 WHEN 'protect' THEN 10 WHEN 'task' THEN 20 ELSE 0 END";
- const result=await db.batch([
-  db.prepare('SELECT id,nick FROM members WHERE squad_id=? AND is_active=1 ORDER BY nick').bind(squadId),
-  db.prepare('SELECT e.member_id,e.metric,e.event_key,e.occurred_at FROM hub_achievement_events e JOIN members m ON m.id=e.member_id AND m.squad_id=e.squad_id WHERE e.squad_id=? AND m.is_active=1 ORDER BY e.occurred_at').bind(squadId),
-  db.prepare(`SELECT m.id,m.nick,COALESCE(SUM(${weight}),0) AS total,COALESCE(SUM(CASE WHEN julianday(e.occurred_at)>=julianday(?) AND julianday(e.occurred_at)<=julianday(?) THEN ${weight} ELSE 0 END),0) AS day,COALESCE(SUM(CASE WHEN julianday(e.occurred_at)>=julianday(?) AND julianday(e.occurred_at)<=julianday(?) THEN ${weight} ELSE 0 END),0) AS week,COALESCE(SUM(CASE WHEN julianday(e.occurred_at)>=julianday(?) AND julianday(e.occurred_at)<=julianday(?) THEN ${weight} ELSE 0 END),0) AS month FROM members m LEFT JOIN hub_achievement_events e ON e.member_id=m.id AND e.squad_id=m.squad_id WHERE m.squad_id=? AND m.is_active=1 GROUP BY m.id,m.nick`).bind(b.day,now.toISOString(),b.week,now.toISOString(),b.month,now.toISOString(),squadId),
+ const [result,rankings]=await Promise.all([
+  db.batch([
+   db.prepare('SELECT id,nick FROM members WHERE squad_id=? AND is_active=1 ORDER BY nick').bind(squadId),
+   db.prepare('SELECT e.member_id,e.metric,e.event_key,e.occurred_at FROM hub_achievement_events e JOIN members m ON m.id=e.member_id AND m.squad_id=e.squad_id WHERE e.squad_id=? AND m.is_active=1 ORDER BY e.occurred_at').bind(squadId)
+  ]),getCompletedLeaderboards(db,squadId,now)
  ]);
- return {...buildAchievements(result[0].results||[],result[1].results||[]),leaderboard:result[2].results||[],periods:b,asOf:now.toISOString()};
+ const active=result[0].results||[],stored=new Map(rankings.leaderboard.map(x=>[String(x.id),x]));
+ const leaderboard=active.map(m=>({...{day:0,week:0,month:0,total:0},...stored.get(String(m.id)),id:m.id,nick:m.nick}));
+ return {...buildAchievements(active,result[1].results||[]),...rankings,leaderboard,asOf:now.toISOString()};
 }
