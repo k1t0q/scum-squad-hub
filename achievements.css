@@ -18,7 +18,9 @@ html,body,body *{scrollbar-color:var(--hub-scroll-thumb) var(--hub-scroll-track)
 .ach-top-row>.ach-place{margin-right:5px}
 
 /* Two real card faces: the front retains its layout, while the back scrolls independently. */
-.ach-flip{min-width:0;perspective:1200px;position:relative}
+.ach-flip{min-width:0;perspective:1200px;position:relative;transform:translateY(0) rotateX(0deg) rotateY(0deg);transition:transform .22s ease-out;will-change:transform}
+@media(hover:hover) and (pointer:fine){.ach-flip:not(.is-flipped):hover{transform:translateY(-5px) rotateX(var(--ach-hover-x,0deg)) rotateY(var(--ach-hover-y,0deg))}}
+@media(prefers-reduced-motion:reduce){.ach-flip,.ach-flip:hover{transition:none!important;transform:none!important}}
 .ach-flip-inner{height:100%;position:relative;transform:rotateY(0deg);transform-style:flat}
 .ach-flip-front{width:100%;height:100%;transform:none!important}
 .ach-flip.is-flipped .ach-flip-front{pointer-events:none;visibility:hidden}

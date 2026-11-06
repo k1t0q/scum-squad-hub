@@ -26,6 +26,13 @@ function renderAchievements(){
  }).join('')+'</div><p class="ach-year-note">Последний уровень рассчитан примерно на год активности. Прогресс не сбрасывается, закончить можно раньше.</p><section class="ach-leaderboard" aria-labelledby="ach-top-title"><div class="ach-top-heading"><div><span class="ach-eyebrow">ВКЛАД В ОТРЯД</span><h2 id="ach-top-title">Лидеры отряда</h2></div><div class="ach-periods" role="group" aria-label="Период рейтинга">'+[['day','Топ дня'],['week','Топ недели'],['month','Топ месяца'],['total','За всё время']].map(([key,label])=>'<button type="button" data-top-period="'+key+'" aria-pressed="'+(key===hubTopPeriod)+'" class="'+(key===hubTopPeriod?'active':'')+'">'+label+'</button>').join('')+'</div></div><div id="ach-top-body"></div><details class="ach-rules"><summary>Как начисляются очки и прогресс</summary><ul class="ach-points-list"><li><span>Отметка участия · раз в день</span><b>+2</b></li><li><span>Новая метка на карте</span><b>+5</b></li><li><span>Новый схрон · вместе с меткой</span><b>+15</b></li><li><span>Проверка схрона · раз в день на схрон</span><b>+3</b></li><li><span>Протект · раз в 9 часов на игрока</span><b>+10</b></li><li><span>Выполненная задача · один раз</span><b>+20</b></li></ul><p>У каждой карточки 5 уровней. Нажми на неё — увидишь, что делать дальше и сколько осталось каждому игроку.</p><p>Полученные уровни сохраняются. В топах — готовые итоги: день и общий топ обновляются в 03:00, неделя — в понедельник, месяц — первого числа.</p></details></section></div>';
  $('#view').querySelectorAll('[data-achievement]').forEach(card=>{
   const front=card.querySelector('.ach-flip-front'),back=card.querySelector('.ach-card-back'),inner=card.querySelector('.ach-flip-inner');
+  front.addEventListener('pointermove',e=>{
+   if(e.pointerType==='touch'||card.classList.contains('is-flipped'))return;
+   const rect=front.getBoundingClientRect(),x=(e.clientX-rect.left)/rect.width-.5,y=(e.clientY-rect.top)/rect.height-.5;
+   card.style.setProperty('--ach-hover-x',(-y*5).toFixed(2)+'deg');
+   card.style.setProperty('--ach-hover-y',(x*5).toFixed(2)+'deg');
+  });
+  front.addEventListener('pointerleave',()=>{card.style.removeProperty('--ach-hover-x');card.style.removeProperty('--ach-hover-y')});
   let turning=false;
   const setFace=on=>{card.classList.toggle('is-flipped',on);front.setAttribute('aria-expanded',String(on));front.tabIndex=on?-1:0;back.setAttribute('aria-hidden',String(!on));back.tabIndex=on?0:-1;(on?back:front).focus({preventScroll:true});};
   const flip=async on=>{

@@ -43,3 +43,17 @@ test('Onest font files resolve and achievements use Onest, except squad logo',()
  assert.match(css,/\.logo i,\.logo>div/);
  assert.doesNotMatch(css,/\.ach-page[^\n]*\{font-family:Inter/);
 });
+
+test('squad name column overrides the legacy last-child right alignment',()=>{
+ const css=readFileSync(new URL('../overrides.css',import.meta.url),'utf8');
+ assert.match(css,/\.itemtop>div\.hub-squad-member-info:last-child/);
+ assert.match(css,/align-items:flex-start!important;justify-content:center!important/);
+});
+
+test('achievement hover animation is independent from flip animation',()=>{
+ const css=readFileSync(new URL('../achievements.css',import.meta.url),'utf8');
+ const js=readFileSync(new URL('../achievements.js',import.meta.url),'utf8');
+ assert.match(css,/\.ach-flip:not\(\.is-flipped\):hover\{transform:translateY\(-5px\)/);
+ assert.match(js,/front\.addEventListener\('pointermove'/);
+ assert.match(js,/front\.addEventListener\('pointerleave'/);
+});
