@@ -45,7 +45,7 @@ html,body,body *{scrollbar-color:var(--hub-scroll-thumb) var(--hub-scroll-track)
 .ach-back-member.is-me{background:#85ba880d}
 .ach-back-member-top{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:9px}
 .ach-back-member-top b{font-size:11px;overflow-wrap:anywhere;min-width:0;line-height:1.6}
-.ach-back-member-top b small{display:inline-block;vertical-align:middle;white-space:nowrap;margin-left:5px;padding:2px 5px;border-radius:4px;background:#9fc5a51a;border:1px solid #9fc5a533;color:#a7d3b0;font-size:8px;font-weight:500;line-height:1.2}
+.ach-back-member-top b small{display:inline;white-space:nowrap;margin-left:6px;padding:0;border:0;background:none;color:#a7d3b0;font-size:9px;font-weight:500;line-height:inherit}
 .ach-back-member-top>span{font-size:9px;color:var(--ach-color);white-space:nowrap}
 .ach-back-member-top .ach-place{font-size:12px;width:auto;display:inline}
 .ach-back-member .ach-progress-title{gap:5px;margin-bottom:6px}
