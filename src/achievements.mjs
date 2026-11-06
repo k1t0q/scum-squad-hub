@@ -10,7 +10,11 @@ export const achievementDefinitions = [
  ['enemy','Вражеский след','Добавлять вражеские базы','enemy',[1,3,6,12,24],'target','#d77d78','Около 2 баз в месяц'],
  ['guardian','Страж отряда','Обновлять протект отряда','protect',[5,12,40,80,150],'shield','#dbbb70','Около 3 обновлений в неделю'],
  ['reliable','Человек дела','Выполнять назначенные себе задачи','task',[1,10,30,75,150],'orders','#b4a0f5','Около 3 задач в неделю'],
- ['collector','Полный комплект','Довести другие карточки до V уровня','collection',[2,4,6,8,10],'medal','#edc776','Все 10 карточек за год'],
+ ['regular','Долгая служба','Совершать полезные действия в разные дни','active_days',[7,30,90,180,365],'calendar','#87b8cf','Один активный день в день'],
+ ['rhythm','Ритм отряда','Приносить пользу отряду в разные недели','active_weeks',[2,6,13,26,52],'rhythm','#bba0db','Одна активная неделя в неделю'],
+ ['versatile','На все руки','Проявить себя в разных видах активности','variety',[2,3,4,6,8],'tools','#d3ad7d','Все 8 видов помощи отряду'],
+ ['contributor','Опора отряда','Набирать очки за полезные действия','points',[100,500,2000,5000,10000],'beacon','#8fc4a1','Около 200 очков в неделю'],
+ ['collector','Полный комплект','Довести другие карточки до 5 уровня','collection',[2,5,8,11,14],'medal','#edc776','Все 14 карточек за год'],
 ].map(([id,name,description,metric,levels,art,color,pace])=>({id,name,description,metric,levels,art,color,pace}));
 export const achievementPoints={presence:2,marker:5,stash:10,refresh:3,protect:10,task:20};
 function itemProgress(def,value,dates){
@@ -30,10 +34,29 @@ export function buildAchievements(members,events){
    streak=day-previous===86400000?streak+1:1;previous=day;best=Math.max(best,streak);
    if(streakGoals.includes(streak)&&!streakDates[streak])streakDates[streak]=e.occurred_at;
   }
+  // Derived goals use existing durable events, without awarding additional points.
+  const days=new Set(),weeks=new Set(),kinds=new Set();
+  const derived={active_days:[],active_weeks:[],variety:[],points:[]};
+  let points=0;const pointDates=[];
+  const kindsAllowed=new Set([...Object.keys(achievementPoints),'vehicle','enemy']);
+  for(const e of own){
+   if(!kindsAllowed.has(e.metric))continue;
+   if(!kinds.has(e.metric)){kinds.add(e.metric);derived.variety.push(e.occurred_at);}
+   const stamp=Date.parse(e.occurred_at);
+   if(Number.isFinite(stamp)){
+    const day=new Date(stamp+3*3600000).toISOString().slice(0,10);
+    const week=leaderboardBoundaries(new Date(stamp)).week;
+    if(!days.has(day)){days.add(day);derived.active_days.push(e.occurred_at);}
+    if(!weeks.has(week)){weeks.add(week);derived.active_weeks.push(e.occurred_at);}
+   }
+   const weight=achievementPoints[e.metric]||0;
+   if(weight){points+=weight;pointDates.push({value:points,date:e.occurred_at});}
+  }
   const items={};
   for(const a of achievementDefinitions.filter(a=>a.metric!=='collection')){
-   const rows=metrics[a.metric]||[],value=a.metric==='streak'?best:rows.length;
-   const dates=a.levels.map(n=>a.metric==='streak'?streakDates[n]:rows[n-1]?.occurred_at);
+   const rows=metrics[a.metric]||[];
+   const value=a.metric==='streak'?best:a.metric==='points'?points:derived[a.metric]?derived[a.metric].length:rows.length;
+   const dates=a.levels.map(n=>a.metric==='streak'?streakDates[n]:a.metric==='points'?pointDates.find(x=>x.value>=n)?.date:derived[a.metric]?derived[a.metric][n-1]:rows[n-1]?.occurred_at);
    items[a.id]=itemProgress(a,value,dates);
   }
   const earned=Object.values(items).filter(x=>x.completed).sort((a,b)=>a.earnedAt.localeCompare(b.earnedAt));

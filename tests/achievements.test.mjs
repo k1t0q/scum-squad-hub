@@ -46,3 +46,15 @@ test('rankings use current Moscow day, Monday and month boundaries, and isolate 
  const snapshot=await getSquadAchievements(DB,'a',new Date('2026-11-06T20:00:00Z'));assert.equal(snapshot.members.length,2);assert.equal(snapshot.leaderboard.find(x=>x.id==='u').day,22);assert.equal(snapshot.leaderboard.some(x=>x.id==='x'),false);assert.deepEqual(leaderboardBoundaries(new Date('2026-11-01T22:00:00Z')),{day:'2026-11-01T21:00:00.000Z',week:'2026-11-01T21:00:00.000Z',month:'2026-10-31T21:00:00.000Z'});
  const rpc=await legacyApi({rpc:'get_squad_achievements',args:{squad_id:'b'}},{DB},{squad_id:'a',id:'u'});assert.equal(rpc.members.some(x=>x.id==='x'),false);
 });
+test('four added cards derive Moscow days, Monday weeks, distinct activities and weighted points',()=>{
+ const rows=[
+  ['presence','2026-11-01T20:59:00Z'],['marker','2026-11-01T21:01:00Z'],
+  ['stash','2026-11-02T12:00:00Z'],['refresh','2026-11-02T13:00:00Z'],
+  ['vehicle','2026-11-02T14:00:00Z'],['enemy','2026-11-02T15:00:00Z'],
+  ['protect','2026-11-02T16:00:00Z'],['task','2026-11-02T17:00:00Z'],
+  ['ready','2026-11-02T18:00:00Z'],['task','0000-unknown'],
+ ].map(([metric,occurred_at],i)=>({member_id:'u',metric,occurred_at,event_key:String(i)}));
+ const data=buildAchievements([{id:'u',nick:'Player'}],rows),p=data.members[0].items;
+ assert.equal(data.definitions.length,15);assert.equal(data.definitions.at(-1).id,'collector');assert.equal(p.collector.max,14);
+ assert.equal(p.regular.value,2);assert.equal(p.rhythm.value,2);assert.equal(p.versatile.value,8);assert.equal(p.versatile.level,5);assert.equal(p.contributor.value,70);
+});
