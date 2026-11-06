@@ -8,13 +8,13 @@ const rosterSource=source.slice(source.indexOf('function members(){'),source.ind
 
 test('merged squad roster has no legacy per-member duty buttons',()=>{
  const view={innerHTML:'',insertAdjacentHTML(_position,html){this.innerHTML+=html}};
- const context={db:{profile:{nick:'k1t0',access:'admin'},members:[['k1t0','Sniper'],['Player','Rifler']]},window:{currentSquadName:'ДУБЛЬ'},$:()=>view,esc:s=>String(s)};
+ const context={db:{profile:{nick:'k1t0',access:'admin'},members:[['k1t0','Sniper'],['Player','Rifler']]},window:{currentSquadName:'ДУБЛЬ'},$:()=>view,esc:s=>String(s),loadSquadDiscordStatuses:()=>{}};
  vm.createContext(context);vm.runInContext(rosterSource,context);
  context.squadPage();
- assert.match(view.innerHTML,/Состав ДУБЛЬ/);
+ assert.match(view.innerHTML,/<h2>Отряд<\/h2>/);
  assert.match(view.innerHTML,/Изменить ник/);
  assert.match(view.innerHTML,/Выгнать/);
- assert.doesNotMatch(view.innerHTML,/Discord|Настройки/);
+ assert.match(view.innerHTML,/Discord: проверяем/);
  assert.doesNotMatch(view.innerHTML,/editMemberDuties|>Задачи<|Рейд:|Антирейд:/);
 });
 
@@ -25,10 +25,12 @@ test('old roster and settings destinations redirect to one squad tab',()=>{
  assert.doesNotMatch(source,/function editMemberDuties\(|function saveMemberDuties\(/);
 });
 
-test('Discord linking and member management are moved entirely into the profile',()=>{
- assert.match(source,/function editProfile\(\)[^\n]*furyDiscordLinkButton[^\n]*furyDiscordAdminList/);
+test('profile only manages its own Discord; squad manages member Discord links',()=>{
+ assert.match(source,/function editProfile\(\)[^\n]*furyDiscordLinkButton/);
+ assert.doesNotMatch(source,/function editProfile\(\)[^\n]*furyDiscordAdminList/);
  assert.match(source,/function editProfile\(\)[^\n]*loadDiscordLinkStatus\(\)/);
- assert.match(source,/function editProfile\(\)[^\n]*loadDiscordAdminList\(\)/);
+ assert.match(source,/async function loadSquadDiscordStatuses\(\)/);
+ assert.match(source,/adminRevokeMemberChannel/);
  assert.match(source,/document\.getElementById\('profileDiscordCode'\)/);
  assert.doesNotMatch(source,/function settingsPage\(/);
  assert.match(source,/function squadPage\(\)\{members\(\)\}/);

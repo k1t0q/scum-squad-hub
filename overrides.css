@@ -2954,3 +2954,36 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 .profile-discord-code-row button{flex:0 0 auto}
 .profile-discord-admin{margin-top:18px;border-top:1px solid #284039;padding-top:14px}
 .profile-discord-admin>b{display:block;margin-bottom:10px}
+
+/* Roster names must align to the left for every member, regardless of permissions. */
+#view .hub-squad-members .hub-squad-roster .hub-squad-member{padding:12px 15px!important;min-height:64px!important}
+#view .hub-squad-members .hub-squad-roster .hub-squad-member .itemtop{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;width:100%!important;text-align:left!important}
+#view .hub-squad-members .hub-squad-roster .hub-squad-member .hub-squad-member-info{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;flex:1 1 auto!important;min-width:0!important;width:auto!important;margin:0!important;text-align:left!important}
+#view .hub-squad-members .hub-squad-member-info h3,#view .hub-squad-members .hub-squad-member-info>.muted{display:block!important;width:auto!important;max-width:100%!important;margin:0!important;text-align:left!important}
+#view .hub-squad-members .hub-squad-member-info h3{line-height:1.35!important}
+#view .hub-squad-members .hub-squad-member-info>.muted{margin-top:2px!important;font-size:12px}
+#view .hub-squad-members .hub-squad-discord-status:empty,#view .hub-squad-members .hub-squad-discord-action:empty{display:none!important}
+#view .hub-squad-members .hub-squad-discord-status.is-linked{color:#66d9a9!important}
+#view .hub-squad-members .hub-squad-discord-action button{white-space:nowrap!important}
+#view .hub-squad-members .member-actions-row{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;flex-wrap:wrap!important;min-width:0!important;width:auto!important}
+@media(max-width:700px){#view .hub-squad-members .hub-squad-roster .hub-squad-member .itemtop{flex-wrap:wrap!important}#view .hub-squad-members .member-actions-row{width:100%!important;justify-content:flex-start!important}}
+
+/* Place post author and timestamp use the same left alignment as the text below. */
+#view .place-feed-list .ref-feed-post .itemtop{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;text-align:left!important}
+#view .place-feed-list .ref-feed-post .itemtop>div:first-child{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;text-align:left!important;gap:3px!important;min-width:0!important;margin:0!important}
+#view .place-feed-list .ref-feed-post .itemtop>div:first-child>b,#view .place-feed-list .ref-feed-post .ref-feed-date{display:block!important;text-align:left!important;width:auto!important;margin:0!important}
+
+/* A compact profile: own details and Discord actions, advanced squad name tucked away. */
+#dialog:has(.profile-main-form){width:min(510px,calc(100vw - 24px))}
+.profile-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.profile-dialog-head h2{margin:0}
+.profile-main-form{gap:8px!important}
+.profile-main-form>label{margin-top:6px;color:#9caeaa;font-size:12px}
+.profile-main-form .profile-actions{margin-top:12px!important}
+.profile-discord-settings{margin-top:18px;padding:14px}
+.profile-discord-settings>.muted{margin:6px 0 10px}
+.profile-steam-link{display:block;margin:14px 0 0;text-align:center;color:#a8c1b9;text-decoration:none;font-size:13px}
+.profile-steam-link:hover{color:#fff}
+.profile-squad-admin{margin-top:16px;padding:12px 0 0;border-top:1px solid #284039}
+.profile-squad-admin summary{cursor:pointer;color:#a8c1b9;font-size:13px}
+.profile-squad-admin .form{margin-top:12px;gap:8px}
