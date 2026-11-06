@@ -15,7 +15,7 @@ export class MinimapRoom {
  }
  positions(){const peers=new Map(this.departed),now=Date.now();for(const ws of this.ctx.getWebSockets()){if(ws.readyState>=2)continue;const a=ws.deserializeAttachment();if(a?.position&&a.expires>=now){const previous=peers.get(a.id);if(!previous||a.position.at>previous.at)peers.set(a.id,{id:a.id,nick:a.nick,...a.position});}}return [...peers.values()].filter(p=>now-p.at<3600000);}
  diagnose(ws){const own=ws.deserializeAttachment();if(!own||Date.now()>own.expires)return;const now=Date.now();ws.send(JSON.stringify({diagnostic:true,now,connections:this.ctx.getWebSockets().map(peer=>{const a=peer.deserializeAttachment();return {nick:a.nick,active:now<a.expires,received:a.received||0,rejected:a.rejected||0,lastPacketAge:a.packetAt?now-a.packetAt:null,positionAge:a.position?now-a.position.at:null,reason:a.reason||null,client:a.client||null};})}));}
- send(ws){if(ws.readyState>=2)return;const a=ws.deserializeAttachment();if(!a||Date.now()>a.expires){ws.close(4003,"Reauthenticate");return;}try{ws.send(JSON.stringify({self:a.id,now:Date.now(),peers:this.positions()}));}catch{}}
+ send(ws){if(ws.readyState>=2)return;const a=ws.deserializeAttachment();if(!a||Date.now()>a.expires){ws.close(4003,"Reauthenticate");return;}try{ws.send(JSON.stringify({self:a.id,protocol:2,ack:a.ack||0,now:Date.now(),peers:this.positions()}));}catch{}}
  async webSocketMessage(ws,message){
   const a=ws.deserializeAttachment(),now=Date.now();if(!a||now>a.expires){ws.close(4003,'Reauthenticate');return;}
   if(typeof message!=='string'||message.length>1024){ws.close(1009,'Invalid packet');return;}
@@ -29,6 +29,7 @@ export class MinimapRoom {
   if(!validPosition(p)){a.rejected=(a.rejected||0)+1;a.reason=['x','y','z','age','heading'].filter(k=>k==='heading'?!(p?.heading===null||(Number.isFinite(p?.heading)&&p.heading>=0&&p.heading<360)):!(Number.isFinite(p?.[k])&&(k==='age'?p[k]>=0&&p[k]<=86400000:Math.abs(p[k])<=2000000))).join(',');ws.serializeAttachment(a);return;}if(now-a.last<90){ws.serializeAttachment(a);return;}
   a.reason=null;
   if(now-a.checked>30000){const member=await this.env.DB.prepare('SELECT id FROM members WHERE id=? AND squad_id=? AND is_active=1').bind(a.id,a.squad).first();if(!member){ws.close(4003,'Membership revoked');return;}a.checked=now;}
+  if(Number.isSafeInteger(p.seq)&&p.seq>0)a.ack=p.seq;
   a.last=now;a.position={x:p.x,y:p.y,z:p.z,heading:p.heading,at:now-p.age};ws.serializeAttachment(a);this.departed.delete(a.id);
   if(now-this.lastBroadcast>=100){this.lastBroadcast=now;for(const peer of this.ctx.getWebSockets())this.send(peer);}else if(!this.pendingBroadcast){this.pendingBroadcast=true;this.ctx.waitUntil(new Promise(resolve=>setTimeout(()=>{this.pendingBroadcast=false;this.lastBroadcast=Date.now();for(const peer of this.ctx.getWebSockets())this.send(peer);resolve();},Math.max(1,100-(now-this.lastBroadcast)))));}
  }

@@ -23,3 +23,16 @@ test('closing, closed and expired sockets cannot replace active position',async(
  assert.equal(f.room.positions()[0].x,111);
  for(const ws of [active]){ws.readyState=2;const before=ws.sent.length;f.room.send(ws);assert.equal(ws.sent.length,before);}
 });
+
+test('acknowledgement advances only after accepting a position, including heartbeat replies',async()=>{
+ const f=fixture();await f.ready;const a=f.socket('a','Alice');
+ await f.room.webSocketMessage(a,JSON.stringify({...data,seq:17}));
+ assert.equal(a.sent.at(-1).protocol,2);assert.equal(a.sent.at(-1).ack,17);
+ await f.room.webSocketMessage(a,JSON.stringify({...data,seq:18,x:Infinity}));
+ await f.room.webSocketMessage(a,'{"ping":true}');assert.equal(a.sent.at(-1).ack,17);
+ assert.equal(a.sent.at(-1).peers[0].x,data.x);
+});
+test('legacy clients still receive positions without sequence numbers',async()=>{
+ const f=fixture();await f.ready;const a=f.socket('a','Alice');await f.room.webSocketMessage(a,JSON.stringify(data));
+ assert.equal(a.sent.at(-1).ack,0);assert.equal(a.sent.at(-1).peers[0].x,data.x);
+});
