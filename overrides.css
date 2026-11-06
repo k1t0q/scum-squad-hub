@@ -2938,3 +2938,5 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 
 /* Squad roster: show pointer cursor on actionable buttons */
 #view .member-actions-row button{cursor:pointer!important}
+
+.ref-event-icon-achievement_points{color:#d9bb73!important;border-color:#685432!important;background:#2d271855!important}

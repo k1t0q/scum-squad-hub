@@ -1,3 +1,4 @@
+import {getSquadRecentEvents} from './recent-events.mjs';
 import {getSquadAchievements} from './achievements.mjs';
 import {publishStashMarker} from './stash-marker-publication.mjs';
 // Explicit table/column allowlists. Every query is scoped to verified membership.
@@ -29,7 +30,7 @@ export async function legacyApi(body,env,m){
  }
  case 'get_squad_place_posts':return (await all('SELECT p.*,m.nick AS author_nick,m.nick AS nick FROM squad_place_posts p LEFT JOIN members m ON m.id=p.created_by WHERE p.squad_id=? AND p.kind=? ORDER BY p.created_at DESC',[m.squad_id,p.p_kind])).map(decode);
  case 'get_squad_map_posts':return (await all("SELECT p.*,m.nick AS author_nick FROM squad_place_posts p LEFT JOIN members m ON m.id=p.created_by WHERE p.squad_id=? AND kind IN ('stash','base','other')",[m.squad_id])).map(decode);
- case 'get_squad_recent_events':return await all('SELECT e.*,m.nick AS actor_nick FROM squad_notification_events e LEFT JOIN members m ON m.id=e.actor_id WHERE e.squad_id=? ORDER BY e.created_at DESC LIMIT ?',[m.squad_id,Math.min(50,Number(p.p_limit)||9)]);
+ case 'get_squad_recent_events':return getSquadRecentEvents(db,m.squad_id,p.p_limit);
  case 'squad_map_sync':if(p.p_action==='list')return (await all('SELECT * FROM squad_map_markers WHERE squad_id=?',[m.squad_id])).map(mapMarker);if(p.p_action==='delete'){
  const id=String(p.p_id||'');
  if(!id)fail('invalid_marker_id');
