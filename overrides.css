@@ -2940,3 +2940,34 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 #view .member-actions-row button{cursor:pointer!important}
 
 .ref-event-icon-achievement_points{color:#d9bb73!important;border-color:#685432!important;background:#2d271855!important}
+
+/* Unified restrained card outlines throughout the HUB, excluding controls and the map canvas. */
+#view{--hub-card-line:#365248;--hub-card-line-hover:#648b78}
+#view .card,
+#view .ref-card,
+#view .item,
+#view .ref-expl-item,
+#view .explosiveitem,
+#view .explosivewalls{
+ border-color:var(--hub-card-line);
+ border-radius:10px;
+ transition:border-color .2s ease,box-shadow .2s ease;
+}
+@media(hover:hover) and (pointer:fine){
+ #view .card:hover:not(:has(.item:hover,.ref-card:hover,.ref-expl-item:hover)),
+ #view .ref-card:hover,
+ #view .item:hover,
+ #view .ref-expl-item:hover,
+ #view .explosiveitem:hover,
+ #view .explosivewalls:hover{
+  border-color:var(--hub-card-line-hover);
+ }
+ #view .item:hover,
+ #view .ref-expl-item:hover,
+ #view .explosiveitem:hover{
+  box-shadow:inset 0 0 0 1px #8fbba016,0 5px 18px #0002;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #view .card,#view .ref-card,#view .item,#view .ref-expl-item,#view .explosiveitem,#view .explosivewalls{transition:none}
+}
