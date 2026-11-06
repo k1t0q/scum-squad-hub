@@ -1226,39 +1226,6 @@ async function createDiscordLinkCode() {
 }
 
 
-/* Subtle directional hover glow: top/left/right/bottom follow mouse position. */
-(function initFuryCardGlow(){
- if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches)return;
- let active=null,frame=0,lastEvent=null;
- const clear=()=>{
-  if(active){active.classList.remove('fury-glow-active');active=null}
- };
- document.addEventListener('pointermove',e=>{
-  if(e.pointerType!=='mouse')return;
-  const card=e.target instanceof Element?e.target.closest('.ref-card,.card'):null;
-  if(card!==active){clear();active=card;if(active)active.classList.add('fury-glow-active')}
-  if(!card)return;
-  lastEvent={x:e.clientX,y:e.clientY,card};
-  if(frame)return;
-  frame=requestAnimationFrame(()=>{
-   frame=0;
-   if(!lastEvent||lastEvent.card!==active)return;
-   const rect=active.getBoundingClientRect();
-   if(!rect.width||!rect.height)return;
-   const x=Math.max(0,Math.min(1,(lastEvent.x-rect.left)/rect.width));
-   const y=Math.max(0,Math.min(1,(lastEvent.y-rect.top)/rect.height));
-   active.style.setProperty('--fury-glow-x',(x*100).toFixed(1)+'%');
-   active.style.setProperty('--fury-glow-y',(y*100).toFixed(1)+'%');
-   active.style.setProperty('--fury-glow-shift-x',((x-.5)*20).toFixed(1)+'px');
-   active.style.setProperty('--fury-glow-shift-y',((y-.5)*20).toFixed(1)+'px');
-  });
- },{passive:true});
- document.addEventListener('pointerleave',clear,{passive:true});
- window.addEventListener('blur',clear);
-})();
-
-
-
 /* Migration-only bridge for the ORIGINAL SCUM HUB UI.
    Explicit invocation only: never replaces live Supabase data automatically. */
 // Migration-only, explicitly invoked test path. Does not alter the production login.
