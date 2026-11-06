@@ -2969,6 +2969,11 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 #view .hub-squad-members .hub-squad-discord-status.is-linked{color:#66d9a9!important}
 #view .hub-squad-members .hub-squad-discord-action button{white-space:nowrap!important}
 #view .hub-squad-members .member-actions-row{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;flex-wrap:wrap!important;min-width:0!important;width:auto!important}
+/* Override the legacy last-column stack: all admin buttons share one row. */
+#view .hub-squad-members .hub-squad-roster .hub-squad-member .itemtop>div.member-actions-row:last-child{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;min-width:0!important;width:auto!important;white-space:nowrap!important}
+#view .hub-squad-members .hub-squad-roster .hub-squad-member .member-actions-row>button,
+#view .hub-squad-members .hub-squad-roster .hub-squad-member .hub-squad-discord-action>button{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;width:auto!important;min-width:0!important;height:34px!important;margin:0!important;white-space:nowrap!important}
+#view .hub-squad-members .hub-squad-roster .hub-squad-member .hub-squad-discord-action{display:inline-flex!important;align-items:center!important;flex:0 0 auto!important}
 @media(max-width:700px){#view .hub-squad-members .hub-squad-roster .hub-squad-member .itemtop{flex-wrap:wrap!important}#view .hub-squad-members .member-actions-row{width:100%!important;justify-content:flex-start!important}}
 
 /* Place post author and timestamp use the same left alignment as the text below. */

@@ -47,13 +47,15 @@ test('Onest font files resolve and achievements use Onest, except squad logo',()
 test('squad name column overrides the legacy last-child right alignment',()=>{
  const css=readFileSync(new URL('../overrides.css',import.meta.url),'utf8');
  assert.match(css,/\.itemtop>div\.hub-squad-member-info:last-child/);
+ assert.match(css,/\.itemtop>div\.member-actions-row:last-child\{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important/);
  assert.match(css,/align-items:flex-start!important;justify-content:center!important/);
 });
 
-test('achievement hover animation is independent from flip animation',()=>{
+test('achievement hover restores the original cursor tilt without lifting the card',()=>{
  const css=readFileSync(new URL('../achievements.css',import.meta.url),'utf8');
  const js=readFileSync(new URL('../achievements.js',import.meta.url),'utf8');
- assert.match(css,/\.ach-flip:not\(\.is-flipped\):hover\{transform:translateY\(-5px\)/);
- assert.match(js,/front\.addEventListener\('pointermove'/);
- assert.match(js,/front\.addEventListener\('pointerleave'/);
+ assert.match(css,/\.ach-flip-front\{[^\n]*rotateX\(var\(--rx,0deg\)\) rotateY\(var\(--ry,0deg\)\)/);
+ assert.doesNotMatch(css,/\.ach-flip:not\(\.is-flipped\):hover\{transform:translateY/);
+ assert.match(js,/front\.onpointermove=e=>/);
+ assert.match(js,/front\.onpointerleave=\(\)=>/);
 });
