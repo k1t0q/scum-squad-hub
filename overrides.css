@@ -2912,28 +2912,35 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 #view .item,
 #view .ref-expl-item,
 #view .explosiveitem,
-#view .explosivewalls{
+#view .explosivewalls,
+#view .fury-simple-settings .fury-settings-main-row,
+#view .fury-simple-settings .fury-discord-admin{
  border-color:var(--hub-card-line);
  border-radius:10px;
  transition:border-color .2s ease,box-shadow .2s ease;
 }
+#view .item:hover{transform:none!important}
 @media(hover:hover) and (pointer:fine){
- #view .card:hover:not(:has(.item:hover,.ref-card:hover,.ref-expl-item:hover)),
+ #view .card:hover:not(.fury-settings):not(:has(.item:hover,.ref-card:hover,.ref-expl-item:hover)),
  #view .ref-card:hover,
  #view .item:hover,
  #view .ref-expl-item:hover,
  #view .explosiveitem:hover,
- #view .explosivewalls:hover{
+ #view .explosivewalls:hover,
+ #view .fury-simple-settings .fury-settings-main-row:hover,
+ #view .fury-simple-settings .fury-discord-admin:hover{
   border-color:var(--hub-card-line-hover);
   outline:1px solid color-mix(in srgb,var(--hub-card-line-hover) 58%,transparent);
   outline-offset:2px;
  }
  #view .item:hover,
  #view .ref-expl-item:hover,
- #view .explosiveitem:hover{
+ #view .explosiveitem:hover,
+ #view .fury-simple-settings .fury-settings-main-row:hover,
+ #view .fury-simple-settings .fury-discord-admin:hover{
   box-shadow:0 0 0 1px #8fbba026,0 0 15px #80bd9d14;
  }
 }
 @media(prefers-reduced-motion:reduce){
- #view .card,#view .ref-card,#view .item,#view .ref-expl-item,#view .explosiveitem,#view .explosivewalls{transition:none}
+ #view .card,#view .ref-card,#view .item,#view .ref-expl-item,#view .explosiveitem,#view .explosivewalls,#view .fury-settings-main-row,#view .fury-discord-admin{transition:none}
 }
