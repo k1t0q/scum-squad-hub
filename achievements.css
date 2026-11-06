@@ -17,6 +17,39 @@ html,body,body *{scrollbar-color:var(--hub-scroll-thumb) var(--hub-scroll-track)
 .ach-member-name>b small{color:#8fbc9c;font-size:9px;font-weight:400}
 .ach-top-row>.ach-place{margin-right:5px}
 
+/* Two real card faces: the front retains its layout, while the back scrolls independently. */
+.ach-flip{min-width:0;perspective:1200px;position:relative;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .18s ease-out}
+.ach-flip-inner{height:100%;position:relative;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.2,.72,.15,1)}
+.ach-flip.is-flipped .ach-flip-inner{transform:rotateY(180deg)}
+.ach-flip-front{width:100%;height:100%;transform:none!important;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.ach-flip.is-flipped .ach-flip-front{pointer-events:none}
+.ach-card-back{position:absolute;inset:0;display:flex;flex-direction:column;min-height:0;overflow:hidden;border:1px solid color-mix(in srgb,var(--ach-color) 55%,#28312d);border-radius:14px;background:linear-gradient(165deg,#1b2924,#0b1210 72%);box-shadow:0 10px 35px #0006;transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;color:#e1e8e4}
+.ach-flip:not(.is-flipped) .ach-card-back{pointer-events:none;visibility:hidden;transition:visibility 0s .62s}
+.ach-back-head{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:13px 13px 10px;border-bottom:1px solid #ffffff13}
+.ach-back-head .ach-eyebrow{font-size:8px;letter-spacing:1.1px;color:var(--ach-color)}
+.ach-back-close{background:#ffffff0b!important;border:1px solid #ffffff1c!important;border-radius:6px!important;color:#d8e5dc!important;padding:5px 7px!important;font-size:10px!important;cursor:pointer}
+.ach-back-close:focus-visible{outline:2px solid var(--ach-color);outline-offset:2px}
+.ach-back-scroll{overflow-y:auto;overscroll-behavior:contain;min-height:0;padding:13px;scrollbar-width:thin}
+.ach-back-scroll h3{font-size:16px;line-height:1.2;margin:0 0 6px;color:#f0f5ee}
+.ach-back-desc{font-size:10px;line-height:1.5;color:#a9bbb0;margin:0 0 12px}
+.ach-back-milestones{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.ach-back-milestones span{border:1px solid #ffffff18;border-radius:5px;text-align:center;padding:5px 1px;color:#abbdb0;font-size:9px}
+.ach-back-milestones b{display:block;color:var(--ach-color);font-size:11px}
+.ach-back-note{font-size:9px;line-height:1.5;color:#8d9f95;margin:10px 0 16px}
+.ach-back-scroll h4{color:var(--ach-color);font-size:9px;letter-spacing:1px;margin:0 0 6px}
+.ach-back-member{padding:11px 2px;border-top:1px solid #ffffff12}
+.ach-back-member.is-me{background:#85ba880d}
+.ach-back-member-top{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:9px}
+.ach-back-member-top b{font-size:11px;overflow-wrap:anywhere;min-width:0}
+.ach-back-member-top b small{color:#8fbc9c;font-size:8px;font-weight:400}
+.ach-back-member-top>span{font-size:9px;color:var(--ach-color);white-space:nowrap}
+.ach-back-member-top .ach-place{font-size:12px;width:auto;display:inline}
+.ach-back-member .ach-progress-title{gap:5px;margin-bottom:6px}
+.ach-back-member .ach-progress-title>b{font-size:11px}
+.ach-back-member .ach-progress-title>span{font-size:9px}
+@media(max-width:900px){.ach-back-head{padding:9px}.ach-back-close span{display:none}.ach-back-scroll{padding:9px}.ach-back-scroll h3{font-size:13px}.ach-back-desc{font-size:9px}.ach-back-milestones{gap:2px}.ach-back-milestones span{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.ach-flip,.ach-flip-inner{transition:none!important}}
+
 .ach-points-list{list-style:none;margin:13px 0 0;padding:0;max-width:490px;display:grid;gap:0}
 .ach-points-list li{display:flex;justify-content:space-between;align-items:baseline;gap:18px;padding:7px 0;border-bottom:1px solid #ffffff08}
 .ach-points-list b{flex-shrink:0;color:#d9bb73;font-size:12px}
