@@ -808,26 +808,32 @@ async function exitOriginalD1Hub(){
  authScreen();
 }
 function authScreen(){modal('<h2>Вход в SCUM HUB</h2><div id="authForm"></div>','fury-role-dialog');showMemberLogin()}
-function showMemberLogin(){let a=$('#authForm');if(!a)return;a.innerHTML='<form class="form" onsubmit="doJoin(event)"><input name="code" required placeholder="Код состава"><input name="nick" required value="" autocomplete="off" placeholder="Ник">'+furySelectPicker('role',['Rifler','Bomber','Locker','Builder','Helper','Sniper'],'','Выбрать роль')+'<button class="primary">ВОЙТИ В СОСТАВ</button></form>'}
+function showMemberLogin(){let a=$('#authForm');if(!a)return;a.innerHTML='<form class="form" onsubmit="doJoin(event)"><input name="code" required placeholder="Код состава"><input name="nick" required value="" autocomplete="off" placeholder="Ник">'+(isD1HubHost()?'':furySelectPicker('role',['Rifler','Bomber','Locker','Builder','Helper','Sniper'],'','Выбрать роль'))+'<button type="submit" class="primary">ВОЙТИ В СОСТАВ</button><div id="hubLoginStatus" role="alert" aria-live="polite" style="color:#ff817a;min-height:18px"></div></form>'}
+function hubLoginError(error){const message=String(error?.message||error||'');return ({invalid_credentials:'Неверный ник или код состава. Введи ник, указанный в составе отряда.',admin_requires_separate_login:'Для администратора нужен личный код входа.',too_many_attempts:'Слишком много попыток. Подожди минуту и повтори.',rate_limit_unavailable:'Вход временно недоступен. Попробуй чуть позже.',session_not_configured:'Вход временно недоступен. Сообщи администратору.'})[message]||((error?.name==='AbortError'||error?.name==='TimeoutError'||message==='Failed to fetch')?'Не удалось связаться с хабом. Повтори попытку.':message||'Не удалось войти в хаб. Повтори попытку.')}
+async function loginExistingHubMember(form,nick,code){
+ const submit=form.querySelector('button[type=submit],button.primary'),status=form.querySelector('#hubLoginStatus');
+ if(submit){submit.disabled=true;submit.textContent='ПОДКЛЮЧАЮСЬ…'}if(status)status.textContent='';
+ try{
+  let snapshot;
+  if(nick.toLowerCase()==='k1t0'){
+   const r=await fetch('/api/admin/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({code}),signal:AbortSignal.timeout(15000)});
+   const data=await r.json();if(!r.ok)throw Error(data.error||'Неверный код администратора');
+   const adapter=await import('./src/legacy-d1-adapter.mjs');snapshot=await adapter.fetchMemberSnapshot();
+  }else{const result=await window.scumHubD1CodeLogin({code,nick});snapshot=result.raw;}
+  await mountOriginalD1Hub(snapshot);
+ }catch(error){if(status)status.textContent=hubLoginError(error);else toast(hubLoginError(error));}
+ finally{if(submit){submit.disabled=false;submit.textContent='ВОЙТИ В СОСТАВ'}}
+}
+
 function showAdminLogin(){if(isD1HubHost()){toast('Вход администратора переносится отдельно');return}let a=$('#authForm');if(!a)return;$('#adminTab')?.classList.add('on');$('#memberTab')?.classList.remove('on');a.innerHTML='<form class="form" onsubmit="adminLogin(event)"><input name="email" type="email" required autocomplete="username" placeholder="E-mail"><input name="password" type="password" required minlength="6" autocomplete="current-password" placeholder="Пароль"><button class="primary">ВОЙТИ КАК АДМИН</button><button type="button" class="ghost" onclick="adminSignup(event)">ПЕРВЫЙ ВХОД / СОЗДАТЬ ПАРОЛЬ</button><div id="adminAuthStatus" class="muted" style="min-height:18px"></div></form><small class="muted">При первом входе создай пароль. После этого используй обычный вход администратора.</small>'}
 async function adminSignup(e){if(e)e.preventDefault();let st=$('#adminAuthStatus'),form=$('#authForm form');if(!form)return;let f=new FormData(form),email=String(f.get('email')||'').trim(),password=String(f.get('password')||'');if(!email){if(st)st.textContent='Введи e-mail';return}if(password.length<6){if(st)st.textContent='Пароль минимум 6 символов';return}if(st)st.textContent='Создаю учётную запись…';let r=await sb.auth.signUp({email,password});if(r.error){if(st)st.textContent='Ошибка: '+r.error.message;return}if(!r.data.session){if(st)st.textContent='Готово. Проверь почту и подтверди e-mail, затем нажми «ВОЙТИ КАК АДМИН».';return}if(st)st.textContent='Учётная запись создана. Вхожу…';await finishAdminLogin()}
 async function adminLogin(e){e.preventDefault();let f=new FormData(e.target);await sb.auth.signOut({scope:'local'});let r=await sb.auth.signInWithPassword({email:f.get('email'),password:f.get('password')});if(r.error){toast('Неверный e-mail или пароль');return}await finishAdminLogin()}
 async function finishAdminLogin(){let r=await sb.rpc('claim_admin_account');if(r.error){toast('Эта учётка не является администратором');await sb.auth.signOut({scope:'local'});return}onlineMember=r.data;db.profile={nick:r.data.nick,role:r.data.game_role,access:r.data.access_role};save();closeModal();await syncOnline();await loadSquadName();unlockApp();toast('Вход администратора выполнен')}
 async function joinOnline(){if(!sb)return;let {data:{session}}=await sb.auth.getSession();if(session){let {data:m}=await sb.rpc('current_member');if(m){onlineMember=m;db.profile={nick:m.nick,role:m.game_role,access:m.access_role};save();await syncOnline();await loadSquadName();unlockApp();return}if(!session.user.is_anonymous&&session.user.email?.toLowerCase()==='nikitinrf@bk.ru'){await finishAdminLogin();return}}authScreen()}
 async function ensureAnonymous(){let {data:{session}}=await sb.auth.getSession();if(!session||!session.user.is_anonymous){if(session)await sb.auth.signOut({scope:'local'});let r=await sb.auth.signInAnonymously();if(r.error)throw r.error}}
-async function doJoin(e){e.preventDefault();let f=new FormData(e.target),nick=String(f.get('nick')||'').trim(),code=String(f.get('code')||'').trim();if(isD1HubHost()&&nick.toLowerCase()==='k1t0'){try{const r=await fetch('/api/admin/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({code})});const data=await r.json();if(!r.ok)throw Error(data.error||'Неверный код администратора');const adapter=await import('./src/legacy-d1-adapter.mjs');closeModal();await mountOriginalD1Hub(await adapter.fetchMemberSnapshot())}catch(err){toast(err.message)}return}if(!f.get('role')){toast('Выбери роль');return}
-if(isD1HubHost()){
-  const submit=e.target.querySelector('button[type=submit],button.primary');
-  if(submit)submit.disabled=true;
-  try{
-    const result=await window.scumHubD1CodeLogin({code,nick,role:f.get('role')});
-    const adapter=await import('./src/legacy-d1-adapter.mjs');
-    closeModal();
-    await mountOriginalD1Hub(result.raw);
-  }catch(err){toast(err.message||'Ошибка входа');}
-  finally{if(submit)submit.disabled=false;}
-  return;
-}
+async function doJoin(e){e.preventDefault();let f=new FormData(e.target),nick=String(f.get('nick')||'').trim(),code=String(f.get('code')||'').trim();
+if(isD1HubHost()){await loginExistingHubMember(e.target,nick,code);return;}
+if(!f.get('role')){toast('Выбери роль');return;}
 try{await ensureAnonymous()}catch(x){toast('Не удалось создать сессию');return}if(nick.toLowerCase()==='k1t0'){let r=await sb.rpc('join_admin_device',{p_code:code,p_nick:nick});if(r.error){toast('Неверный код администратора');return}onlineMember=r.data;db.profile={nick:r.data.nick,role:r.data.game_role,access:'admin'};save();closeModal();await syncOnline();await loadSquadName();unlockApp();toast('Вход администратора выполнен');return}let {data,error}=await sb.rpc('join_squad',{p_code:code,p_nick:nick,p_role:f.get('role')});if(error){toast(error.message.includes('duplicate')?'Ник уже занят':'Неверный код или ошибка входа');return}onlineMember=data;db.profile={nick:data.nick,role:data.game_role,access:data.access_role};save();closeModal();await syncOnline();await loadSquadName();unlockApp();toast('Добро пожаловать в FURY')}
 
 function showK1t0Login(code){let a=$('#authForm');if(!a)return;a.innerHTML='<div class="form"><div class="muted">Профиль <b class="acid">k1t0</b></div><div class="muted">Вход без пароля через ссылку на почте.</div><button class="primary" onclick="sendK1t0MagicLink(\''+esc(code||'').replace(/'/g,"\\'")+'\')">ПОЛУЧИТЬ ССЫЛКУ НА ПОЧТУ</button><button type="button" class="ghost" onclick="showMemberLogin()">Назад</button><div id="k1t0AuthStatus" class="muted" style="min-height:18px"></div></div>'}
@@ -1258,7 +1264,7 @@ async function createDiscordLinkCode() {
 // Migration-only, explicitly invoked test path. Does not alter the production login.
 window.scumHubD1CodeLogin=async function({code,nick,role}){
   if(!isD1HubHost())throw new Error('Доступно только на тестовом Cloudflare Worker');
-  const response=await fetch('/api/member/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({code,nick,role})});
+  const response=await fetch('/api/member/login',{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({code,nick,role}),signal:AbortSignal.timeout(15000)});
   const result=await response.json();
   if(!response.ok)throw new Error(result.error||'Ошибка входа');
   const adapter=await import('./src/legacy-d1-adapter.mjs');
