@@ -1,3 +1,4 @@
+import {getSquadAchievements} from './achievements.mjs';
 import {publishStashMarker} from './stash-marker-publication.mjs';
 // Explicit table/column allowlists. Every query is scoped to verified membership.
 const tables={squads:['name','appearance'],members:['nick','game_role'],presence_history:['status','join_time','day'],tasks:['title','quantity','unit','place','priority','deadline','comment','status','assignee_id'],task_contributions:['task_id','amount'],raids:['title','raid_time','note','raid_date','sector','walls','loadout','transport','rally_point','target_images'],raid_participants:['raid_id'],explosives_inventory:['item','quantity'],protect_updates:['member_id','effective_at'],squad_place_posts:['kind','images','comment','map_marker_name'],protect_update_edits:[],squad_member_duties:['member_id','raid','def','counter'],squad_map_markers:['id','x','y','type','name','note','icon','color','size','show_label','locked','enemy_nicks'],squad_photo_annotations:['photo_url','strokes'],squad_notification_events:[]};
@@ -16,6 +17,7 @@ export async function legacyApi(body,env,m){
  const event=async(category,title,body='',sourceKey=crypto.randomUUID())=>run('INSERT INTO squad_notification_events (id,squad_id,category,actor_id,title,body,source_key,created_at) VALUES (?,?,?,?,?,?,?,?)',[Date.now()*1000+crypto.getRandomValues(new Uint16Array(1))[0]%1000,m.squad_id,category,m.id,title,body,sourceKey,now]);
  if(body.rpc){const p=body.args||{};
  switch(body.rpc){
+ case 'get_squad_achievements':return getSquadAchievements(db,m.squad_id);
  case 'current_member': case 'claim_admin_account':return {...m,is_active:true};
  case 'get_squad_map_snapshot':{
  const [markerResult,postResult]=await db.batch([
@@ -104,7 +106,7 @@ export async function legacyApi(body,env,m){
  if(cols.includes('created_at'))v.created_at=now;if(cols.includes('updated_at'))v.updated_at=now;if(cols.includes('updated_by'))v.updated_by=m.id;
  if(cols.includes('id')&&!['members','squads','squad_map_markers'].includes(t))v.id=Date.now()*1000+crypto.getRandomValues(new Uint16Array(1))[0]%1000;
  if(t==='squad_map_markers'&&(!Number.isFinite(Number(v.x))||!Number.isFinite(Number(v.y))||v.x<0||v.x>1||v.y<0||v.y>1))fail('invalid_coordinates');
- let newVehicle=false;if(t==='squad_map_markers'){v.id=String(input.id||crypto.randomUUID());const existing=await all('SELECT * FROM squad_map_markers WHERE id=?',[v.id]);if(existing.length&&(existing[0].squad_id!==m.squad_id||(existing[0].locked&&!admin)))fail('forbidden');newVehicle=!existing.length&&['vehicle','car','transport'].includes(v.type);if(existing[0]?.type==='stash'&&v.type==='stash'){v.updated_at=existing[0].updated_at;if(cols.includes('created_by'))v.created_by=existing[0].created_by}}
+ let newVehicle=false;if(t==='squad_map_markers'){v.id=String(input.id||crypto.randomUUID());const existing=await all('SELECT * FROM squad_map_markers WHERE id=?',[v.id]);if(existing.length&&(existing[0].squad_id!==m.squad_id||(existing[0].locked&&!admin)))fail('forbidden');if(existing[0])v.created_by=existing[0].created_by;newVehicle=!existing.length&&['vehicle','car','transport'].includes(v.type);if(existing[0]?.type==='stash'&&v.type==='stash'){v.updated_at=existing[0].updated_at;if(cols.includes('created_by'))v.created_by=existing[0].created_by}}
  if(t==='presence_history'&&action==='upsert'){const old=(await all('SELECT id FROM presence_history WHERE member_id=? AND day=? AND squad_id=?',[m.id,v.day,m.squad_id]))[0];if(old)v.id=old.id}
  if(t==='explosives_inventory'&&(!Number.isFinite(Number(v.quantity))||v.quantity<0||v.quantity>300))fail('invalid_quantity');
  const keys=Object.keys(v),pk=info.filter(x=>x.pk).map(x=>x.name);const conflict=action==='upsert'?' ON CONFLICT ('+pk.map(k=>'"'+k+'"').join(',')+') DO UPDATE SET '+keys.filter(k=>!pk.includes(k)).map(k=>'"'+k+'"=excluded."'+k+'"').join(','):'';

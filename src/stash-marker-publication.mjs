@@ -26,6 +26,14 @@ export async function publishStashMarker(env,member,input){
  db.prepare('DELETE FROM squad_map_markers WHERE id=? AND squad_id=?').bind(sourceId,member.squad_id)
  ];
  if(!post&&original?.type!=='stash')statements.push(db.prepare("INSERT INTO squad_notification_events(id,squad_id,category,actor_id,title,body,source_key,created_at) SELECT ?,?,'stash',?,'Новый схрон',?,?,? WHERE NOT EXISTS(SELECT 1 FROM squad_notification_events WHERE source_key=?)").bind(Date.now()*1000+crypto.getRandomValues(new Uint16Array(1))[0]%1000,member.squad_id,member.id,marker.name||'Схрон','squad-place:'+postId,now,'squad-place:'+postId));
+ // Converting an existing marker changes its identity, not its lifetime contribution.
+ if(original&&(await all("SELECT name FROM sqlite_master WHERE type='table' AND name='hub_achievement_events'",[])).length){
+  const metrics=original.type==='stash'?['marker','stash']:['marker'];
+  for(const metric of metrics){
+   statements.push(db.prepare('UPDATE hub_achievement_events SET occurred_at=MIN(occurred_at,COALESCE((SELECT occurred_at FROM hub_achievement_events WHERE squad_id=? AND member_id=? AND metric=? AND event_key=?),occurred_at)) WHERE squad_id=? AND member_id=? AND metric=? AND event_key=?').bind(member.squad_id,author,metric,'map:'+sourceId,member.squad_id,author,metric,'post:'+postId));
+   statements.push(db.prepare('DELETE FROM hub_achievement_events WHERE squad_id=? AND member_id=? AND metric=? AND event_key=?').bind(member.squad_id,author,metric,'map:'+sourceId));
+  }
+ }
  await db.batch(statements);
  return {id:postId,marker_id:id,existing:!!post||original?.type==='stash'};
 }
