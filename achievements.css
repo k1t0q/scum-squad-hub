@@ -27,9 +27,13 @@ html,body,body *{scrollbar-color:var(--hub-scroll-thumb) var(--hub-scroll-track)
 .ach-flip:not(.is-flipped) .ach-card-back{pointer-events:none;visibility:hidden;transition:visibility 0s .62s}
 .ach-back-head{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:13px 13px 10px;border-bottom:1px solid #ffffff13}
 .ach-back-head .ach-eyebrow{font-size:8px;letter-spacing:1.1px;color:var(--ach-color)}
-.ach-back-close{background:#ffffff0b!important;border:1px solid #ffffff1c!important;border-radius:6px!important;color:#d8e5dc!important;padding:5px 7px!important;font-size:10px!important;cursor:pointer}
-.ach-back-close:focus-visible{outline:2px solid var(--ach-color);outline-offset:2px}
-.ach-back-scroll{overflow-y:auto;overscroll-behavior:contain;min-height:0;padding:13px;scrollbar-width:thin}
+.ach-back-turn{font-size:17px;color:var(--ach-color);opacity:.8}
+.ach-card-back{cursor:pointer}
+.ach-card-back:focus-visible{outline:2px solid var(--ach-color);outline-offset:-3px}
+.ach-back-scroll{overflow-y:auto;overscroll-behavior:contain;min-height:0;padding:13px;scrollbar-width:thin;scrollbar-color:var(--ach-color) #08110f!important}
+.ach-back-scroll::-webkit-scrollbar{width:7px}
+.ach-back-scroll::-webkit-scrollbar-thumb{background:var(--ach-color)!important;border:1px solid #08110f;border-radius:8px}
+.ach-back-scroll::-webkit-scrollbar-track{background:#08110f!important}
 .ach-back-scroll h3{font-size:16px;line-height:1.2;margin:0 0 6px;color:#f0f5ee}
 .ach-back-desc{font-size:10px;line-height:1.5;color:#a9bbb0;margin:0 0 12px}
 .ach-back-milestones{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
@@ -40,14 +44,14 @@ html,body,body *{scrollbar-color:var(--hub-scroll-thumb) var(--hub-scroll-track)
 .ach-back-member{padding:11px 2px;border-top:1px solid #ffffff12}
 .ach-back-member.is-me{background:#85ba880d}
 .ach-back-member-top{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:9px}
-.ach-back-member-top b{font-size:11px;overflow-wrap:anywhere;min-width:0}
-.ach-back-member-top b small{color:#8fbc9c;font-size:8px;font-weight:400}
+.ach-back-member-top b{font-size:11px;overflow-wrap:anywhere;min-width:0;line-height:1.6}
+.ach-back-member-top b small{display:inline-block;vertical-align:middle;white-space:nowrap;margin-left:5px;padding:2px 5px;border-radius:4px;background:#9fc5a51a;border:1px solid #9fc5a533;color:#a7d3b0;font-size:8px;font-weight:500;line-height:1.2}
 .ach-back-member-top>span{font-size:9px;color:var(--ach-color);white-space:nowrap}
 .ach-back-member-top .ach-place{font-size:12px;width:auto;display:inline}
 .ach-back-member .ach-progress-title{gap:5px;margin-bottom:6px}
 .ach-back-member .ach-progress-title>b{font-size:11px}
 .ach-back-member .ach-progress-title>span{font-size:9px}
-@media(max-width:900px){.ach-back-head{padding:9px}.ach-back-close span{display:none}.ach-back-scroll{padding:9px}.ach-back-scroll h3{font-size:13px}.ach-back-desc{font-size:9px}.ach-back-milestones{gap:2px}.ach-back-milestones span{font-size:8px}}
+@media(max-width:900px){.ach-back-head{padding:9px}.ach-back-scroll{padding:9px}.ach-back-scroll h3{font-size:13px}.ach-back-desc{font-size:9px}.ach-back-milestones{gap:2px}.ach-back-milestones span{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.ach-flip,.ach-flip-inner{transition:none!important}}
 
 .ach-points-list{list-style:none;margin:13px 0 0;padding:0;max-width:490px;display:grid;gap:0}
