@@ -2938,3 +2938,19 @@ body>.ref-post-menu-pop.fury-post-menu-portal button{
 @media(prefers-reduced-motion:reduce){
  #view .card,#view .ref-card,#view .item,#view .ref-expl-item,#view .explosiveitem,#view .explosivewalls{transition:none}
 }
+
+/* Discord account management lives inside the player's profile dialog. */
+#dialog:has(.profile-discord-settings){width:min(580px,calc(100vw - 24px));max-height:min(90vh,900px);overflow-y:auto}
+.profile-discord-settings{margin-top:20px;padding:16px;border:1px solid #284039;border-radius:10px;background:rgba(13,31,27,.72)}
+.profile-discord-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.profile-discord-heading>b{font-size:16px}
+.profile-discord-settings>.muted{font-size:13px;margin:8px 0 12px}
+.profile-discord-settings>.fury-setting-action{width:100%;min-height:38px;visibility:visible!important}
+.profile-discord-code{margin-top:14px;padding:12px;border:1px solid #395749;border-radius:8px;background:#0c1916}
+.profile-discord-code[hidden]{display:none}
+.profile-discord-code .muted{font-size:12px;margin:0 0 10px}
+.profile-discord-code-row{display:flex;gap:8px;flex-wrap:wrap}
+.profile-discord-code-row input{min-width:0;flex:1 1 160px}
+.profile-discord-code-row button{flex:0 0 auto}
+.profile-discord-admin{margin-top:18px;border-top:1px solid #284039;padding-top:14px}
+.profile-discord-admin>b{display:block;margin-bottom:10px}

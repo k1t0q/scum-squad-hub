@@ -13,12 +13,12 @@ test('Onest is bundled locally with Cyrillic and Latin font subsets',()=>{
   assert.ok(css.includes(filename));
   assert.ok(statSync(new URL(`fonts/onest/${filename}`,root)).size>5000);
  }
- assert.match(html,/fonts\/onest\.css\?v=1/);
+ assert.match(html,/fonts\/onest\.css\?v=2/);
  assert.match(deploy,/cp -R fonts migration-public\/fonts/);
 });
 
-test('Achievements and the squad brand keep their previous typography',()=>{
- assert.match(css,/\.ach-page,\.ach-page button/);
- assert.match(css,/\.logo i,\.ref-brand/);
+test('Achievements use Onest while the squad logo keeps original typography',()=>{
+ assert.match(css,/\.ach-page,\.ach-page \*/);
+ assert.match(css,/\.logo i,\.logo>div/);
  assert.match(css,/body,button,input,textarea,select/);
 });
