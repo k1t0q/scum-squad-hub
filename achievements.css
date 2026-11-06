@@ -16,3 +16,7 @@ html,body,body *{scrollbar-color:var(--hub-scroll-thumb) var(--hub-scroll-track)
 .ach-member-name>b{font-size:14px;color:#e7ecea}
 .ach-member-name>b small{color:#8fbc9c;font-size:9px;font-weight:400}
 .ach-top-row>.ach-place{margin-right:5px}
+
+.ach-points-list{list-style:none;margin:13px 0 0;padding:0;max-width:490px;display:grid;gap:0}
+.ach-points-list li{display:flex;justify-content:space-between;align-items:baseline;gap:18px;padding:7px 0;border-bottom:1px solid #ffffff08}
+.ach-points-list b{flex-shrink:0;color:#d9bb73;font-size:12px}
